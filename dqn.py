@@ -42,6 +42,65 @@ class DuelingDQN(nn.Module):
         
         return Q
     
+class CNNDQN(nn.Module):
+    # Based on https://github.com/yenchenlin/DeepLearningFlappyBird/blob/master/deep_q_network.py
+    def __init__(self, in_channels, action_dim, hidden_dim=512):
+        super(CNNDQN, self).__init__()
+        self.conv1 = nn.Conv2d(in_channels, 32, kernel_size=8, stride=4, padding=2)
+        self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=4, stride=2, padding=1)
+        #self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2, ceil_mode=True)
+        self.conv3 = nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1)
+        #self.pool3 = nn.MaxPool2d(kernel_size=2, stride=2, ceil_mode=True)
+        #If i ever uncomment i need to change the input layers
+        self.fc1   = nn.Linear(1600, hidden_dim)
+        self.output = nn.Linear(hidden_dim, action_dim)
+
+    def forward(self, x):
+        x = F.relu(self.conv1(x))
+        x = self.pool1(x)
+        x = F.relu(self.conv2(x))
+        #x = self.pool2(x)
+        x = F.relu(self.conv3(x))
+        #x = self.pool3(x)
+        x = x.view(x.size(0), -1)
+        x = F.relu(self.fc1(x))
+        return self.output(x)
+
+
+NETWORK_REGISTRY = {
+    "dqn":         DQN,
+    "dueling_dqn": DuelingDQN,
+    "cnn_dqn":     CNNDQN,
+}
+
+
+def optimize(batch, policy_dqn, target_dqn, optimizer, loss_fn, discount_factor_g, enable_double_dqn, device):
+    states, actions, new_states, rewards, terminations = zip(*batch)
+
+    states = torch.stack(states)
+    actions = torch.stack(actions)
+    new_states = torch.stack(new_states)
+    rewards = torch.stack(rewards)
+    terminations = torch.tensor(terminations, dtype=torch.bool).to(device)
+
+    with torch.no_grad():
+        if enable_double_dqn:
+            best_actions = policy_dqn(new_states).max(dim=1)[1]
+            target_q = rewards + (1 - terminations.float()) * discount_factor_g * \
+                target_dqn(new_states).gather(1, best_actions.unsqueeze(1)).squeeze(1)
+        else:
+            target_q = rewards + (1 - terminations.float()) * discount_factor_g * \
+                target_dqn(new_states).max(dim=1)[0]
+
+    current_q = policy_dqn(states).gather(1, actions.unsqueeze(1)).squeeze(1)
+
+    loss = loss_fn(current_q, target_q)
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+
+
 if __name__ == "__main__":
     state_dim = 12
     action_dim = 2

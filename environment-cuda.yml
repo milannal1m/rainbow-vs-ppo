@@ -1,0 +1,20 @@
+name: dqn-flappy-bird-cuda
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - numpy
+  - matplotlib
+  - pyyaml
+  - pytorch
+  - torchvision
+  - pytorch-cuda=12.4
+  - gymnasium>=1.0
+  - opencv
+  - pip
+  - pip:
+    - flappy-bird-gymnasium
+    - flappy-bird-env

@@ -5,13 +5,22 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import torch
 import gymnasium as gym
-from gymnasium.wrappers import (
-    GrayscaleObservation,
-    ResizeObservation,
-    FrameStackObservation,
-    TransformObservation,
-    RecordVideo,
-)
+try:
+    from gymnasium.wrappers import (  # gymnasium >= 1.0
+        GrayscaleObservation,
+        ResizeObservation,
+        FrameStackObservation,
+        TransformObservation,
+        RecordVideo,
+    )
+except ImportError:
+    from gymnasium.wrappers import (  # gymnasium 0.29.x
+        GrayScaleObservation as GrayscaleObservation,
+        ResizeObservation,
+        FrameStack as FrameStackObservation,
+        TransformObservation,
+        RecordVideo,
+    )
 from gymnasium.spaces import Box
 
 

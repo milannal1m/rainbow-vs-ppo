@@ -30,23 +30,24 @@ class Agent:
         hyperparams = all_hyperparam_sets[hyperparams_set]
 
         self.hyperparams_set = hyperparams_set
-        self.env_id             = hyperparams["env_id"]
-        self.replay_memory_size = hyperparams["replay_memory_size"]
-        self.batch_size         = hyperparams["batch_size"]
-        self.epsilon_init       = hyperparams["epsilon_init"]
-        self.epsilon_decay      = hyperparams["epsilon_decay"]
-        self.epsilon_min        = hyperparams["epsilon_min"]
-        self.network_sync_rate  = hyperparams["network_sync_rate"]
-        self.learning_rate_a    = hyperparams["learning_rate_a"]
-        self.discount_factor_g  = hyperparams["discount_factor_g"]
-        self.stop_on_reward     = hyperparams["stop_on_reward"]
-        self.hidden_dim          = hyperparams["hidden_dim"]
-        self.enable_double_dqn  = hyperparams.get("enable_double_dqn", False)
-        self.network_type       = hyperparams.get("network_type", "dqn")
-        self.env_make_params    = hyperparams.get("env_make_params", {})
-        self.frame_stack        = hyperparams.get("frame_stack", None)
-        self.obs_size           = hyperparams.get("obs_size", 80)
-        self.env_package        = hyperparams.get("env_package", "flappy_bird_gymnasium")
+        self.env_id                 = hyperparams["env_id"]
+        self.replay_memory_size     = hyperparams["replay_memory_size"]
+        self.batch_size             = hyperparams["batch_size"]
+        self.start_learning_after   = hyperparams.get("start_learning_after", 0)
+        self.epsilon_init           = hyperparams["epsilon_init"]
+        self.epsilon_decay          = hyperparams["epsilon_decay"]
+        self.epsilon_min            = hyperparams["epsilon_min"]
+        self.network_sync_rate      = hyperparams["network_sync_rate"]
+        self.learning_rate_a        = hyperparams["learning_rate_a"]
+        self.discount_factor_g      = hyperparams["discount_factor_g"]
+        self.stop_on_reward         = hyperparams["stop_on_reward"]
+        self.hidden_dim             = hyperparams["hidden_dim"]
+        self.enable_double_dqn      = hyperparams.get("enable_double_dqn", False)
+        self.network_type           = hyperparams.get("network_type", "dqn")
+        self.env_make_params        = hyperparams.get("env_make_params", {})
+        self.frame_stack            = hyperparams.get("frame_stack", None)
+        self.obs_size               = hyperparams.get("obs_size", 80)
+        self.env_package            = hyperparams.get("env_package", "flappy_bird_gymnasium")
 
         importlib.import_module(self.env_package)
         if self.env_package == "flappy_bird_env":
@@ -132,7 +133,7 @@ class Agent:
                     step_count += 1
                     state = new_state
 
-                    if len(memory) > self.batch_size:
+                    if len(memory) > self.batch_size and step_count > self.start_learning_after:
                         mini_batch = memory.sample(self.batch_size)
                         optimize(mini_batch, policy_dqn, target_dqn, optimizer, self.loss_fn,
                                  self.discount_factor_g, self.enable_double_dqn, device)

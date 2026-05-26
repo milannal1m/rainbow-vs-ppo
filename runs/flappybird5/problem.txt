@@ -1,0 +1,1 @@
+Problem here was, that the weights werent saved after the 20 mins video. If I want the weights i have to rerun

@@ -1,0 +1,17 @@
+name: flappybird-nocnn
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - numpy
+  - matplotlib
+  - pyyaml
+  - pytorch
+  - torchvision
+  - cpuonly               # remove this line and add cudatoolkit if you want GPU support
+  - gymnasium
+  - pip
+  - pip:
+    - flappy-bird-gymnasium

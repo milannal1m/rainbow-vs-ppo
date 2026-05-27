@@ -6,6 +6,7 @@ import argparse
 import itertools
 import importlib
 import os
+import numpy as np
 
 from datetime import datetime, timedelta
 
@@ -94,6 +95,10 @@ class Agent:
         epsilon = self.epsilon_init
 
         rewards_per_episode = []
+        pipes_per_episode   = []
+        lengths_per_episode = []
+        loss_per_step       = []
+        q_per_step          = []
         epsilon_history     = []
         step_count          = 0
         best_reward         = float("-inf")
@@ -116,6 +121,8 @@ class Agent:
                 terminated     = False
                 truncated      = False
                 episode_reward = 0.0
+                episode_pipes  = 0
+                episode_length = 0
 
                 while not (terminated or truncated) and episode_reward < self.stop_on_reward:
                     if random.random() < epsilon:
@@ -126,6 +133,9 @@ class Agent:
 
                     new_state, reward, terminated, truncated, _ = env.step(action)
                     episode_reward += reward
+                    episode_length += 1
+                    if reward >= 1.0:
+                        episode_pipes += 1
 
                     new_state     = torch.tensor(new_state, dtype=torch.float32).to(device)
                     reward_tensor = torch.tensor(reward, dtype=torch.float32).to(device)
@@ -137,8 +147,10 @@ class Agent:
 
                     if len(memory) > self.batch_size and step_count > self.start_learning_after:
                         mini_batch = memory.sample(self.batch_size)
-                        optimize(mini_batch, policy_dqn, target_dqn, optimizer, self.loss_fn,
-                                 self.discount_factor_g, self.enable_double_dqn, device)
+                        loss, mean_q = optimize(mini_batch, policy_dqn, target_dqn, optimizer, self.loss_fn,
+                                                self.discount_factor_g, self.enable_double_dqn, device)
+                        loss_per_step.append(loss)
+                        q_per_step.append(mean_q)
 
                         epsilon = max(epsilon * self.epsilon_decay, self.epsilon_min)
                         epsilon_history.append(epsilon)
@@ -148,6 +160,8 @@ class Agent:
                             step_count = 0
 
                 rewards_per_episode.append(episode_reward)
+                pipes_per_episode.append(episode_pipes)
+                lengths_per_episode.append(episode_length)
 
                 if episode_reward > best_reward:
                     best_reward = episode_reward
@@ -171,10 +185,69 @@ class Agent:
                         log(f"{datetime.now().strftime(DATE_FORMAT)} Episode {episode}: New best greedy reward {best_greedy_reward:.2f}, model saved.", self.LOG_FILE)
 
                 if datetime.now() - last_graph_update_time > timedelta(seconds=GRAPH_UPDATE_SECONDS):
-                    save_graph(rewards_per_episode, epsilon_history, self.GRAPH_FILE)
+                    save_graph(rewards_per_episode, pipes_per_episode, lengths_per_episode,
+                               loss_per_step, q_per_step, epsilon_history, self.GRAPH_FILE)
                     last_graph_update_time = datetime.now()
         finally:
             env.close()
+
+    def evaluate(self, num_episodes=100):
+        env = self._make_env()
+
+        num_actions = env.action_space.n
+        num_states  = env.observation_space.shape[0]
+
+        policy_dqn = self._build_model(num_states, num_actions)
+        policy_dqn.load_state_dict(torch.load(self.MODEL_FILE, map_location=device))
+        policy_dqn.eval()
+
+        all_rewards, all_pipes, all_lengths, all_q = [], [], [], []
+
+        try:
+            for episode in range(num_episodes):
+                state, _ = env.reset(seed=episode + 1)
+                state = torch.tensor(state, dtype=torch.float32).to(device)
+
+                terminated     = False
+                truncated      = False
+                episode_reward = 0.0
+                episode_pipes  = 0
+                episode_length = 0
+                episode_q      = []
+
+                while not (terminated or truncated) and episode_reward < self.stop_on_reward:
+                    with torch.no_grad():
+                        q_vals = policy_dqn(state.unsqueeze(0)).squeeze()
+                        episode_q.append(q_vals.max().item())
+                        action = q_vals.argmax().item()
+
+                    new_state, reward, terminated, truncated, _ = env.step(action)
+                    episode_reward += reward
+                    episode_length += 1
+                    if reward >= 1.0:
+                        episode_pipes += 1
+                    state = torch.tensor(new_state, dtype=torch.float32).to(device)
+
+                all_rewards.append(episode_reward)
+                all_pipes.append(episode_pipes)
+                all_lengths.append(episode_length)
+                all_q.append(np.mean(episode_q) if episode_q else 0.0)
+        finally:
+            env.close()
+
+        eval_log = os.path.join(self.RUN_DIR, "evaluation.log")
+        lengths_s = [l / 30 for l in all_lengths]
+        lines = [
+            f"Evaluation over {num_episodes} greedy episodes",
+            f"Reward:               mean={np.mean(all_rewards):.2f}  std={np.std(all_rewards):.2f}",
+            f"Pipes passed:         mean={np.mean(all_pipes):.2f}  std={np.std(all_pipes):.2f}",
+            f"Episode length (s):   mean={np.mean(lengths_s):.2f}  std={np.std(lengths_s):.2f}",
+            f"Q-value mag:          mean={np.mean(all_q):.4f}  std={np.std(all_q):.4f}",
+        ]
+        with open(eval_log, "w") as f:
+            f.write("\n".join(lines) + "\n")
+        for line in lines:
+            print(line)
 
     def test(self, render=True):
         env = self._make_env(render_mode='human' if render else None)
@@ -212,11 +285,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Train or test model.')
     parser.add_argument('hyperparameters', help='')
     parser.add_argument('--train', help='Training mode', action='store_true')
+    parser.add_argument('--evaluate', help='Evaluate saved model over 100 greedy episodes', action='store_true')
     args = parser.parse_args()
 
     dql = Agent(hyperparams_set=args.hyperparameters)
 
     if args.train:
         dql.train()
+    elif args.evaluate:
+        dql.evaluate()
     else:
         dql.test()

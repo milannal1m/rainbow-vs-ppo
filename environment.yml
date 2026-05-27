@@ -16,3 +16,4 @@ dependencies:
   - pip
   - pip:
     - flappy-bird-gymnasium
+    - moviepy

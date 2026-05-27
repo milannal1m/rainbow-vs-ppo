@@ -93,12 +93,15 @@ def optimize(batch, policy_dqn, target_dqn, optimizer, loss_fn, discount_factor_
             target_q = rewards + (1 - terminations.float()) * discount_factor_g * \
                 target_dqn(new_states).max(dim=1)[0]
 
-    current_q = policy_dqn(states).gather(1, actions.unsqueeze(1)).squeeze(1)
+    q_all = policy_dqn(states)
+    current_q = q_all.gather(1, actions.unsqueeze(1)).squeeze(1)
+    mean_max_q = q_all.max(dim=1)[0].mean().item()
 
     loss = loss_fn(current_q, target_q)
     optimizer.zero_grad()
     loss.backward()
     optimizer.step()
+    return loss.item(), mean_max_q
 
 
 if __name__ == "__main__":

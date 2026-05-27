@@ -5,52 +5,27 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import torch
 import gymnasium as gym
-try:
-    from gymnasium.wrappers import (  # gymnasium >= 1.0
-        GrayscaleObservation,
-        ResizeObservation,
-        FrameStackObservation,
-        TransformObservation,
-        RecordVideo,
-    )
-except ImportError:
-    from gymnasium.wrappers import (  # gymnasium 0.29.x
-        GrayScaleObservation as GrayscaleObservation,
-        ResizeObservation,
-        FrameStack as FrameStackObservation,
-        TransformObservation,
-        RecordVideo,
-    )
+from gymnasium.wrappers import (
+    GrayscaleObservation,
+    ResizeObservation,
+    FrameStackObservation,
+    TransformObservation,
+    RecordVideo,
+)
 from gymnasium.spaces import Box
 
 
-def _patch_flappy_bird_env():
-    # Applies the fixes from https://github.com/robertoschiavone/flappy-bird-env/pull/3:
-    # render() returned early on first surface init without drawing, and step() never
-    # called render() in rgb_array mode.
-    try:
-        import pygame
-        from flappy_bird_env.flappy_bird_env import FlappyBirdEnv
+class RGBObservationWrapper(gym.ObservationWrapper):
+    def __init__(self, env):
+        super().__init__(env)
+        self.env.reset()
+        frame = self.env.render()
+        h, w, c = frame.shape
+        self.observation_space = Box(0, 255, shape=(h, w, c), dtype=np.uint8)
 
-        _orig_render = FlappyBirdEnv.render
-        _orig_step   = FlappyBirdEnv.step
+    def observation(self, _):
+        return self.env.render()
 
-        def _fixed_render(self):
-            if self._surface is None and self.render_mode == "rgb_array":
-                pygame.init()
-                self._surface = pygame.Surface(self._shape)
-            return _orig_render(self)
-
-        def _fixed_step(self, action):
-            _, reward, terminated, truncated, info = _orig_step(self, action)
-            if self.render_mode == "rgb_array":
-                self.render()
-            return self.observation, reward, terminated, truncated, info
-
-        FlappyBirdEnv.render = _fixed_render
-        FlappyBirdEnv.step   = _fixed_step
-    except ImportError:
-        pass
 
 def preprocess_env(env, obs_size, frame_stack):
     env = ResizeObservation(env, shape=(obs_size, obs_size))
@@ -64,11 +39,14 @@ def preprocess_env(env, obs_size, frame_stack):
     return env
 
 
-def save_preprocessed_sanity_check(env_id, env_make_params, obs_size, frame_stack, run_dir, steps=10):
+def save_preprocessed_sanity_check(env_id, env_make_params, obs_size, frame_stack, run_dir,
+                                    rgb_wrapper=False, steps=10):
     sample_dir = os.path.join(run_dir, "sanity_check")
     os.makedirs(sample_dir, exist_ok=True)
 
     env = gym.make(env_id, render_mode="rgb_array", **env_make_params)
+    if rgb_wrapper:
+        env = RGBObservationWrapper(env)
     env = preprocess_env(env, obs_size, frame_stack)
     state, _ = env.reset(seed=0)
 
@@ -134,8 +112,10 @@ def _rename_latest_video(video_dir, new_filename):
 
 
 def record_episode(policy_dqn, env_id, env_make_params, video_dir, name_prefix,
-                   stop_on_reward, seed, device, obs_size=None, frame_stack=None):
+                   stop_on_reward, seed, device, obs_size=None, frame_stack=None, rgb_wrapper=False):
     env = gym.make(env_id, render_mode="rgb_array", **env_make_params)
+    if rgb_wrapper:
+        env = RGBObservationWrapper(env)
     if frame_stack:
         env = preprocess_env(env, obs_size, frame_stack)
     env = RecordVideo(

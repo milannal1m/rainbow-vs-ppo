@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 
 from experience_replay import ReplayMemory
 from dqn import NETWORK_REGISTRY, optimize
-from utils import log, save_graph, record_episode, preprocess_env, save_preprocessed_sanity_check, _patch_flappy_bird_env
+from utils import log, save_graph, record_episode, preprocess_env, save_preprocessed_sanity_check, RGBObservationWrapper
 from config import DATE_FORMAT, RUNS_DIR, CHECKPOINT_EVERY, REPLAY_MEMORY_SEED, GRAPH_UPDATE_SECONDS, HEADLESS
 
 os.makedirs(RUNS_DIR, exist_ok=True)
@@ -48,10 +48,9 @@ class Agent:
         self.frame_stack            = hyperparams.get("frame_stack", None)
         self.obs_size               = hyperparams.get("obs_size", 80)
         self.env_package            = hyperparams.get("env_package", "flappy_bird_gymnasium")
+        self.rgb_wrapper            = hyperparams.get("rgb_wrapper", False)
 
         importlib.import_module(self.env_package)
-        if self.env_package == "flappy_bird_env":
-            _patch_flappy_bird_env()
 
         self.loss_fn = torch.nn.MSELoss()
 
@@ -69,6 +68,8 @@ class Agent:
         if render_mode is None and self.frame_stack:
             render_mode = "rgb_array"
         env = gym.make(self.env_id, render_mode=render_mode, **self.env_make_params)
+        if self.rgb_wrapper:
+            env = RGBObservationWrapper(env)
         if self.frame_stack:
             env = preprocess_env(env, self.obs_size, self.frame_stack)
         return env
@@ -104,7 +105,8 @@ class Agent:
 
         if self.frame_stack:
             save_preprocessed_sanity_check(self.env_id, self.env_make_params,
-                                           self.obs_size, self.frame_stack, self.RUN_DIR)
+                                           self.obs_size, self.frame_stack, self.RUN_DIR,
+                                           rgb_wrapper=self.rgb_wrapper)
 
         try:
             for episode in itertools.count():
@@ -154,13 +156,15 @@ class Agent:
                     record_episode(policy_dqn, self.env_id, self.env_make_params,
                                    self.BEST_VIDEO_DIR, f"best_ep{episode}",
                                    self.stop_on_reward, seed=episode + 1, device=device,
-                                   obs_size=self.obs_size, frame_stack=self.frame_stack)
+                                   obs_size=self.obs_size, frame_stack=self.frame_stack,
+                                   rgb_wrapper=self.rgb_wrapper)
 
                 if episode % CHECKPOINT_EVERY == 0:
                     greedy_reward = record_episode(policy_dqn, self.env_id, self.env_make_params,
                                                    self.CHECKPOINT_VIDEO_DIR, f"checkpoint_ep{episode}",
                                                    self.stop_on_reward, seed=episode + 1, device=device,
-                                                   obs_size=self.obs_size, frame_stack=self.frame_stack)
+                                                   obs_size=self.obs_size, frame_stack=self.frame_stack,
+                                                   rgb_wrapper=self.rgb_wrapper)
                     if greedy_reward > best_greedy_reward:
                         best_greedy_reward = greedy_reward
                         torch.save(policy_dqn.state_dict(), self.MODEL_FILE)

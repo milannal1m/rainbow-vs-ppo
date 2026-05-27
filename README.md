@@ -72,17 +72,3 @@ All available configs are defined in `hyperparams.yml`.
 Training outputs (logs, model checkpoints, graphs, videos) are saved under `runs/<config_name>/`.
 
 ---
-
-## Challenges
-
-### Same environment ID conflict
-
-Both `flappy-bird-gymnasium` and `flappy-bird-env` register their environment as `FlappyBird-v0` in Gymnasium. Having both installed causes one to silently override the other, making it impossible to use both in the same Python process.
-
-The fix: use `importlib.import_module()` to import only the intended package at runtime, driven by an `env_package` key in each hyperparameter config. This way only one package registers `FlappyBird-v0` per run.
-
-### Rendering bug in `flappy-bird-env`
-
-[`flappy-bird-env`](https://github.com/robertoschiavone/flappy-bird-env) has a bug in `rgb_array` mode ([issue #1](https://github.com/robertoschiavone/flappy-bird-env/issues/1), [PR #3](https://github.com/robertoschiavone/flappy-bird-env/pull/3)): `render()` returns early on the first call without drawing anything, and `step()` never calls `render()` in `rgb_array` mode. This causes the agent to observe an empty black frame every step.
-
-Since PR #3 is not yet merged, the fix is applied via monkey-patching at runtime in `utils.py`: the broken `render()` and `step()` methods are replaced with corrected versions that draw the frame before returning the observation.

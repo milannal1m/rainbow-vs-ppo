@@ -15,5 +15,4 @@ dependencies:
   - opencv
   - pip
   - pip:
-    - flappy-bird-gymnasium   # vector observation envs (FlappyBird1-8, tutorial, cartpole)
-    - flappy-bird-env         # pixel observation env (flappybird_cnn*) — conflicts with above, use separate env if needed
+    - flappy-bird-gymnasium

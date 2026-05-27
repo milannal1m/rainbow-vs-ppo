@@ -166,9 +166,6 @@ flappybird8:
   enable_double_dqn: True
   network_type: "dueling_dqn"
 
-# Requires flappy-bird-env (pip install flappy-bird-env).
-# NOTE: flappy-bird-env and flappy-bird-gymnasium both register as "FlappyBird-v0".
-# Set env_package: "flappy_bird_env" to use flappy-bird-env instead of flappy-bird-gymnasium.
 flappybird_cnn1:
   env_id: FlappyBird-v0
   replay_memory_size: 50000
@@ -185,4 +182,4 @@ flappybird_cnn1:
   network_type: "cnn_dqn"
   frame_stack: 4
   obs_size: 80
-  env_package: "flappy_bird_env"
+  rgb_wrapper: true

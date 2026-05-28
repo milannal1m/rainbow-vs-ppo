@@ -107,6 +107,7 @@ class Agent:
         start_time = datetime.now()
         last_graph_update_time = start_time
         log(f"{start_time.strftime(DATE_FORMAT)}: Training starting...", self.LOG_FILE, mode='w')
+        log(f"Device: {device}", self.LOG_FILE)
 
         if self.frame_stack:
             save_preprocessed_sanity_check(self.env_id, self.env_make_params,

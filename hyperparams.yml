@@ -168,8 +168,8 @@ flappybird8:
 
 flappybird_cnn1:
   env_id: FlappyBird-v0
-  replay_memory_size: 50000
-  batch_size: 32
+  replay_memory_size: 200000
+  batch_size: 512
   epsilon_init: 1.0
   epsilon_decay: 0.999995
   epsilon_min: 0.05
@@ -183,3 +183,27 @@ flappybird_cnn1:
   frame_stack: 4
   obs_size: 80
   rgb_wrapper: true
+  env_make_params:
+    use_lidar: False
+    background: null
+
+flappybird_cnn2:
+  env_id: FlappyBird-v0
+  replay_memory_size: 200000
+  batch_size: 512
+  epsilon_init: 1.0
+  epsilon_decay: 0.999995
+  epsilon_min: 0.02
+  network_sync_rate: 500
+  learning_rate_a: 0.0001
+  discount_factor_g: 0.99
+  stop_on_reward: 100000
+  hidden_dim: 512
+  enable_double_dqn: True
+  network_type: "cnn_dqn"
+  frame_stack: 4
+  obs_size: 80
+  rgb_wrapper: true
+  env_make_params:
+    use_lidar: False
+    background: null

@@ -8,8 +8,8 @@
 #SBATCH --output=logs/%x_%j.out
 #SBATCH --error=logs/%x_%j.err
 
-# Usage: sbatch slurm.sh [hyperparams_set]
-# Example: sbatch slurm.sh flappybird_cnn1
+# Usage: sbatch train.sh [hyperparams_set]
+# Example: sbatch train.sh flappybird_cnn1
 HYPERPARAMS=${1:-flappybird_cnn1}
 
 mkdir -p logs

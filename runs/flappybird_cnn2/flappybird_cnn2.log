@@ -1,0 +1,39 @@
+2026-05-28_11-19-11: Training starting...
+Device: cuda
+2026-05-28_11-19-12 Episode 0: New best reward -2.70, model saved.
+2026-05-28_11-19-20 Episode 0: New best greedy reward -9.30, model saved.
+2026-05-28_11-26-46 Episode 719: New best reward -1.50, model saved.
+2026-05-28_11-29-22 Episode 954: New best reward 0.90, model saved.
+2026-05-28_11-32-18 Episode 1208: New best reward 3.90, model saved.
+2026-05-28_12-11-26 Episode 4013: New best reward 4.70, model saved.
+2026-05-28_12-14-41 Episode 4205: New best reward 4.80, model saved.
+2026-05-28_12-16-45 Episode 4323: New best reward 5.00, model saved.
+2026-05-28_12-32-09 Episode 5199: New best reward 6.00, model saved.
+2026-05-28_12-33-37 Episode 5278: New best reward 6.30, model saved.
+2026-05-28_12-42-05 Episode 5735: New best reward 6.60, model saved.
+2026-05-28_12-47-20 Episode 6008: New best reward 6.70, model saved.
+2026-05-28_12-50-34 Episode 6176: New best reward 8.40, model saved.
+2026-05-28_13-03-13 Episode 6796: New best reward 9.00, model saved.
+2026-05-28_13-09-39 Episode 7097: New best reward 9.20, model saved.
+2026-05-28_13-13-40 Episode 7289: New best reward 12.90, model saved.
+2026-05-28_13-16-26 Episode 7412: New best reward 14.00, model saved.
+2026-05-28_13-26-29 Episode 7877: New best reward 15.00, model saved.
+2026-05-28_13-30-02 Episode 8032: New best reward 17.90, model saved.
+2026-05-28_13-53-27 Episode 8989: New best reward 20.10, model saved.
+2026-05-28_14-02-03 Episode 9312: New best reward 23.00, model saved.
+2026-05-28_14-09-00 Episode 9549: New best reward 23.40, model saved.
+2026-05-28_14-14-34 Episode 9725: New best reward 27.40, model saved.
+2026-05-28_14-17-14 Episode 9801: New best reward 33.10, model saved.
+2026-05-28_14-24-10 Episode 10000: New best greedy reward 197.30, model saved.
+2026-05-28_14-30-24 Episode 10185: New best reward 43.20, model saved.
+2026-05-28_15-04-46 Episode 10982: New best reward 45.90, model saved.
+2026-05-28_15-06-58 Episode 11010: New best reward 50.40, model saved.
+2026-05-28_15-09-59 Episode 11012: New best reward 59.90, model saved.
+2026-05-28_15-34-40 Episode 11427: New best reward 66.70, model saved.
+2026-05-28_15-46-43 Episode 11599: New best reward 78.40, model saved.
+2026-05-28_16-08-26 Episode 11870: New best reward 92.40, model saved.
+2026-05-28_16-12-56 Episode 11907: New best reward 97.30, model saved.
+2026-05-28_16-20-06 Episode 11989: New best reward 110.90, model saved.
+2026-05-28_16-35-07 Episode 12123: New best reward 154.00, model saved.
+2026-05-28_17-49-02 Episode 12798: New best reward 177.60, model saved.
+2026-05-29_10-36-46 Episode 20000: New best greedy reward 216.80, model saved.

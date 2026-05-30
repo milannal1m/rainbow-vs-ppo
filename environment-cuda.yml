@@ -18,3 +18,4 @@ dependencies:
   - pip:
     - flappy-bird-gymnasium
     - moviepy
+    - grad-cam

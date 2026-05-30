@@ -50,6 +50,7 @@ class Agent:
         self.obs_size               = hyperparams.get("obs_size", 80)
         self.env_package            = hyperparams.get("env_package", "flappy_bird_gymnasium")
         self.rgb_wrapper            = hyperparams.get("rgb_wrapper", False)
+        self.lr_decay_patience      = hyperparams.get("lr_decay_patience", None)
 
         importlib.import_module(self.env_package)
 
@@ -60,8 +61,6 @@ class Agent:
         self.LOG_FILE   = os.path.join(self.RUN_DIR, f"{self.hyperparams_set}.log")
         self.MODEL_FILE = os.path.join(self.RUN_DIR, f"{self.hyperparams_set}.pt")
         self.GRAPH_FILE = os.path.join(self.RUN_DIR, f"{self.hyperparams_set}.png")
-        self.BEST_VIDEO_DIR       = os.path.join(self.RUN_DIR, "best_videos")
-        os.makedirs(self.BEST_VIDEO_DIR, exist_ok=True)
         self.CHECKPOINT_VIDEO_DIR = os.path.join(self.RUN_DIR, "checkpoint_videos")
         os.makedirs(self.CHECKPOINT_VIDEO_DIR, exist_ok=True)
 
@@ -90,6 +89,9 @@ class Agent:
         target_dqn.load_state_dict(policy_dqn.state_dict())
 
         optimizer = torch.optim.Adam(policy_dqn.parameters(), lr=self.learning_rate_a)
+        lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+            optimizer, mode='max', factor=0.5, patience=self.lr_decay_patience, min_lr=1e-6
+        ) if self.lr_decay_patience else None
 
         memory  = ReplayMemory(capacity=self.replay_memory_size, seed=REPLAY_MEMORY_SEED)
         epsilon = self.epsilon_init
@@ -164,15 +166,12 @@ class Agent:
                 pipes_per_episode.append(episode_pipes)
                 lengths_per_episode.append(episode_length)
 
+                if lr_scheduler:
+                    lr_scheduler.step(np.mean(rewards_per_episode[-100:]))
+
                 if episode_reward > best_reward:
                     best_reward = episode_reward
-                    torch.save(policy_dqn.state_dict(), self.MODEL_FILE)
-                    log(f"{datetime.now().strftime(DATE_FORMAT)} Episode {episode}: New best reward {best_reward:.2f}, model saved.", self.LOG_FILE)
-                    record_episode(policy_dqn, self.env_id, self.env_make_params,
-                                   self.BEST_VIDEO_DIR, f"best_ep{episode}",
-                                   self.stop_on_reward, seed=episode + 1, device=device,
-                                   obs_size=self.obs_size, frame_stack=self.frame_stack,
-                                   rgb_wrapper=self.rgb_wrapper)
+                    log(f"{datetime.now().strftime(DATE_FORMAT)} Episode {episode}: New best reward {best_reward:.2f}.", self.LOG_FILE)
 
                 if episode % CHECKPOINT_EVERY == 0:
                     greedy_reward = record_episode(policy_dqn, self.env_id, self.env_make_params,
@@ -192,7 +191,86 @@ class Agent:
         finally:
             env.close()
 
+    def explain(self, num_frames=10):
+        from pytorch_grad_cam import GradCAM
+        from pytorch_grad_cam.utils.image import show_cam_on_image
+        from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
+        import matplotlib.pyplot as plt
+
+        env = self._make_env()
+        num_actions = env.action_space.n
+        num_states  = env.observation_space.shape[0]
+
+        policy_dqn = self._build_model(num_states, num_actions)
+        policy_dqn.load_state_dict(torch.load(self.MODEL_FILE, map_location=device))
+        policy_dqn.eval()
+
+        if not hasattr(policy_dqn, 'conv3'):
+            print("explain() only supported for CNN models.")
+            env.close()
+            return
+
+        all_states = []
+        state, _ = env.reset(seed=42)
+        state = torch.tensor(state, dtype=torch.float32).to(device)
+        terminated = False
+        truncated  = False
+        episode_reward = 0.0
+
+        while not (terminated or truncated) and episode_reward < self.stop_on_reward:
+            all_states.append(state.clone())
+            with torch.no_grad():
+                action = policy_dqn(state.unsqueeze(0)).squeeze().argmax().item()
+            new_state, reward, terminated, truncated, _ = env.step(action)
+            episode_reward += reward
+            state = torch.tensor(new_state, dtype=torch.float32).to(device)
+
+        env.close()
+
+        n = min(num_frames, len(all_states))
+        indices = np.linspace(0, len(all_states) - 1, n, dtype=int)
+        sampled = [all_states[i] for i in indices]
+
+        explain_dir = os.path.join(self.RUN_DIR, "grad_cam")
+        os.makedirs(explain_dir, exist_ok=True)
+
+        conv_layers = [("conv1", policy_dqn.conv1), ("conv2", policy_dqn.conv2), ("conv3", policy_dqn.conv3)]
+
+        for layer_name, layer in conv_layers:
+            with GradCAM(model=policy_dqn, target_layers=[layer]) as cam:
+                fig, axes = plt.subplots(n, 5, figsize=(15, n * 3))
+                if n == 1:
+                    axes = axes[np.newaxis, :]
+                fig.suptitle(f"Grad-CAM — {layer_name}")
+
+                for i, s in enumerate(sampled):
+                    inp = s.unsqueeze(0)
+                    with torch.no_grad():
+                        q_vals = policy_dqn(inp).squeeze()
+                    action = q_vals.argmax().item()
+
+                    grayscale_cam = cam(input_tensor=inp, targets=[ClassifierOutputTarget(action)])[0]
+
+                    for f in range(4):
+                        axes[i, f].imshow(s[f].cpu().numpy(), cmap='gray', vmin=0, vmax=1)
+                        axes[i, f].set_title(f"Frame {f + 1}")
+                        axes[i, f].axis('off')
+
+                    frame_rgb = np.stack([s[3].cpu().numpy()] * 3, axis=-1)
+                    cam_img   = show_cam_on_image(frame_rgb, grayscale_cam, use_rgb=True)
+                    label = f"{'flap' if action == 1 else 'no-flap'}  Q={q_vals[action]:.2f}"
+                    axes[i, 4].imshow(cam_img)
+                    axes[i, 4].set_title(label)
+                    axes[i, 4].axis('off')
+
+                fig.tight_layout()
+                fig.savefig(os.path.join(explain_dir, f"grad_cam_{layer_name}.png"), bbox_inches='tight')
+                plt.close(fig)
+                print(f"Grad-CAM saved to {explain_dir}/grad_cam_{layer_name}.png")
+
     def evaluate(self, num_episodes=100):
+        self.explain()
+
         env = self._make_env()
 
         num_actions = env.action_space.n

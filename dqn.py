@@ -100,6 +100,7 @@ def optimize(batch, policy_dqn, target_dqn, optimizer, loss_fn, discount_factor_
     loss = loss_fn(current_q, target_q)
     optimizer.zero_grad()
     loss.backward()
+    torch.nn.utils.clip_grad_norm_(policy_dqn.parameters(), 10)
     optimizer.step()
     return loss.item(), mean_max_q
 

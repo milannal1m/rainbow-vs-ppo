@@ -1,0 +1,21 @@
+Using device: cuda
+Evaluation over 100 greedy episodes
+Reward:               mean=317.13  std=271.90
+Pipes passed:         mean=67.19  std=58.28
+Episode length (s):   mean=85.92  std=73.15
+Q-value mag:          mean=12.7309  std=0.1587
+
+============================= JOB FEEDBACK =============================
+
+NodeName=uc2n909
+Job ID: 4868732
+Cluster: uc3
+User/Group: ul_lmm50/ul_student
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 2
+CPU Utilized: 00:25:45
+CPU Efficiency: 47.54% of 00:54:10 core-walltime
+Job Wall-clock time: 00:27:05
+Memory Utilized: 617.10 MB
+Memory Efficiency: 7.71% of 7.81 GB (7.81 GB/node)

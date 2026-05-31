@@ -51,6 +51,15 @@ class Agent:
         self.env_package            = hyperparams.get("env_package", "flappy_bird_gymnasium")
         self.rgb_wrapper            = hyperparams.get("rgb_wrapper", False)
         self.lr_decay_patience      = hyperparams.get("lr_decay_patience", None)
+        self.seed                   = hyperparams.get("seed", None)
+
+        if self.seed is not None:
+            random.seed(self.seed)
+            np.random.seed(self.seed)
+            torch.manual_seed(self.seed)
+            torch.cuda.manual_seed_all(self.seed)
+            torch.backends.cudnn.deterministic = True
+            torch.backends.cudnn.benchmark = False
 
         importlib.import_module(self.env_package)
 

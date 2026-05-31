@@ -59,7 +59,8 @@ class Agent:
         self.RUN_DIR = os.path.join(RUNS_DIR, self.hyperparams_set)
         os.makedirs(self.RUN_DIR, exist_ok=True)
         self.LOG_FILE   = os.path.join(self.RUN_DIR, f"{self.hyperparams_set}.log")
-        self.MODEL_FILE = os.path.join(self.RUN_DIR, f"{self.hyperparams_set}.pt")
+        self.MODEL_FILE         = os.path.join(self.RUN_DIR, f"{self.hyperparams_set}.pt")
+        self.MODEL_FILE_TRAINING = os.path.join(self.RUN_DIR, f"{self.hyperparams_set}_best_training.pt")
         self.GRAPH_FILE = os.path.join(self.RUN_DIR, f"{self.hyperparams_set}.png")
         self.CHECKPOINT_VIDEO_DIR = os.path.join(self.RUN_DIR, "checkpoint_videos")
         os.makedirs(self.CHECKPOINT_VIDEO_DIR, exist_ok=True)
@@ -171,7 +172,8 @@ class Agent:
 
                 if episode_reward > best_reward:
                     best_reward = episode_reward
-                    log(f"{datetime.now().strftime(DATE_FORMAT)} Episode {episode}: New best reward {best_reward:.2f}.", self.LOG_FILE)
+                    torch.save(policy_dqn.state_dict(), self.MODEL_FILE_TRAINING)
+                    log(f"{datetime.now().strftime(DATE_FORMAT)} Episode {episode}: New best reward {best_reward:.2f}, training model saved.", self.LOG_FILE)
 
                 if episode % CHECKPOINT_EVERY == 0:
                     greedy_reward = record_episode(policy_dqn, self.env_id, self.env_make_params,

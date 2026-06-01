@@ -113,6 +113,7 @@ class Agent:
         q_per_step          = []
         epsilon_history     = []
         step_count          = 0
+        total_steps         = 0
         best_reward         = float("-inf")
         best_greedy_reward  = float("-inf")
 
@@ -156,9 +157,10 @@ class Agent:
 
                     memory.push((state, action_tensor, new_state, reward_tensor, terminated))
                     step_count += 1
+                    total_steps += 1
                     state = new_state
 
-                    if len(memory) > self.batch_size and step_count > self.start_learning_after:
+                    if len(memory) > self.batch_size and total_steps > self.start_learning_after:
                         mini_batch = memory.sample(self.batch_size)
                         loss, mean_q = optimize(mini_batch, policy_dqn, target_dqn, optimizer, self.loss_fn,
                                                 self.discount_factor_g, self.enable_double_dqn, device)

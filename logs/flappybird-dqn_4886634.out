@@ -1,0 +1,15 @@
+
+============================= JOB FEEDBACK =============================
+
+NodeName=uc2n913
+Job ID: 4886634
+Cluster: uc3
+User/Group: ul_lmm50/ul_student
+State: CANCELLED (exit code 0)
+Nodes: 1
+Cores per node: 4
+CPU Utilized: 00:00:07
+CPU Efficiency: 0.14% of 01:25:16 core-walltime
+Job Wall-clock time: 00:21:19
+Memory Utilized: 1.04 GB
+Memory Efficiency: 6.66% of 15.62 GB (15.62 GB/node)

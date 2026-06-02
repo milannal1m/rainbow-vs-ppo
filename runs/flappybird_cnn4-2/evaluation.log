@@ -1,0 +1,5 @@
+Evaluation over 100 greedy episodes
+Reward:               mean=1024.60  std=916.75
+Pipes passed:         mean=218.82  std=196.42
+Episode length (s):   mean=276.26  std=246.66
+Q-value mag:          mean=12.4152  std=0.0203

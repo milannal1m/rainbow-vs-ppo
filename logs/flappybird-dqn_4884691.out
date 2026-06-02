@@ -1,0 +1,36 @@
+Sun May 31 00:34:32 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.71.05              Driver Version: 595.71.05      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A100 80GB PCIe          On  |   00000000:1A:00.0 Off |                    0 |
+| N/A   46C    P0             79W /  300W |   21336MiB /  81920MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           44292      G   /usr/libexec/Xorg                        17MiB |
+|    0   N/A  N/A         2599318      C   python                                21300MiB |
++-----------------------------------------------------------------------------------------+
+
+============================= JOB FEEDBACK =============================
+
+NodeName=uc2n913
+Job ID: 4884691
+Cluster: uc3
+User/Group: ul_lmm50/ul_student
+State: CANCELLED (exit code 0)
+Nodes: 1
+Cores per node: 4
+CPU Utilized: 00:00:06
+CPU Efficiency: 0.00% of 2-16:14:32 core-walltime
+Job Wall-clock time: 16:03:38
+Memory Utilized: 6.82 GB
+Memory Efficiency: 43.64% of 15.62 GB (15.62 GB/node)

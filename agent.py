@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 
 from experience_replay import ReplayMemory
 from dqn import NETWORK_REGISTRY, optimize
-from utils import log, save_graph, record_episode, preprocess_env, save_preprocessed_sanity_check, RGBObservationWrapper
+from utils import log, save_graph, save_eval_chart, record_episode, preprocess_env, save_preprocessed_sanity_check, RGBObservationWrapper
 from config import DATE_FORMAT, RUNS_DIR, CHECKPOINT_EVERY, REPLAY_MEMORY_SEED, GRAPH_UPDATE_SECONDS, HEADLESS
 
 os.makedirs(RUNS_DIR, exist_ok=True)
@@ -75,13 +75,15 @@ class Agent:
         os.makedirs(self.CHECKPOINT_VIDEO_DIR, exist_ok=True)
 
     def _make_env(self, render_mode=None):
-        if render_mode is None and self.frame_stack:
-            render_mode = "rgb_array"
-        env = gym.make(self.env_id, render_mode=render_mode, **self.env_make_params)
+        needs_rgb = self.rgb_wrapper or self.frame_stack
+        env = gym.make(self.env_id, render_mode="rgb_array" if needs_rgb else render_mode, **self.env_make_params)
         if self.rgb_wrapper:
             env = RGBObservationWrapper(env)
         if self.frame_stack:
             env = preprocess_env(env, self.obs_size, self.frame_stack)
+        if needs_rgb and render_mode == "human":
+            from gymnasium.wrappers import HumanRendering
+            env = HumanRendering(env)
         return env
 
     def _build_model(self, num_states, num_actions):
@@ -340,6 +342,9 @@ class Agent:
             f.write("\n".join(lines) + "\n")
         for line in lines:
             print(line)
+
+        eval_chart = os.path.join(self.RUN_DIR, "evaluation.png")
+        save_eval_chart(all_rewards, all_pipes, eval_chart)
 
     def test(self, render=True):
         env = self._make_env(render_mode='human' if render else None)

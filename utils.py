@@ -124,6 +124,34 @@ def save_graph(rewards_per_episode, pipes_per_episode, lengths_per_episode,
     plt.close(fig)
 
 
+def save_eval_chart(all_rewards, all_pipes, chart_file):
+    x = np.arange(len(all_rewards))
+    width = 0.4
+
+    fig, ax1 = plt.subplots(figsize=(15, 5))
+    ax2 = ax1.twinx()
+
+    ax1.bar(x - width / 2, all_rewards, width=width, color="#4C72B0", label="Reward")
+    ax2.bar(x + width / 2, all_pipes,   width=width, color="#55A868", label="Pipes passed")
+
+    ax1.set_xlabel("Episode")
+    ax1.set_ylabel("Reward", color="#4C72B0")
+    ax2.set_ylabel("Pipes passed", color="#55A868")
+    ax1.tick_params(axis='y', labelcolor="#4C72B0")
+    ax2.tick_params(axis='y', labelcolor="#55A868")
+
+    handles = [
+        plt.Rectangle((0, 0), 1, 1, color="#4C72B0"),
+        plt.Rectangle((0, 0), 1, 1, color="#55A868"),
+    ]
+    ax1.legend(handles, ["Reward", "Pipes passed"], loc="upper left")
+
+    fig.suptitle("Evaluation results")
+    fig.tight_layout()
+    fig.savefig(chart_file)
+    plt.close(fig)
+
+
 def _rename_latest_video(video_dir, new_filename):
     try:
         candidates = [

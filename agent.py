@@ -344,7 +344,7 @@ class Agent:
             print(line)
 
         eval_chart = os.path.join(self.RUN_DIR, "evaluation.png")
-        save_eval_chart(all_rewards, all_pipes, eval_chart)
+        save_eval_chart(all_rewards, eval_chart)
 
     def test(self, render=True):
         env = self._make_env(render_mode='human' if render else None)

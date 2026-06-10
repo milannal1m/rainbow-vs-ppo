@@ -17,11 +17,15 @@ from gymnasium.spaces import Box
 
 
 class FlappyBirdResetFix(gym.Wrapper):
-    """flappy-bird-gymnasium never resets _player_idx_gen on reset(), so the bird's
-    wing animation state leaks across episodes. This makes CNN observations
-    non-deterministic for the same seed depending on episode history."""
+    """flappy-bird-gymnasium leaks several state variables across episodes:
+    _player_idx_gen (wing animation cycle), _ground["x"] (scrolling ground
+    position), and _player_flapped. All affect rendered frames, making CNN
+    observations non-deterministic for the same seed depending on history."""
     def reset(self, **kwargs):
-        self.unwrapped._player_idx_gen = cycle([0, 1, 2, 1])
+        u = self.unwrapped
+        u._player_idx_gen = cycle([0, 1, 2, 1])
+        u._ground["x"] = 0
+        u._player_flapped = False
         return super().reset(**kwargs)
 
 
@@ -99,9 +103,6 @@ def save_graph(rewards_per_episode, pipes_per_episode, lengths_per_episode,
                loss_per_step, q_per_step, epsilon_history, graph_file):
     fig, axes = plt.subplots(2, 3, figsize=(15, 8))
     fig.suptitle("Training metrics")
-
-    ep_x = range(len(rewards_per_episode))
-    step_x = range(len(loss_per_step))
 
     axes[0, 0].set_xlabel("Episodes")
     axes[0, 0].set_ylabel("Mean reward (100-ep)")

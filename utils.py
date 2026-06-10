@@ -1,4 +1,5 @@
 import os
+from itertools import cycle
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
@@ -13,6 +14,15 @@ from gymnasium.wrappers import (
     RecordVideo,
 )
 from gymnasium.spaces import Box
+
+
+class FlappyBirdResetFix(gym.Wrapper):
+    """flappy-bird-gymnasium never resets _player_idx_gen on reset(), so the bird's
+    wing animation state leaks across episodes. This makes CNN observations
+    non-deterministic for the same seed depending on episode history."""
+    def reset(self, **kwargs):
+        self.unwrapped._player_idx_gen = cycle([0, 1, 2, 1])
+        return super().reset(**kwargs)
 
 
 class RGBObservationWrapper(gym.ObservationWrapper):
@@ -157,6 +167,7 @@ def _rename_latest_video(video_dir, new_filename):
 def record_episode(policy_dqn, env_id, env_make_params, video_dir, name_prefix,
                    stop_on_reward, seed, device, obs_size=None, frame_stack=None, rgb_wrapper=False):
     env = gym.make(env_id, render_mode="rgb_array", **env_make_params)
+    env = FlappyBirdResetFix(env)
     if rgb_wrapper:
         env = RGBObservationWrapper(env)
     if frame_stack:

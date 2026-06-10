@@ -1,3 +1,5 @@
+import glob
+import shutil
 import gymnasium as gym
 import random
 import torch
@@ -12,7 +14,7 @@ from datetime import datetime, timedelta
 
 from experience_replay import ReplayMemory
 from dqn import NETWORK_REGISTRY, optimize
-from utils import log, save_graph, save_eval_chart, record_episode, preprocess_env, save_preprocessed_sanity_check, RGBObservationWrapper
+from utils import log, save_graph, save_eval_chart, record_episode, preprocess_env, save_preprocessed_sanity_check, RGBObservationWrapper, FlappyBirdResetFix
 from config import DATE_FORMAT, RUNS_DIR, CHECKPOINT_EVERY, REPLAY_MEMORY_SEED, GRAPH_UPDATE_SECONDS, HEADLESS
 
 os.makedirs(RUNS_DIR, exist_ok=True)
@@ -77,6 +79,7 @@ class Agent:
     def _make_env(self, render_mode=None):
         needs_rgb = self.rgb_wrapper or self.frame_stack
         env = gym.make(self.env_id, render_mode="rgb_array" if needs_rgb else render_mode, **self.env_make_params)
+        env = FlappyBirdResetFix(env)
         if self.rgb_wrapper:
             env = RGBObservationWrapper(env)
         if self.frame_stack:
@@ -287,9 +290,12 @@ class Agent:
         self.explain()
 
         eval_dir = os.path.join(self.RUN_DIR, "evaluation")
-        os.makedirs(eval_dir, exist_ok=True)
+        video_tmp = os.path.join(eval_dir, "_tmp")
+        os.makedirs(video_tmp, exist_ok=True)
 
         env = self._make_env()
+        env = gym.wrappers.RecordVideo(env, video_tmp, name_prefix="ep",
+                                       episode_trigger=lambda _: True, disable_logger=True)
 
         num_actions = env.action_space.n
         num_states  = env.observation_space.shape[0]
@@ -299,12 +305,10 @@ class Agent:
         policy_dqn.eval()
 
         all_rewards, all_pipes, all_lengths, all_q = [], [], [], []
-        best_reward, best_seed = float("-inf"), 1
 
         try:
             for episode in range(num_episodes):
-                seed = episode + 1
-                state, _ = env.reset(seed=seed)
+                state, _ = env.reset(seed=episode + 1)
                 state = torch.tensor(state, dtype=torch.float32).to(device)
 
                 terminated     = False
@@ -331,12 +335,18 @@ class Agent:
                 all_pipes.append(episode_pipes)
                 all_lengths.append(episode_length)
                 all_q.append(np.mean(episode_q) if episode_q else 0.0)
-
-                if episode_reward > best_reward:
-                    best_reward = episode_reward
-                    best_seed   = seed
         finally:
             env.close()
+
+        best_idx = int(np.argmax(all_rewards))
+        best_reward = all_rewards[best_idx]
+        videos = sorted(glob.glob(os.path.join(video_tmp, "*.mp4")))
+        for i, path in enumerate(videos):
+            if i == best_idx:
+                os.rename(path, os.path.join(eval_dir, f"evaluation_r{best_reward:.2f}.mp4"))
+            else:
+                os.remove(path)
+        shutil.rmtree(video_tmp, ignore_errors=True)
 
         lengths_s = [l / 30 for l in all_lengths]
         lines = [
@@ -352,10 +362,6 @@ class Agent:
             print(line)
 
         save_eval_chart(all_rewards, os.path.join(eval_dir, "evaluation.png"))
-
-        record_episode(policy_dqn, self.env_id, self.env_make_params, eval_dir, "evaluation",
-                       self.stop_on_reward, best_seed, device,
-                       obs_size=self.obs_size, frame_stack=self.frame_stack, rgb_wrapper=self.rgb_wrapper)
 
     def test(self, render=True):
         env = self._make_env(render_mode='human' if render else None)

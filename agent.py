@@ -286,6 +286,9 @@ class Agent:
     def evaluate(self, num_episodes=100):
         self.explain()
 
+        eval_dir = os.path.join(self.RUN_DIR, "evaluation")
+        os.makedirs(eval_dir, exist_ok=True)
+
         env = self._make_env()
 
         num_actions = env.action_space.n
@@ -296,10 +299,12 @@ class Agent:
         policy_dqn.eval()
 
         all_rewards, all_pipes, all_lengths, all_q = [], [], [], []
+        best_reward, best_seed = float("-inf"), 1
 
         try:
             for episode in range(num_episodes):
-                state, _ = env.reset(seed=episode + 1)
+                seed = episode + 1
+                state, _ = env.reset(seed=seed)
                 state = torch.tensor(state, dtype=torch.float32).to(device)
 
                 terminated     = False
@@ -326,10 +331,13 @@ class Agent:
                 all_pipes.append(episode_pipes)
                 all_lengths.append(episode_length)
                 all_q.append(np.mean(episode_q) if episode_q else 0.0)
+
+                if episode_reward > best_reward:
+                    best_reward = episode_reward
+                    best_seed   = seed
         finally:
             env.close()
 
-        eval_log = os.path.join(self.RUN_DIR, "evaluation.log")
         lengths_s = [l / 30 for l in all_lengths]
         lines = [
             f"Evaluation over {num_episodes} greedy episodes",
@@ -338,13 +346,16 @@ class Agent:
             f"Episode length (s):   mean={np.mean(lengths_s):.2f}  std={np.std(lengths_s):.2f}",
             f"Q-value mag:          mean={np.mean(all_q):.4f}  std={np.std(all_q):.4f}",
         ]
-        with open(eval_log, "w") as f:
+        with open(os.path.join(eval_dir, "evaluation.log"), "w") as f:
             f.write("\n".join(lines) + "\n")
         for line in lines:
             print(line)
 
-        eval_chart = os.path.join(self.RUN_DIR, "evaluation.png")
-        save_eval_chart(all_rewards, eval_chart)
+        save_eval_chart(all_rewards, os.path.join(eval_dir, "evaluation.png"))
+
+        record_episode(policy_dqn, self.env_id, self.env_make_params, eval_dir, "evaluation",
+                       self.stop_on_reward, best_seed, device,
+                       obs_size=self.obs_size, frame_stack=self.frame_stack, rgb_wrapper=self.rgb_wrapper)
 
     def test(self, render=True):
         env = self._make_env(render_mode='human' if render else None)

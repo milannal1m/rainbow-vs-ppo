@@ -229,11 +229,12 @@ class Agent:
                     if reward >= 1.0:
                         episode_pipes += 1
 
-                    new_state     = torch.tensor(new_state, dtype=torch.float32).to(device)
-                    reward_tensor = torch.tensor(reward, dtype=torch.float32).to(device)
-                    action_tensor = torch.tensor(action, dtype=torch.int64, device=device)
+                    new_state_t   = torch.tensor(new_state, dtype=torch.float32).to(device)
+                    reward_tensor = torch.tensor(reward, dtype=torch.float32)
+                    action_tensor = torch.tensor(action, dtype=torch.int64)
 
-                    transition = (state, action_tensor, new_state, reward_tensor, terminated)
+                    # Store on CPU — VRAM overflow with large replay buffers
+                    transition = (state.cpu(), action_tensor, new_state_t.cpu(), reward_tensor, terminated)
                     if nstep_buf is not None:
                         nstep_buf.push(transition)
                     else:
@@ -241,7 +242,7 @@ class Agent:
 
                     step_count  += 1
                     total_steps += 1
-                    state = new_state
+                    state = new_state_t
 
                     if len(memory) > self.batch_size and total_steps > self.start_learning_after:
                         if self.use_per:

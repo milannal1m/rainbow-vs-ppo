@@ -302,7 +302,7 @@ flappybird_cnn5:
 # All six extensions enabled: Double DQN, Dueling, PER, Noisy Nets, n-step, Distributional RL
 flappybird_rainbow:
   env_id: FlappyBird-v0
-  replay_memory_size: 1000000   # paper: 1M
+  replay_memory_size: 100000    # paper uses 1M for Atari; FlappyBird needs far less
   batch_size: 32                # paper: 32
   # epsilon unused — Noisy Nets handle exploration (auto-set to 0 when use_noisy: true)
   epsilon_init: 1.0

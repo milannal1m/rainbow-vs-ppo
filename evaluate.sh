@@ -20,4 +20,4 @@ conda activate dqn-flappy-bird-cuda
 
 export HEADLESS=1
 
-python agent.py "$HYPERPARAMS" --evaluate
+python src/agent.py "$HYPERPARAMS" --evaluate

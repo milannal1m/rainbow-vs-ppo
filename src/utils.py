@@ -63,6 +63,7 @@ def save_preprocessed_sanity_check(env_id, env_make_params, obs_size, frame_stac
     os.makedirs(sample_dir, exist_ok=True)
 
     env = gym.make(env_id, render_mode="rgb_array", **env_make_params)
+    env = FlappyBirdResetFix(env)
     if rgb_wrapper:
         env = RGBObservationWrapper(env)
     env = preprocess_env(env, obs_size, frame_stack)
@@ -93,14 +94,18 @@ def log(message, log_file, mode='a'):
 
 
 def _rolling_avg(data, window=100):
-    result = np.zeros(len(data))
-    for i in range(len(data)):
-        result[i] = np.mean(data[max(0, i - window + 1):i + 1])
-    return result
+    if len(data) == 0:
+        return np.array([])
+    arr = np.asarray(data, dtype=np.float64)
+    cumsum = np.cumsum(np.insert(arr, 0, 0))
+    end = np.arange(1, len(arr) + 1)
+    start = np.maximum(0, end - window)
+    return (cumsum[end] - cumsum[start]) / (end - start)
 
 
 def save_graph(rewards_per_episode, pipes_per_episode, lengths_per_episode,
-               loss_per_step, q_per_step, epsilon_history, graph_file):
+               loss_per_step, q_per_step, epsilon_history, graph_file,
+               exploration_label="Epsilon"):
     fig, axes = plt.subplots(2, 3, figsize=(15, 8))
     fig.suptitle("Training metrics")
 
@@ -127,7 +132,7 @@ def save_graph(rewards_per_episode, pipes_per_episode, lengths_per_episode,
         axes[1, 1].plot(_rolling_avg(q_per_step), color="#8172B2")
 
     axes[1, 2].set_xlabel("Steps")
-    axes[1, 2].set_ylabel("Epsilon")
+    axes[1, 2].set_ylabel(exploration_label)
     axes[1, 2].plot(epsilon_history, color="#937860")
 
     fig.tight_layout()

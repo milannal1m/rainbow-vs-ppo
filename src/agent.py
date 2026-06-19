@@ -10,8 +10,8 @@ import numpy as np
 
 from datetime import datetime, timedelta
 
-from experience_replay import ReplayMemory
-from dqn import NETWORK_REGISTRY, optimize
+from experience_replay import ReplayMemory, PrioritizedReplayMemory, NStepBuffer
+from dqn import NETWORK_REGISTRY, optimize, mean_sigma
 from utils import log, save_graph, save_eval_chart, record_episode, preprocess_env, save_preprocessed_sanity_check, RGBObservationWrapper, FlappyBirdResetFix
 from config import DATE_FORMAT, RUNS_DIR, CHECKPOINT_EVERY, REPLAY_MEMORY_SEED, GRAPH_UPDATE_SECONDS, HEADLESS
 
@@ -53,6 +53,26 @@ class Agent:
         self.lr_decay_patience      = hyperparams.get("lr_decay_patience", None)
         self.seed                   = hyperparams.get("seed", None)
 
+        # Rainbow extension flags
+        self.use_noisy          = hyperparams.get("use_noisy", False)
+        self.use_per            = hyperparams.get("use_per", False)
+        self.use_nstep          = hyperparams.get("use_nstep", False)
+        self.n_step             = hyperparams.get("n_step", 3)
+        self.use_distributional = hyperparams.get("use_distributional", False)
+        self.n_atoms            = hyperparams.get("n_atoms", 51)
+        self.v_min              = hyperparams.get("v_min", -10.0)
+        self.v_max              = hyperparams.get("v_max", 10.0)
+        self.per_alpha          = hyperparams.get("per_alpha", 0.5)
+        self.per_beta_init      = hyperparams.get("per_beta_init", 0.4)
+        self.per_beta_frames    = hyperparams.get("per_beta_frames", 2000000)
+        self.sigma_init         = hyperparams.get("sigma_init", 0.5)
+        self.use_dueling        = hyperparams.get("use_dueling", False)
+
+        # Noisy Nets replace epsilon-greedy exploration
+        if self.use_noisy:
+            self.epsilon_init = 0.0
+            self.epsilon_min  = 0.0
+
         if self.seed is not None:
             random.seed(self.seed)
             np.random.seed(self.seed)
@@ -62,8 +82,6 @@ class Agent:
             torch.backends.cudnn.benchmark = False
 
         importlib.import_module(self.env_package)
-
-        self.loss_fn = torch.nn.MSELoss()
 
         self.RUN_DIR = os.path.join(RUNS_DIR, self.hyperparams_set)
         os.makedirs(self.RUN_DIR, exist_ok=True)
@@ -89,7 +107,52 @@ class Agent:
 
     def _build_model(self, num_states, num_actions):
         cls = NETWORK_REGISTRY[self.network_type]
+        if self.network_type == "rainbow_cnn_dqn":
+            return cls(
+                num_states, num_actions, self.hidden_dim, obs_size=self.obs_size,
+                use_noisy=self.use_noisy, sigma_init=self.sigma_init,
+                use_dueling=self.use_dueling,
+                use_distributional=self.use_distributional,
+                n_atoms=self.n_atoms, v_min=self.v_min, v_max=self.v_max,
+            ).to(device)
+        if self.network_type == "cnn_dqn":
+            return cls(num_states, num_actions, self.hidden_dim, obs_size=self.obs_size).to(device)
         return cls(num_states, num_actions, self.hidden_dim).to(device)
+
+    def _load_policy(self, env):
+        num_actions = env.action_space.n
+        num_states  = env.observation_space.shape[0]
+        policy_dqn  = self._build_model(num_states, num_actions)
+        policy_dqn.load_state_dict(torch.load(self.MODEL_FILE, map_location=device))
+        policy_dqn.eval()
+        return policy_dqn
+
+    def _run_episode_greedy(self, env, policy_dqn, seed, collect_states=False):
+        state, _ = env.reset(seed=seed)
+        state = torch.tensor(state, dtype=torch.float32).to(device)
+        terminated = False
+        truncated  = False
+        episode_reward = 0.0
+        episode_pipes  = 0
+        episode_length = 0
+        episode_q      = []
+        states         = []
+
+        while not (terminated or truncated) and episode_reward < self.stop_on_reward:
+            if collect_states:
+                states.append(state.clone())
+            with torch.no_grad():
+                q_vals = policy_dqn(state.unsqueeze(0)).squeeze()
+            action = q_vals.argmax().item()
+            episode_q.append(q_vals.max().item())
+            new_state, reward, terminated, truncated, _ = env.step(action)
+            episode_reward += reward
+            episode_length += 1
+            if reward >= 1.0:
+                episode_pipes += 1
+            state = torch.tensor(new_state, dtype=torch.float32).to(device)
+
+        return episode_reward, episode_pipes, episode_length, episode_q, states
 
     def train(self):
         env = self._make_env()
@@ -106,8 +169,16 @@ class Agent:
             optimizer, mode='max', factor=0.5, patience=self.lr_decay_patience, min_lr=1e-6
         ) if self.lr_decay_patience else None
 
-        memory  = ReplayMemory(capacity=self.replay_memory_size, seed=REPLAY_MEMORY_SEED)
+        if self.use_per:
+            memory = PrioritizedReplayMemory(self.replay_memory_size, alpha=self.per_alpha)
+        else:
+            memory = ReplayMemory(capacity=self.replay_memory_size, seed=REPLAY_MEMORY_SEED)
+
+        nstep_buf       = NStepBuffer(self.n_step, self.discount_factor_g, memory) if self.use_nstep else None
+        effective_gamma = self.discount_factor_g ** self.n_step if self.use_nstep else self.discount_factor_g
+
         epsilon = self.epsilon_init
+        exploration_label = "Mean σ (Noisy Nets)" if self.use_noisy else "Epsilon"
 
         rewards_per_episode = []
         pipes_per_episode   = []
@@ -142,7 +213,11 @@ class Agent:
                 episode_length = 0
 
                 while not (terminated or truncated) and episode_reward < self.stop_on_reward:
-                    if random.random() < epsilon:
+                    if self.use_noisy:
+                        policy_dqn.sample_noise()
+                        target_dqn.sample_noise()
+
+                    if not self.use_noisy and random.random() < epsilon:
                         action = env.action_space.sample()
                     else:
                         with torch.no_grad():
@@ -158,24 +233,48 @@ class Agent:
                     reward_tensor = torch.tensor(reward, dtype=torch.float32).to(device)
                     action_tensor = torch.tensor(action, dtype=torch.int64, device=device)
 
-                    memory.push((state, action_tensor, new_state, reward_tensor, terminated))
-                    step_count += 1
+                    transition = (state, action_tensor, new_state, reward_tensor, terminated)
+                    if nstep_buf is not None:
+                        nstep_buf.push(transition)
+                    else:
+                        memory.push(transition)
+
+                    step_count  += 1
                     total_steps += 1
                     state = new_state
 
                     if len(memory) > self.batch_size and total_steps > self.start_learning_after:
-                        mini_batch = memory.sample(self.batch_size)
-                        loss, mean_q = optimize(mini_batch, policy_dqn, target_dqn, optimizer, self.loss_fn,
-                                                self.discount_factor_g, self.enable_double_dqn, device)
+                        if self.use_per:
+                            beta = min(1.0, self.per_beta_init +
+                                       total_steps * (1.0 - self.per_beta_init) / self.per_beta_frames)
+                            mini_batch, per_idxs, per_weights = memory.sample(self.batch_size, beta=beta)
+                            weights_t = torch.tensor(per_weights, dtype=torch.float32).to(device)
+                        else:
+                            mini_batch = memory.sample(self.batch_size)
+                            per_idxs, weights_t = None, None
+
+                        loss, mean_q, td_errors = optimize(
+                            mini_batch, policy_dqn, target_dqn, optimizer,
+                            effective_gamma, self.enable_double_dqn, device, weights=weights_t
+                        )
                         loss_per_step.append(loss)
                         q_per_step.append(mean_q)
 
-                        epsilon = max(epsilon * self.epsilon_decay, self.epsilon_min)
-                        epsilon_history.append(epsilon)
+                        if self.use_per:
+                            memory.update_priorities(per_idxs, td_errors)
 
                         if step_count > self.network_sync_rate:
                             target_dqn.load_state_dict(policy_dqn.state_dict())
                             step_count = 0
+
+                    if not self.use_noisy:
+                        epsilon = max(epsilon * self.epsilon_decay, self.epsilon_min)
+                    epsilon_history.append(
+                        mean_sigma(policy_dqn) if self.use_noisy else epsilon
+                    )
+
+                if nstep_buf is not None:
+                    nstep_buf.flush()
 
                 rewards_per_episode.append(episode_reward)
                 pipes_per_episode.append(episode_pipes)
@@ -202,7 +301,8 @@ class Agent:
 
                 if datetime.now() - last_graph_update_time > timedelta(seconds=GRAPH_UPDATE_SECONDS):
                     save_graph(rewards_per_episode, pipes_per_episode, lengths_per_episode,
-                               loss_per_step, q_per_step, epsilon_history, self.GRAPH_FILE)
+                               loss_per_step, q_per_step, epsilon_history, self.GRAPH_FILE,
+                               exploration_label=exploration_label)
                     last_graph_update_time = datetime.now()
         finally:
             env.close()
@@ -214,33 +314,14 @@ class Agent:
         import matplotlib.pyplot as plt
 
         env = self._make_env()
-        num_actions = env.action_space.n
-        num_states  = env.observation_space.shape[0]
-
-        policy_dqn = self._build_model(num_states, num_actions)
-        policy_dqn.load_state_dict(torch.load(self.MODEL_FILE, map_location=device))
-        policy_dqn.eval()
+        policy_dqn = self._load_policy(env)
 
         if not hasattr(policy_dqn, 'conv3'):
             print("explain() only supported for CNN models.")
             env.close()
             return
 
-        all_states = []
-        state, _ = env.reset(seed=42)
-        state = torch.tensor(state, dtype=torch.float32).to(device)
-        terminated = False
-        truncated  = False
-        episode_reward = 0.0
-
-        while not (terminated or truncated) and episode_reward < self.stop_on_reward:
-            all_states.append(state.clone())
-            with torch.no_grad():
-                action = policy_dqn(state.unsqueeze(0)).squeeze().argmax().item()
-            new_state, reward, terminated, truncated, _ = env.step(action)
-            episode_reward += reward
-            state = torch.tensor(new_state, dtype=torch.float32).to(device)
-
+        _, _, _, _, all_states = self._run_episode_greedy(env, policy_dqn, seed=42, collect_states=True)
         env.close()
 
         n = min(num_frames, len(all_states))
@@ -285,19 +366,14 @@ class Agent:
                 print(f"Grad-CAM saved to {explain_dir}/grad_cam_{layer_name}.png")
 
     def evaluate(self, num_episodes=100):
-        self.explain()
+        if self.network_type in ("cnn_dqn", "rainbow_cnn_dqn"):
+            self.explain()
 
         eval_dir = os.path.join(self.RUN_DIR, "evaluation")
         os.makedirs(eval_dir, exist_ok=True)
 
         env = self._make_env()
-
-        num_actions = env.action_space.n
-        num_states  = env.observation_space.shape[0]
-
-        policy_dqn = self._build_model(num_states, num_actions)
-        policy_dqn.load_state_dict(torch.load(self.MODEL_FILE, map_location=device))
-        policy_dqn.eval()
+        policy_dqn = self._load_policy(env)
 
         all_rewards, all_pipes, all_lengths, all_q = [], [], [], []
         best_reward, best_seed = float("-inf"), 1
@@ -305,36 +381,13 @@ class Agent:
         try:
             for episode in range(num_episodes):
                 seed = episode + 1
-                state, _ = env.reset(seed=seed)
-                state = torch.tensor(state, dtype=torch.float32).to(device)
-
-                terminated     = False
-                truncated      = False
-                episode_reward = 0.0
-                episode_pipes  = 0
-                episode_length = 0
-                episode_q      = []
-
-                while not (terminated or truncated) and episode_reward < self.stop_on_reward:
-                    with torch.no_grad():
-                        q_vals = policy_dqn(state.unsqueeze(0)).squeeze()
-                        episode_q.append(q_vals.max().item())
-                        action = q_vals.argmax().item()
-
-                    new_state, reward, terminated, truncated, _ = env.step(action)
-                    episode_reward += reward
-                    episode_length += 1
-                    if reward >= 1.0:
-                        episode_pipes += 1
-                    state = torch.tensor(new_state, dtype=torch.float32).to(device)
-
-                all_rewards.append(episode_reward)
-                all_pipes.append(episode_pipes)
-                all_lengths.append(episode_length)
-                all_q.append(np.mean(episode_q) if episode_q else 0.0)
-
-                if episode_reward > best_reward:
-                    best_reward = episode_reward
+                reward, pipes, length, q_vals, _ = self._run_episode_greedy(env, policy_dqn, seed=seed)
+                all_rewards.append(reward)
+                all_pipes.append(pipes)
+                all_lengths.append(length)
+                all_q.append(np.mean(q_vals) if q_vals else 0.0)
+                if reward > best_reward:
+                    best_reward = reward
                     best_seed   = seed
         finally:
             env.close()
@@ -360,32 +413,12 @@ class Agent:
 
     def test(self, render=True):
         env = self._make_env(render_mode='human' if render else None)
-
-        num_actions = env.action_space.n
-        num_states  = env.observation_space.shape[0]
-
-        policy_dqn = self._build_model(num_states, num_actions)
-        policy_dqn.load_state_dict(torch.load(self.MODEL_FILE, map_location=device))
-        policy_dqn.eval()
+        policy_dqn = self._load_policy(env)
 
         try:
             for episode in itertools.count():
-                state, _ = env.reset(seed=episode + 1)
-                state = torch.tensor(state, dtype=torch.float32).to(device)
-
-                terminated     = False
-                truncated      = False
-                episode_reward = 0.0
-
-                while not (terminated or truncated) and episode_reward < self.stop_on_reward:
-                    with torch.no_grad():
-                        action = policy_dqn(state.unsqueeze(0)).squeeze().argmax().item()
-
-                    new_state, reward, terminated, truncated, _ = env.step(action)
-                    episode_reward += reward
-                    state = torch.tensor(new_state, dtype=torch.float32).to(device)
-
-                print(f"Episode {episode}: reward = {episode_reward:.2f}")
+                reward, _, _, _, _ = self._run_episode_greedy(env, policy_dqn, seed=episode + 1)
+                print(f"Episode {episode}: reward = {reward:.2f}")
         finally:
             env.close()
 

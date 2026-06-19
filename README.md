@@ -32,13 +32,13 @@ conda activate dqn-flappy-bird-cuda
 
 ```bash
 conda activate flappybird-nocnn
-python agent.py flappybird7 --train
+python src/agent.py flappybird7 --train
 ```
 
 ### Test (with display)
 
 ```bash
-python agent.py flappybird7
+python src/agent.py flappybird7
 ```
 
 ### Submit to cluster

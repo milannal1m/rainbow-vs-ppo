@@ -233,8 +233,14 @@ class Agent:
                     reward_tensor = torch.tensor(reward, dtype=torch.float32)
                     action_tensor = torch.tensor(action, dtype=torch.int64)
 
-                    # Store on CPU — VRAM overflow with large replay buffers
-                    transition = (state.cpu(), action_tensor, new_state_t.cpu(), reward_tensor, terminated)
+                    # Store on CPU as uint8 for image obs (4x smaller than float32)
+                    if self.frame_stack:
+                        s_store  = (state       * 255).round().byte().cpu()
+                        ns_store = (new_state_t * 255).round().byte().cpu()
+                    else:
+                        s_store  = state.cpu()
+                        ns_store = new_state_t.cpu()
+                    transition = (s_store, action_tensor, ns_store, reward_tensor, terminated)
                     if nstep_buf is not None:
                         nstep_buf.push(transition)
                     else:

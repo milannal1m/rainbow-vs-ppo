@@ -293,9 +293,12 @@ def optimize(batch, policy_dqn, target_dqn, optimizer, discount_factor_g,
         (loss_scalar, mean_max_q, td_errors_numpy)
     """
     states, actions, new_states, rewards, terminations = zip(*batch)
-    states       = torch.stack(states).to(device)
+    states     = torch.stack(states).to(device)
+    new_states = torch.stack(new_states).to(device)
+    if states.dtype == torch.uint8:
+        states     = states.float().div_(255.0)
+        new_states = new_states.float().div_(255.0)
     actions      = torch.stack(actions).to(device)
-    new_states   = torch.stack(new_states).to(device)
     rewards      = torch.stack(rewards).to(device)
     terminations = torch.tensor(terminations, dtype=torch.bool).to(device)
 

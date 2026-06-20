@@ -302,7 +302,7 @@ flappybird_cnn5:
 # All six extensions enabled: Double DQN, Dueling, PER, Noisy Nets, n-step, Distributional RL
 flappybird_rainbow:
   env_id: FlappyBird-v0
-  replay_memory_size: 100000    # paper uses 1M for Atari; FlappyBird needs far less
+  replay_memory_size: 1000000   # uint8 storage: 1M * ~50KB = ~50GB CPU RAM
   batch_size: 32                # paper: 32
   # epsilon unused — Noisy Nets handle exploration (auto-set to 0 when use_noisy: true)
   epsilon_init: 1.0
@@ -336,8 +336,8 @@ flappybird_rainbow:
   n_step: 3                     # paper: n=3
   # Distributional RL (C51)
   n_atoms: 51                   # paper: 51 atoms
-  v_min: -10.0                  # paper: V_min=-10
-  v_max: 10.0                   # paper: V_max=10
+  v_min: -5.0                   # paper uses -10 for Atari; FlappyBird rarely goes negative
+  v_max: 30.0                   # 0.1/step*(1/(1-0.99))=10, plus pipe bonuses; needs headroom
   # Noisy Nets
   sigma_init: 0.5               # paper: σ_0=0.5 (factorised)
   seed: 42

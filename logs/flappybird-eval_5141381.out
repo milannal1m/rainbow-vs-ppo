@@ -1,0 +1,16 @@
+Using device: cuda
+
+============================= JOB FEEDBACK =============================
+
+NodeName=uc2n909
+Job ID: 5141381
+Cluster: uc3
+User/Group: ul_lmm50/ul_student
+State: FAILED (exit code 1)
+Nodes: 1
+Cores per node: 2
+CPU Utilized: 00:00:09
+CPU Efficiency: 7.03% of 00:02:08 core-walltime
+Job Wall-clock time: 00:01:04
+Memory Utilized: 272.52 MB
+Memory Efficiency: 13.63% of 1.95 GB (1.95 GB/node)

@@ -1,0 +1,6 @@
+/home/ul/ul_student/ul_lmm50/.conda/envs/dqn-flappy-bird-cuda/lib/python3.11/site-packages/gymnasium/wrappers/rendering.py:292: UserWarning: [33mWARN: Overwriting existing videos at /pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/runs/flappybird_rainbow/checkpoint_videos folder (try specifying a different `video_folder` for the `RecordVideo` wrapper if this is not desired)[0m
+  logger.warn(
+/home/ul/ul_student/ul_lmm50/.conda/envs/dqn-flappy-bird-cuda/lib/python3.11/site-packages/gymnasium/wrappers/rendering.py:292: UserWarning: [33mWARN: Overwriting existing videos at /pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/runs/flappybird_rainbow/checkpoint_videos folder (try specifying a different `video_folder` for the `RecordVideo` wrapper if this is not desired)[0m
+  logger.warn(
+/var/spool/slurmd/job5088715/slurm_script: line 30: 506081 Killed                  python src/agent.py "$HYPERPARAMS" --train
+[2026-06-21T00:40:14.522] error: Detected 1 oom_kill event in StepId=5088715.batch. Some of the step tasks have been OOM Killed.

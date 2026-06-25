@@ -1,0 +1,15 @@
+
+============================= JOB FEEDBACK =============================
+
+NodeName=uc2n904
+Job ID: 4989132
+Cluster: uc3
+User/Group: ul_lmm50/ul_student
+State: TIMEOUT (exit code 0)
+Nodes: 1
+Cores per node: 2
+CPU Utilized: 00:00:06
+CPU Efficiency: 0.04% of 04:00:06 core-walltime
+Job Wall-clock time: 02:00:03
+Memory Utilized: 1.96 GB
+Memory Efficiency: 100.15% of 1.95 GB (1.95 GB/node)

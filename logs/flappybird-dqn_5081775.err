@@ -1,0 +1,35 @@
+/home/ul/ul_student/ul_lmm50/.conda/envs/dqn-flappy-bird-cuda/lib/python3.11/site-packages/gymnasium/wrappers/rendering.py:292: UserWarning: [33mWARN: Overwriting existing videos at /pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/runs/flappybird_rainbow/checkpoint_videos folder (try specifying a different `video_folder` for the `RecordVideo` wrapper if this is not desired)[0m
+  logger.warn(
+/home/ul/ul_student/ul_lmm50/.conda/envs/dqn-flappy-bird-cuda/lib/python3.11/site-packages/gymnasium/wrappers/rendering.py:292: UserWarning: [33mWARN: Overwriting existing videos at /pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/runs/flappybird_rainbow/checkpoint_videos folder (try specifying a different `video_folder` for the `RecordVideo` wrapper if this is not desired)[0m
+  logger.warn(
+Traceback (most recent call last):
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/agent.py", line 436, in <module>
+    dql.train()
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/agent.py", line 256, in train
+    loss, mean_q, td_errors = optimize(
+                              ^^^^^^^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/dqn.py", line 312, in optimize
+    mean_max_q = policy_dqn(states).max(dim=1)[0].mean().item()
+                 ^^^^^^^^^^^^^^^^^^
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/dqn-flappy-bird-cuda/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/dqn-flappy-bird-cuda/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/dqn.py", line 187, in forward
+    logits = self._logits(x)
+             ^^^^^^^^^^^^^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/dqn.py", line 173, in _logits
+    v = self.value(F.relu(self.fc_value(x)))
+                          ^^^^^^^^^^^^^^^^
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/dqn-flappy-bird-cuda/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/dqn-flappy-bird-cuda/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/dqn.py", line 100, in forward
+    w = self.weight_mu + self.weight_sigma * self.weight_epsilon
+        ~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 2.00 MiB. GPU 0 has a total capacity of 79.25 GiB of which 3.62 MiB is free. Including non-PyTorch memory, this process has 79.21 GiB memory in use. Of the allocated memory 72.35 GiB is allocated by PyTorch, and 6.36 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)

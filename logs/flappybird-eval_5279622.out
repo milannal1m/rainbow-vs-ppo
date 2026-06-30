@@ -1,0 +1,24 @@
+Using device: cuda
+Grad-CAM saved to runs/flappybird_rainbow9/grad_cam/grad_cam_conv1.png
+Grad-CAM saved to runs/flappybird_rainbow9/grad_cam/grad_cam_conv2.png
+Grad-CAM saved to runs/flappybird_rainbow9/grad_cam/grad_cam_conv3.png
+Evaluation over 100 greedy episodes
+Reward:               mean=1267.64  std=1302.94
+Pipes passed:         mean=270.84  std=279.21
+Episode length (s):   mean=341.66  std=350.55
+Q-value mag:          mean=12.3716  std=0.0336
+
+============================= JOB FEEDBACK =============================
+
+NodeName=uc2n911
+Job ID: 5279622
+Cluster: uc3
+User/Group: ul_lmm50/ul_student
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 2
+CPU Utilized: 02:01:33
+CPU Efficiency: 50.70% of 03:59:44 core-walltime
+Job Wall-clock time: 01:59:52
+Memory Utilized: 23.06 GB
+Memory Efficiency: 73.79% of 31.25 GB (31.25 GB/node)

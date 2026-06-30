@@ -19,3 +19,18 @@ Fri Jun 26 21:56:15 2026
 |    0   N/A  N/A            8971      G   /usr/libexec/Xorg                        17MiB |
 |    0   N/A  N/A         3493081      C   python                                  630MiB |
 +-----------------------------------------------------------------------------------------+
+
+============================= JOB FEEDBACK =============================
+
+NodeName=uc2n904
+Job ID: 5237489
+Cluster: uc3
+User/Group: ul_lmm50/ul_student
+State: CANCELLED (exit code 0)
+Nodes: 1
+Cores per node: 4
+CPU Utilized: 00:00:06
+CPU Efficiency: 0.00% of 2-05:10:24 core-walltime
+Job Wall-clock time: 13:17:36
+Memory Utilized: 59.42 GB
+Memory Efficiency: 47.54% of 125.00 GB (125.00 GB/node)

@@ -2,3 +2,4 @@
   logger.warn(
 /home/ul/ul_student/ul_lmm50/.conda/envs/dqn-flappy-bird-cuda/lib/python3.11/site-packages/gymnasium/wrappers/rendering.py:292: UserWarning: [33mWARN: Overwriting existing videos at /pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/runs/flappybird_rainbow8/checkpoint_videos folder (try specifying a different `video_folder` for the `RecordVideo` wrapper if this is not desired)[0m
   logger.warn(
+[2026-06-27T10:13:16.008] error: *** JOB 5232737 ON uc2n903 CANCELLED AT 2026-06-27T10:13:16 DUE to SIGNAL Terminated ***

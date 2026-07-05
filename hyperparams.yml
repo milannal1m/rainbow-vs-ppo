@@ -810,3 +810,31 @@ flappybird_rainbow12:
   # Noisy Nets
   sigma_init: 0.5               # paper: σ_0=0.5 (factorised)
   seed: 42
+  
+flappybird_ppo:
+  # ── Environment (pixel observations) ──────────────────────────
+  env_id: FlappyBird-v0
+  env_make_params:
+    use_lidar: False            # not used; obs come from rendered frames
+    background: null            # remove background for cleaner pixel input
+  frame_stack: 4                # stack 4 consecutive frames (motion cues)
+  obs_size: 80                  # frames resized to 80x80
+  rgb_wrapper: true             # render RGB frames as the observation
+  # ── Base / shared ─────────────────────────────────────────────
+  algorithm: "ppo"              # dispatches to PPOAgent (agent.py keys on this)
+  network_type: "ppo_cnn"       # CNNActorCritic (shared conv backbone, separate heads)
+  hidden_dim: 512               # width of the actor/critic head MLPs
+  learning_rate_a: 0.00025      # Adam LR (canonical PPO default, used with eps=1e-5)
+  discount_factor_g: 0.99       # gamma — reward discount for GAE & returns
+  stop_on_reward: 100000        # effectively no early stop; run until killed (24h)
+  seed: 42                       # reproducibility
+  # lr_decay_patience omitted → LR stays fixed (clean canonical PPO baseline)
+  # ── PPO-specific ──────────────────────────────────────────────
+  rollout_steps: 2048           # env steps collected per iteration
+  ppo_epochs: 10                # passes over the buffer per iteration
+  minibatch_size: 64            # SGD minibatch size (2048/64 = 32 minibatches/epoch)
+  clip_eps: 0.2                 # PPO clip range epsilon (the "proximal" safety belt)
+  gae_lambda: 0.95              # GAE bias/variance knob
+  vf_coef: 0.5                  # value-loss weight (c1)
+  ent_coef: 0.01                # entropy bonus weight (c2) — the exploration knob
+  max_grad_norm: 0.5            # global gradient-norm clip

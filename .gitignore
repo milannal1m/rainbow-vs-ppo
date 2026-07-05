@@ -1,3 +1,6 @@
 __pycache__/
 *.pyc
 *.pyo
+
+# Personal notes / reference (not part of the deliverable)
+PPO.md

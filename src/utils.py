@@ -105,7 +105,9 @@ def _rolling_avg(data, window=100):
 
 def save_graph(rewards_per_episode, pipes_per_episode, lengths_per_episode,
                loss_per_step, q_per_step, epsilon_history, graph_file,
-               exploration_label="Epsilon"):
+               loss_label="TD Loss", aux_label="Q-Value", exploration_label="Epsilon",
+               metric_xlabel="Steps", metric_window="100-step",
+               smooth_exploration=False):
     fig, axes = plt.subplots(2, 3, figsize=(15, 8))
     fig.suptitle("Training metrics")
 
@@ -121,19 +123,24 @@ def save_graph(rewards_per_episode, pipes_per_episode, lengths_per_episode,
     axes[0, 2].set_ylabel("Episode length in s (100-ep)")
     axes[0, 2].plot(_rolling_avg([s / 30 for s in lengths_per_episode]), color="#C44E52")
 
-    axes[1, 0].set_xlabel("Steps")
-    axes[1, 0].set_ylabel("TD loss (100-step)")
+    axes[1, 0].set_xlabel(metric_xlabel)
+    axes[1, 0].set_ylabel(f"{loss_label} ({metric_window})")
     if loss_per_step:
         axes[1, 0].plot(_rolling_avg(loss_per_step), color="#DD8452")
 
-    axes[1, 1].set_xlabel("Steps")
-    axes[1, 1].set_ylabel("Q-value magnitude (100-step)")
+    axes[1, 1].set_xlabel(metric_xlabel)
+    axes[1, 1].set_ylabel(f"{aux_label} ({metric_window})")
     if q_per_step:
         axes[1, 1].plot(_rolling_avg(q_per_step), color="#8172B2")
 
-    axes[1, 2].set_xlabel("Steps")
-    axes[1, 2].set_ylabel(exploration_label)
-    axes[1, 2].plot(epsilon_history, color="#937860")
+    axes[1, 2].set_xlabel(metric_xlabel)
+    if smooth_exploration:
+        axes[1, 2].set_ylabel(f"{exploration_label} ({metric_window})")
+        if epsilon_history:
+            axes[1, 2].plot(_rolling_avg(epsilon_history), color="#937860")
+    else:
+        axes[1, 2].set_ylabel(exploration_label)
+        axes[1, 2].plot(epsilon_history, color="#937860")
 
     fig.tight_layout()
     fig.savefig(graph_file)
@@ -194,7 +201,9 @@ def record_episode(policy_dqn, env_id, env_make_params, video_dir, name_prefix,
 
     while not (terminated or truncated) and episode_reward < stop_on_reward:
         with torch.no_grad():
-            action = policy_dqn(state.unsqueeze(0)).squeeze().argmax().item()
+            out = policy_dqn(state.unsqueeze(0))
+            logits = out[0] if isinstance(out, tuple) else out
+            action = logits.squeeze().argmax().item()
         new_state, reward, terminated, truncated, _ = env.step(action)
         episode_reward += reward
         state = torch.tensor(new_state, dtype=torch.float32).to(device)

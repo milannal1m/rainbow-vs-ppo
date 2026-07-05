@@ -767,3 +767,46 @@ flappybird_rainbow11:
   # Noisy Nets
   sigma_init: 0.5               # paper: σ_0=0.5 (factorised)
   seed: 42
+
+flappybird_rainbow12:
+  env_id: FlappyBird-v0
+  replay_memory_size: 1000000   # uint8 storage: 1M * ~50KB = ~50GB CPU RAM
+  batch_size: 16                # paper: 32
+  # epsilon unused — Noisy Nets handle exploration (auto-set to 0 when use_noisy: true)
+  epsilon_init: 1.0
+  epsilon_decay: 1.0
+  epsilon_min: 0.0
+  network_sync_rate: 1000      # paper: target net updated every 32k steps
+  learning_rate_a: 0.0000625    # paper: 6.25e-5 (Adam)
+  discount_factor_g: 0.99       # paper: 0.99
+  stop_on_reward: 100000
+  hidden_dim: 512
+  start_learning_after: 20000   # paper: 80k steps before first update
+  network_type: "rainbow_cnn_dqn"
+  frame_stack: 4
+  obs_size: 80
+  rgb_wrapper: true
+  lr_decay_patience: 300
+  env_make_params:
+    use_lidar: False
+    background: null
+  # Rainbow extension flags
+  enable_double_dqn: true       # Double DQN (action selection from online net)
+  use_dueling: true             # Dueling network streams
+  use_per: true                 # Prioritized Experience Replay
+  use_nstep: true               # Multi-step returns
+  use_noisy: true               # Noisy Nets (replaces epsilon-greedy)
+  use_distributional: true      # C51 distributional RL
+  # PER parameters (paper: alpha=0.5, beta 0.4→1 over 10M steps)
+  per_alpha: 0.5
+  per_beta_init: 0.4
+  per_beta_frames: 2000000
+  # n-step returns
+  n_step: 3                     # paper: n=3
+  # Distributional RL (C51)
+  n_atoms: 51                   # paper: 51 atoms
+  v_min: -5.0                   # paper uses -10 for Atari; FlappyBird rarely goes negative
+  v_max: 20.0                   # 0.1/step*(1/(1-0.99))=10, plus pipe bonuses; needs headroom
+  # Noisy Nets
+  sigma_init: 0.5               # paper: σ_0=0.5 (factorised)
+  seed: 42

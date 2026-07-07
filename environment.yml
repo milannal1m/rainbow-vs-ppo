@@ -13,6 +13,8 @@ dependencies:
   - cpuonly               # remove this line and add cudatoolkit if you want GPU support
   - gymnasium>=1.0
   - opencv
+  - optuna>=3.4          # hyperparameter tuning (src/tune.py)
+  - scikit-learn         # optuna param-importance plots
   - pip
   - pip:
     - flappy-bird-gymnasium

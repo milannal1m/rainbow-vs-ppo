@@ -15,12 +15,10 @@ from config import DATE_FORMAT, CHECKPOINT_EVERY, GRAPH_UPDATE_SECONDS
 class PPOAgent(BaseAgent):
     _eval_aux_label = "Value estimate"
 
-    def __init__(self, hyperparams_set):
-        super().__init__(hyperparams_set)
+    def __init__(self, hyperparams_set, hyperparams=None, run_name=None):
+        super().__init__(hyperparams_set, hyperparams=hyperparams, run_name=run_name)
 
-        import yaml
-        with open("hyperparams.yml", "r") as f:
-            hyperparams = yaml.safe_load(f)[hyperparams_set]
+        hyperparams = self.hyperparams  # resolved by BaseAgent (file or injected dict)
 
         self.network_type   = hyperparams.get("network_type", "ppo")
         self.rollout_steps  = hyperparams.get("rollout_steps", 2048)
@@ -72,7 +70,10 @@ class PPOAgent(BaseAgent):
 
         return episode_reward, episode_pipes, episode_length, value_estimates, states
 
-    def train(self):
+    def train(self, report_cb=None, record_video=True):
+        # report_cb(step, metric): optional hook (used by HPO) called once per PPO iteration;
+        #   it may raise to abort the run early (pruning). record_video=False skips the
+        #   checkpoint video writes and sanity-check png for lightweight HPO trials.
         env = self._make_env()
 
         num_actions  = env.action_space.n
@@ -100,7 +101,7 @@ class PPOAgent(BaseAgent):
         log(f"{start_time.strftime(DATE_FORMAT)}: Training starting...", self.LOG_FILE, mode='w')
         log(f"Device: {device}", self.LOG_FILE)
 
-        if self.frame_stack:
+        if self.frame_stack and record_video:
             save_preprocessed_sanity_check(self.env_id, self.env_make_params,
                                            self.obs_size, self.frame_stack, self.RUN_DIR,
                                            rgb_wrapper=self.rgb_wrapper)
@@ -115,6 +116,8 @@ class PPOAgent(BaseAgent):
 
         try:
             for _ in itertools.count():
+                if self.max_env_steps and global_step >= self.max_env_steps:
+                    break
                 buffer.reset()
 
                 # ── collect rollout ──────────────────────────────────────────
@@ -151,7 +154,7 @@ class PPOAgent(BaseAgent):
                                 self.CHECKPOINT_VIDEO_DIR, f"checkpoint_ep{episode}",
                                 self.stop_on_reward, seed=episode + 1, device=device,
                                 obs_size=self.obs_size, frame_stack=self.frame_stack,
-                                rgb_wrapper=self.rgb_wrapper,
+                                rgb_wrapper=self.rgb_wrapper, record_video=record_video,
                             )
                             if greedy_reward > best_greedy_reward:
                                 best_greedy_reward = greedy_reward
@@ -187,6 +190,9 @@ class PPOAgent(BaseAgent):
                 policy_loss_history.append(np.mean(batch_policy_losses))
                 value_loss_history.append(np.mean(batch_value_losses))
                 entropy_history.append(np.mean(batch_entropies))
+
+                if report_cb is not None and rewards_per_episode:
+                    report_cb(global_step, float(np.mean(rewards_per_episode[-100:])))
 
                 if lr_scheduler and rewards_per_episode and global_step > self.start_learning_after:
                     lr_before = optimizer.param_groups[0]['lr']

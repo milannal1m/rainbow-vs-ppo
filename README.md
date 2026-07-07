@@ -84,6 +84,49 @@ Create a new set in `hyperparams.yml` with `algorithm: "ppo"`. Key PPO parameter
 
 ---
 
+## Automatic hyperparameter tuning
+
+`src/tune.py` runs an **Optuna** search (TPE sampler + Hyperband pruning) over any of the three algorithms, using the same agents as normal training. Because a full run takes ~24h, the search trains many **short proxy runs** in parallel and prunes weak ones early, then you run only the winner at full length.
+
+`hyperparametertune.sh` packs several trials onto each of 4 A100s in one SLURM job (training is CPU/env-bound, so the GPUs sit near-idle otherwise):
+
+```bash
+# Search one algorithm (dqn | rainbow | ppo). Args: <algorithm> [n_trials] [trials_per_gpu]
+sbatch hyperparametertune.sh rainbow 400
+sbatch hyperparametertune.sh dqn 400
+
+# PPO is replay-free — request less RAM/CPU:
+sbatch --mem=64000 --cpus-per-task=24 hyperparametertune.sh ppo 400
+```
+
+**Objective:** mean greedy reward over `--eval-episodes` (default 30) deterministic episodes. **What's tuned vs fixed:** fast-acting knobs (learning rate, batch size, PPO `ent_coef`/`clip_eps`/`ppo_epochs`, etc.) are searched; horizon-dependent ones are handled specially — `replay_memory_size` is **fixed** (a short proxy can't fill a large buffer, so it has no signal), while epsilon decay is searched as a **horizon-relative fraction** (`epsilon_frac`) that transfers from the proxy to the full run.
+
+**Results** land in `runs/hpo/<study>/`:
+
+| File | Contents |
+|---|---|
+| `<study>.journal` | the Optuna study — the authoritative record of every config tried |
+| `trials.csv` | flat table: params + objective value + state, one row per trial |
+| `optimization_history.png`, `param_importances.png`, `parallel_coordinate.png`, `slice.png` | search plots |
+| `summary.txt` | best value + config |
+
+The best config is appended to `hyperparams.yml` as `flappybird_<algorithm>_tuned`. Run it at full length with the normal script:
+
+```bash
+sbatch train.sh flappybird_ppo_tuned
+```
+
+Local smoke test (few tiny trials, CPU/MPS):
+
+```bash
+python src/tune.py --algorithm ppo --n-trials 4 --proxy-steps 5000 --eval-episodes 5
+python src/tune.py --algorithm ppo --study ppo --report-only
+```
+
+Per-worker trials run under `runs/hpo/<study>/trials/` (lightweight — no videos) and never touch top-level `runs/`.
+
+---
+
 ## Project Structure
 
 | File | Description |
@@ -96,6 +139,7 @@ Create a new set in `hyperparams.yml` with `algorithm: "ppo"`. Key PPO parameter
 | `ppo.py` | PPO network definitions (`ActorCritic`, `CNNActorCritic`; `PPO_NETWORK_REGISTRY`) and the `ppo_optimize` step (clipped surrogate + value loss + entropy bonus). |
 | `ppo_agent.py` | `PPOAgent` — the PPO training loop (collect rollout → GAE → epochs of minibatch updates). |
 | `rollout_buffer.py` | On-policy `RolloutBuffer` with GAE advantage estimation; wiped each iteration. |
+| `tune.py` | Optuna hyperparameter search (search spaces, objective, pruning, plots, winner export). The only module that imports Optuna. |
 | `utils.py` | Preprocessing pipeline, video recording, sanity check, logging, the shared `save_graph` (labels adapt to DQN vs PPO), and the `flappy_bird_env` render patch. |
 | `config.py` | Global constants (`RUNS_DIR`, `CHECKPOINT_EVERY`, `HEADLESS`, etc.). Set `HEADLESS=1` as an environment variable to suppress the display (done automatically in `train.sh`/`evaluate.sh`). |
 | `hyperparams.yml` | All training configurations. Each named set maps to one experiment; the `algorithm` key selects DQN or PPO. |
@@ -103,7 +147,8 @@ Create a new set in `hyperparams.yml` with `algorithm: "ppo"`. Key PPO parameter
 | `environment-cuda.yml` | Conda environment for cluster GPU training (CUDA 12.4). |
 | `train.sh` | SLURM training job script for the cluster. Accepts the config name as an argument (works for DQN or PPO). |
 | `evaluate.sh` | SLURM evaluation job script. Accepts the config name as an argument. |
+| `hyperparametertune.sh` | SLURM job that packs multiple Optuna trials across 4 GPUs for one algorithm, then exports the best config. |
 
-Training outputs (logs, model checkpoints, graphs, videos) are saved under `runs/<config_name>/`.
+Training outputs (logs, model checkpoints, graphs, videos) are saved under `runs/<config_name>/`. Hyperparameter-search outputs are saved under `runs/hpo/<study>/`.
 
 ---

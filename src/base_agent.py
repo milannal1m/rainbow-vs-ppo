@@ -2,6 +2,7 @@ import gymnasium as gym
 import random
 import torch
 import yaml
+import json
 import itertools
 import importlib
 import os
@@ -18,10 +19,13 @@ device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is
 class BaseAgent:
     _eval_aux_label = "Aux metric"
 
-    def __init__(self, hyperparams_set):
-        with open("hyperparams.yml", "r") as f:
-            all_hyperparam_sets = yaml.safe_load(f)
-        hyperparams = all_hyperparam_sets[hyperparams_set]
+    def __init__(self, hyperparams_set, hyperparams=None, run_name=None):
+        # `hyperparams` (a pre-parsed dict) lets the HPO layer inject a trial config
+        # without touching hyperparams.yml; when None we load it by name as before.
+        if hyperparams is None:
+            with open("hyperparams.yml", "r") as f:
+                hyperparams = yaml.safe_load(f)[hyperparams_set]
+        self.hyperparams = hyperparams
 
         self.hyperparams_set   = hyperparams_set
         self.env_id            = hyperparams["env_id"]
@@ -36,6 +40,7 @@ class BaseAgent:
         self.stop_on_reward    = hyperparams["stop_on_reward"]
         self.lr_decay_patience = hyperparams.get("lr_decay_patience", None)
         self.start_learning_after = hyperparams.get("start_learning_after", 0)
+        self.max_env_steps     = hyperparams.get("max_env_steps", None)  # None = run until killed
         self.seed              = hyperparams.get("seed", None)
 
         if self.seed is not None:
@@ -48,12 +53,16 @@ class BaseAgent:
 
         importlib.import_module(self.env_package)
 
-        self.RUN_DIR             = os.path.join(RUNS_DIR, self.hyperparams_set)
+        # run_name controls the output subdirectory (defaults to the set name for normal
+        # runs); HPO passes e.g. "hpo/<study>/trials/t7" to isolate trials under runs/hpo/.
+        self.run_name            = run_name if run_name is not None else hyperparams_set
+        base                     = os.path.basename(self.run_name)
+        self.RUN_DIR             = os.path.join(RUNS_DIR, self.run_name)
         os.makedirs(self.RUN_DIR, exist_ok=True)
-        self.LOG_FILE            = os.path.join(self.RUN_DIR, f"{self.hyperparams_set}.log")
-        self.MODEL_FILE          = os.path.join(self.RUN_DIR, f"{self.hyperparams_set}.pt")
-        self.MODEL_FILE_TRAINING = os.path.join(self.RUN_DIR, f"{self.hyperparams_set}_best_training.pt")
-        self.GRAPH_FILE          = os.path.join(self.RUN_DIR, f"{self.hyperparams_set}.png")
+        self.LOG_FILE            = os.path.join(self.RUN_DIR, f"{base}.log")
+        self.MODEL_FILE          = os.path.join(self.RUN_DIR, f"{base}.pt")
+        self.MODEL_FILE_TRAINING = os.path.join(self.RUN_DIR, f"{base}_best_training.pt")
+        self.GRAPH_FILE          = os.path.join(self.RUN_DIR, f"{base}.png")
         self.CHECKPOINT_VIDEO_DIR = os.path.join(self.RUN_DIR, "checkpoint_videos")
         os.makedirs(self.CHECKPOINT_VIDEO_DIR, exist_ok=True)
 
@@ -147,12 +156,11 @@ class BaseAgent:
                 plt.close(fig)
                 print(f"Grad-CAM saved to {explain_dir}/grad_cam_{layer_name}.png")
 
-    def evaluate(self, num_episodes=100):
-        if self.frame_stack:
+    def evaluate(self, num_episodes=100, record_artifacts=True):
+        # record_artifacts=False is the lightweight HPO path: compute the objective
+        # metrics and dump metrics.json, but skip Grad-CAM, video and chart writes.
+        if record_artifacts and self.frame_stack:
             self.explain()
-
-        eval_dir = os.path.join(self.RUN_DIR, "evaluation")
-        os.makedirs(eval_dir, exist_ok=True)
 
         env = self._make_env()
         policy = self._load_policy(env)
@@ -175,6 +183,16 @@ class BaseAgent:
             env.close()
 
         lengths_s = [l / 30 for l in all_lengths]
+        metrics = {
+            "eval_reward_mean":   float(np.mean(all_rewards)),
+            "eval_reward_std":    float(np.std(all_rewards)),
+            "eval_pipes_mean":    float(np.mean(all_pipes)),
+            "eval_length_s_mean": float(np.mean(lengths_s)),
+            "n_episodes":         int(num_episodes),
+        }
+        with open(os.path.join(self.RUN_DIR, "metrics.json"), "w") as f:
+            json.dump(metrics, f, indent=2)
+
         lines = [
             f"Evaluation over {num_episodes} greedy episodes",
             f"Reward:               mean={np.mean(all_rewards):.2f}  std={np.std(all_rewards):.2f}",
@@ -182,16 +200,20 @@ class BaseAgent:
             f"Episode length (s):   mean={np.mean(lengths_s):.2f}  std={np.std(lengths_s):.2f}",
             f"{self._eval_aux_label}:  mean={np.mean(all_aux):.4f}  std={np.std(all_aux):.4f}",
         ]
-        with open(os.path.join(eval_dir, "evaluation.log"), "w") as f:
-            f.write("\n".join(lines) + "\n")
-        for line in lines:
-            print(line)
 
-        save_eval_chart(all_rewards, os.path.join(eval_dir, "evaluation.png"))
+        if record_artifacts:
+            eval_dir = os.path.join(self.RUN_DIR, "evaluation")
+            os.makedirs(eval_dir, exist_ok=True)
+            with open(os.path.join(eval_dir, "evaluation.log"), "w") as f:
+                f.write("\n".join(lines) + "\n")
+            for line in lines:
+                print(line)
+            save_eval_chart(all_rewards, os.path.join(eval_dir, "evaluation.png"))
+            record_episode(policy, self.env_id, self.env_make_params, eval_dir, "evaluation",
+                           self.stop_on_reward, best_seed, device,
+                           obs_size=self.obs_size, frame_stack=self.frame_stack, rgb_wrapper=self.rgb_wrapper)
 
-        record_episode(policy, self.env_id, self.env_make_params, eval_dir, "evaluation",
-                       self.stop_on_reward, best_seed, device,
-                       obs_size=self.obs_size, frame_stack=self.frame_stack, rgb_wrapper=self.rgb_wrapper)
+        return metrics
 
     def test(self, render=True):
         env = self._make_env(render_mode='human' if render else None)

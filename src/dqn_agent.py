@@ -16,12 +16,10 @@ from config import DATE_FORMAT, CHECKPOINT_EVERY, REPLAY_MEMORY_SEED, GRAPH_UPDA
 class DQNAgent(BaseAgent):
     _eval_aux_label = "Q-value mag"
 
-    def __init__(self, hyperparams_set):
-        super().__init__(hyperparams_set)
+    def __init__(self, hyperparams_set, hyperparams=None, run_name=None):
+        super().__init__(hyperparams_set, hyperparams=hyperparams, run_name=run_name)
 
-        import yaml
-        with open("hyperparams.yml", "r") as f:
-            hyperparams = yaml.safe_load(f)[hyperparams_set]
+        hyperparams = self.hyperparams  # resolved by BaseAgent (file or injected dict)
 
         self.replay_memory_size   = hyperparams["replay_memory_size"]
         self.batch_size           = hyperparams["batch_size"]
@@ -46,6 +44,14 @@ class DQNAgent(BaseAgent):
         self.per_beta_frames    = hyperparams.get("per_beta_frames", 2000000)
         self.sigma_init         = hyperparams.get("sigma_init", 0.5)
         self.use_dueling        = hyperparams.get("use_dueling", False)
+
+        # Horizon-relative epsilon schedule: if `epsilon_frac` is given, reach epsilon_min
+        # at that fraction of max_env_steps. This makes a searched schedule transfer between
+        # a short proxy run and the full run. Falls back to the raw epsilon_decay otherwise.
+        epsilon_frac = hyperparams.get("epsilon_frac", None)
+        if epsilon_frac is not None and self.max_env_steps and self.epsilon_min > 0:
+            anneal_steps = max(1.0, epsilon_frac * self.max_env_steps)
+            self.epsilon_decay = (self.epsilon_min / self.epsilon_init) ** (1.0 / anneal_steps)
 
         if self.use_noisy:
             self.epsilon_init = 0.0
@@ -100,7 +106,10 @@ class DQNAgent(BaseAgent):
 
         return episode_reward, episode_pipes, episode_length, episode_q, states
 
-    def train(self):
+    def train(self, report_cb=None, record_video=True):
+        # report_cb(step, metric): optional hook (used by HPO) called once per episode;
+        #   it may raise to abort the run early (pruning). record_video=False skips the
+        #   checkpoint video writes and sanity-check png for lightweight HPO trials.
         env = self._make_env()
 
         num_actions = env.action_space.n
@@ -142,13 +151,15 @@ class DQNAgent(BaseAgent):
         log(f"{start_time.strftime(DATE_FORMAT)}: Training starting...", self.LOG_FILE, mode='w')
         log(f"Device: {device}", self.LOG_FILE)
 
-        if self.frame_stack:
+        if self.frame_stack and record_video:
             save_preprocessed_sanity_check(self.env_id, self.env_make_params,
                                            self.obs_size, self.frame_stack, self.RUN_DIR,
                                            rgb_wrapper=self.rgb_wrapper)
 
         try:
             for episode in itertools.count():
+                if self.max_env_steps and total_steps >= self.max_env_steps:
+                    break
                 state, _ = env.reset(seed=episode + 1)
                 state = torch.tensor(state, dtype=torch.float32).to(device)
 
@@ -226,12 +237,18 @@ class DQNAgent(BaseAgent):
                         mean_sigma(policy_dqn) if self.use_noisy else epsilon
                     )
 
+                    if self.max_env_steps and total_steps >= self.max_env_steps:
+                        break
+
                 if nstep_buf is not None:
                     nstep_buf.flush()
 
                 rewards_per_episode.append(episode_reward)
                 pipes_per_episode.append(episode_pipes)
                 lengths_per_episode.append(episode_length)
+
+                if report_cb is not None:
+                    report_cb(total_steps, float(np.mean(rewards_per_episode[-100:])))
 
                 if lr_scheduler and total_steps > self.start_learning_after:
                     lr_before = optimizer.param_groups[0]['lr']
@@ -250,7 +267,7 @@ class DQNAgent(BaseAgent):
                                                    self.CHECKPOINT_VIDEO_DIR, f"checkpoint_ep{episode}",
                                                    self.stop_on_reward, seed=episode + 1, device=device,
                                                    obs_size=self.obs_size, frame_stack=self.frame_stack,
-                                                   rgb_wrapper=self.rgb_wrapper)
+                                                   rgb_wrapper=self.rgb_wrapper, record_video=record_video)
                     if greedy_reward > best_greedy_reward:
                         best_greedy_reward = greedy_reward
                         torch.save(policy_dqn.state_dict(), self.MODEL_FILE)

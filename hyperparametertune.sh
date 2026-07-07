@@ -1,0 +1,59 @@
+#!/bin/bash
+#SBATCH --job-name=flappybird-hpo
+#SBATCH --partition=gpu_a100_il
+#SBATCH --gres=gpu:4              # pack ~12 trials (3/GPU); you are GPU-underutilized
+#SBATCH --cpus-per-task=32        # ~2.5 cores/trial — NOT the 64 max
+#SBATCH --mem=192000             # ~192GB: 12 Rainbow trials @ ~15GB replay + overhead
+#SBATCH --time=24:00:00          # ~400 trials finish well under this (see PPO.md/plan)
+#SBATCH --output=logs/%x_%j.out
+#SBATCH --error=logs/%x_%j.err
+
+# Unified Optuna hyperparameter search for one algorithm.
+#
+# Usage: sbatch hyperparametertune.sh <algorithm> [n_trials] [trials_per_gpu]
+#   <algorithm>     one of: dqn | rainbow | ppo
+#   n_trials        target total trials in the study        (default 400)
+#   trials_per_gpu  concurrent trials packed onto each GPU  (default 3)
+#
+# PPO is replay-free, so request less RAM/CPU for it:
+#   sbatch --mem=64000 --cpus-per-task=24 hyperparametertune.sh ppo 400
+#
+# Results land in runs/hpo/<algorithm>_<jobid>/ (journal, trials.csv, plots, summary.txt);
+# the best config is appended to hyperparams.yml as flappybird_<algorithm>_tuned, then:
+#   sbatch train.sh flappybird_<algorithm>_tuned
+
+ALGO=${1:-ppo}
+N_TRIALS=${2:-400}
+TRIALS_PER_GPU=${3:-3}
+
+mkdir -p logs
+
+module load devel/miniforge/25.3.1-python-3.12
+source "$(conda info --base)/etc/profile.d/conda.sh"
+conda activate dqn-flappy-bird-cuda
+
+export HEADLESS=1
+export OMP_NUM_THREADS=2          # keep 12 packed processes from oversubscribing the cores
+
+N_GPUS=${SLURM_GPUS_ON_NODE:-4}
+K=$(( N_GPUS * TRIALS_PER_GPU ))
+STUDY="${ALGO}_${SLURM_JOB_ID}"
+
+echo "HPO: algorithm=$ALGO n_trials=$N_TRIALS study=$STUDY workers=$K gpus=$N_GPUS"
+
+# Launch K workers, round-robin pinned across the allocated GPUs. They share one
+# file-based Optuna study (JournalStorage is multi-process safe). The first worker is
+# given a head start so it creates the study before the rest attach.
+for (( i=0; i<K; i++ )); do
+    CUDA_VISIBLE_DEVICES=$(( i % N_GPUS )) \
+        python src/tune.py --algorithm "$ALGO" --n-trials "$N_TRIALS" --study "$STUDY" &
+    if [ "$i" -eq 0 ]; then sleep 15; fi
+done
+
+sleep 3600
+nvidia-smi   # 1h-in GPU snapshot (matches train.sh convention)
+
+wait
+
+# All workers done → export artifacts + best config (single process, no race).
+python src/tune.py --algorithm "$ALGO" --study "$STUDY" --report-only

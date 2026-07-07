@@ -178,20 +178,24 @@ def _rename_latest_video(video_dir, new_filename):
 
 
 def record_episode(policy_dqn, env_id, env_make_params, video_dir, name_prefix,
-                   stop_on_reward, seed, device, obs_size=None, frame_stack=None, rgb_wrapper=False):
+                   stop_on_reward, seed, device, obs_size=None, frame_stack=None, rgb_wrapper=False,
+                   record_video=True):
+    # record_video=False runs the same greedy episode and returns its reward, but skips the
+    # RecordVideo wrapper (and mp4 write) — used by HPO trials where only the reward matters.
     env = gym.make(env_id, render_mode="rgb_array", **env_make_params)
     env = FlappyBirdResetFix(env)
     if rgb_wrapper:
         env = RGBObservationWrapper(env)
     if frame_stack:
         env = preprocess_env(env, obs_size, frame_stack)
-    env = RecordVideo(
-        env,
-        video_dir,
-        name_prefix=f"{name_prefix}_tmp",
-        episode_trigger=lambda _: True,
-        disable_logger=True,
-    )
+    if record_video:
+        env = RecordVideo(
+            env,
+            video_dir,
+            name_prefix=f"{name_prefix}_tmp",
+            episode_trigger=lambda _: True,
+            disable_logger=True,
+        )
 
     state, _ = env.reset(seed=seed)
     state = torch.tensor(state, dtype=torch.float32).to(device)
@@ -209,5 +213,6 @@ def record_episode(policy_dqn, env_id, env_make_params, video_dir, name_prefix,
         state = torch.tensor(new_state, dtype=torch.float32).to(device)
 
     env.close()
-    _rename_latest_video(video_dir, f"{name_prefix}_r{episode_reward:.2f}.mp4")
+    if record_video:
+        _rename_latest_video(video_dir, f"{name_prefix}_r{episode_reward:.2f}.mp4")
     return episode_reward

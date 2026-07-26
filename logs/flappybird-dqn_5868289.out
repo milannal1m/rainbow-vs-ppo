@@ -1,0 +1,82 @@
+Sat Jul 18 02:39:28 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.71.05              Driver Version: 595.71.05      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A100 80GB PCIe          On  |   00000000:1B:00.0 Off |                    0 |
+| N/A   41C    P0             78W /  300W |    1076MiB /  81920MiB |      5%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A            9162      G   /usr/libexec/Xorg                        17MiB |
+|    0   N/A  N/A          137839      C   python                                 1040MiB |
++-----------------------------------------------------------------------------------------+
+Using device: cuda
+2026-07-18_01-40-20: Training starting...
+Device: cuda
+2026-07-18_01-40-27 Episode 0: New best reward -8.10, training model saved.
+2026-07-18_01-40-29 Episode 0: New best greedy reward 2.00, model saved.
+2026-07-18_01-40-30 Episode 1: New best reward -5.70, training model saved.
+2026-07-18_01-40-59 Episode 81: New best reward -2.10, training model saved.
+2026-07-18_01-41-45 Episode 211: New best reward 1.50, training model saved.
+2026-07-18_01-42-11 Episode 287: New best reward 2.10, training model saved.
+2026-07-18_01-42-30 Episode 338: New best reward 3.90, training model saved.
+2026-07-18_01-42-45 Episode 382: New best reward 4.50, training model saved.
+2026-07-18_01-42-59 Episode 420: New best reward 6.40, training model saved.
+2026-07-18_01-45-30 Episode 845: New best reward 6.80, training model saved.
+2026-07-18_01-46-14 Episode 967: New best reward 8.40, training model saved.
+2026-07-18_01-46-28 Episode 1000: New best greedy reward 4.20, model saved.
+2026-07-18_01-47-03 Episode 1090: New best reward 8.60, training model saved.
+2026-07-18_01-47-19 Episode 1128: New best reward 8.80, training model saved.
+2026-07-18_01-48-06 Episode 1238: New best reward 10.90, training model saved.
+2026-07-18_01-48-09 Episode 1246: New best reward 11.00, training model saved.
+2026-07-18_01-50-09 Episode 1485: New best reward 11.20, training model saved.
+2026-07-18_01-50-24 Episode 1517: New best reward 15.00, training model saved.
+2026-07-18_01-51-10 Episode 1605: New best reward 18.80, training model saved.
+2026-07-18_01-52-10 Episode 1709: New best reward 22.80, training model saved.
+2026-07-18_01-52-16 Episode 1717: New best reward 27.30, training model saved.
+2026-07-18_01-52-40 Episode 1749: New best reward 34.50, training model saved.
+2026-07-18_01-53-00 Episode 1775: New best reward 39.10, training model saved.
+2026-07-18_01-53-15 Episode 1788: New best reward 45.90, training model saved.
+2026-07-18_01-53-17 Episode 1789: New best reward 50.40, training model saved.
+2026-07-18_01-53-43 Episode 1810: New best reward 78.60, training model saved.
+2026-07-18_01-55-48 Episode 1886: New best reward 96.90, training model saved.
+2026-07-18_01-55-59 Episode 1889: New best reward 127.30, training model saved.
+2026-07-18_01-57-24 Episode 1925: New best reward 181.70, training model saved.
+2026-07-18_02-00-12 Episode 2000: New best greedy reward 151.30, model saved.
+2026-07-18_02-00-37 Episode 2003: New best reward 261.30, training model saved.
+2026-07-18_02-00-59 Episode 2004: New best reward 379.80, training model saved.
+2026-07-18_02-04-37 Episode 2068: New best reward 414.40, training model saved.
+2026-07-18_02-08-35 Episode 2114: New best reward 614.90, training model saved.
+2026-07-18_02-20-38 Episode 2324: New best reward 852.90, training model saved.
+2026-07-18_02-30-43 Episode 2388: New best reward 941.90, training model saved.
+2026-07-18_02-36-36 Episode 2428: New best reward 1026.00, training model saved.
+2026-07-18_03-05-06 Episode 2759: New best reward 1040.20, training model saved.
+2026-07-18_03-13-23 Episode 2800: New best reward 1072.60, training model saved.
+2026-07-18_03-26-09 Episode 2892: New best reward 1359.10, training model saved.
+2026-07-18_03-53-21 Episode 3130: New best reward 2603.30, training model saved.
+2026-07-18_04-51-14 Episode 3449: New best reward 4626.60, training model saved.
+2026-07-18_06-08-15 Episode 4000: New best greedy reward 1191.80, model saved.
+
+============================= JOB FEEDBACK =============================
+
+NodeName=uc2n910
+Job ID: 5868289
+Cluster: uc3
+User/Group: ul_lmm50/ul_student
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 4
+CPU Utilized: 19:02:59
+CPU Efficiency: 24.76% of 3-04:56:16 core-walltime
+Job Wall-clock time: 19:14:04
+Memory Utilized: 6.23 GB
+Memory Efficiency: 4.99% of 125.00 GB (125.00 GB/node)

@@ -2,9 +2,9 @@
 #SBATCH --job-name=flappybird-hpo
 #SBATCH --partition=gpu_a100_il
 #SBATCH --gres=gpu:4              # pack ~12 trials (3/GPU); you are GPU-underutilized
-#SBATCH --cpus-per-task=32        # ~2.5 cores/trial — NOT the 64 max
+#SBATCH --cpus-per-task=16        # ~2.5 cores/trial — NOT the 64 max
 #SBATCH --mem=192000             # ~192GB: 12 Rainbow trials @ ~15GB replay + overhead
-#SBATCH --time=24:00:00          # ~400 trials finish well under this (see PPO.md/plan)
+#SBATCH --time=32:00:00          # ~400 trials finish well under this (see PPO.md/plan)
 #SBATCH --output=logs/%x_%j.out
 #SBATCH --error=logs/%x_%j.err
 

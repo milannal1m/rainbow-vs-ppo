@@ -2,5 +2,9 @@ __pycache__/
 *.pyc
 *.pyo
 
+runs/hpo/*/trials
+
 # Personal notes / reference (not part of the deliverable)
 PPO.md
+
+

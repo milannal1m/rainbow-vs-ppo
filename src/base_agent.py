@@ -185,6 +185,8 @@ class BaseAgent:
         lengths_s = [l / 30 for l in all_lengths]
         metrics = {
             "eval_reward_mean":   float(np.mean(all_rewards)),
+            "eval_reward_median": float(np.median(all_rewards)),
+            "eval_reward_p25":    float(np.percentile(all_rewards, 25)),  # robust objective
             "eval_reward_std":    float(np.std(all_rewards)),
             "eval_pipes_mean":    float(np.mean(all_pipes)),
             "eval_length_s_mean": float(np.mean(lengths_s)),

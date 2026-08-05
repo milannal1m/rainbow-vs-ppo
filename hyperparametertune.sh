@@ -13,7 +13,7 @@
 # Usage: sbatch hyperparametertune.sh <algorithm> [n_trials] [trials_per_gpu]
 #   <algorithm>     one of: dqn | rainbow | ppo
 #   n_trials        target total trials in the study        (default 400)
-#   trials_per_gpu  concurrent trials packed onto each GPU  (default 3)
+#   trials_per_gpu  concurrent trials packed onto each GPU  (default: rainbow=1, dqn/ppo=3)
 #
 # PPO is replay-free, so request less RAM/CPU for it:
 #   sbatch --mem=64000 --cpus-per-task=24 hyperparametertune.sh ppo 400
@@ -24,7 +24,15 @@
 
 ALGO=${1:-ppo}
 N_TRIALS=${2:-400}
-TRIALS_PER_GPU=${3:-3}
+# Per-algorithm packing default: Rainbow is GPU-compute-bound (C51 + noisy + dueling), so it
+# saturates the card and must NOT be overpacked; PPO / vanilla DQN are env-bound and pack well.
+if [ -n "$3" ]; then
+    TRIALS_PER_GPU=$3
+elif [ "$ALGO" = "rainbow" ]; then
+    TRIALS_PER_GPU=1
+else
+    TRIALS_PER_GPU=3
+fi
 
 mkdir -p logs
 

@@ -40,6 +40,17 @@ torch.set_num_threads(max(1, int(os.environ.get("OMP_NUM_THREADS", "2"))))
 BASE_SEED = 42
 HPO_DIR = os.path.join(RUNS_DIR, "hpo")
 
+# Throttle intermediate pruning reports to at most one per this many env steps. DQN/Rainbow
+# would otherwise report per-episode (~50 steps) and, with many workers on a shared journal,
+# hammer the file lock — the cause of the Rainbow study starving out. PPO already reports
+# per-iteration (~1-4k steps), so this barely affects it.
+REPORT_INTERVAL_STEPS = 5000
+
+# Objective statistic over the greedy-eval episodes. p25 (default) is robust to lucky-tail
+# episodes AND penalises unstable configs (those dying on >25% of seeds), unlike the mean,
+# which the first study inflated 27x on a single lucky episode.
+OBJECTIVE_KEYS = {"p25": "eval_reward_p25", "median": "eval_reward_median", "mean": "eval_reward_mean"}
+
 # ── Base configs (fixed keys per algorithm) ──────────────────────────────────────────
 # Pixel pipeline matching the hand-tuned flappybird_ppo / flappybird_cnn / flappybird_rainbow
 # sets. The tuner overrides the searched keys on top of these.
@@ -109,7 +120,9 @@ def suggest_params(trial, algorithm):
         return {
             "learning_rate_a": trial.suggest_float("learning_rate_a", 1e-5, 1e-3, log=True),
             "ppo_epochs":      trial.suggest_categorical("ppo_epochs", [3, 4, 6, 10]),
-            "ent_coef":        trial.suggest_float("ent_coef", 1e-3, 5e-2, log=True),
+            # Floor raised 1e-3 -> 5e-3: the first study drove ent_coef to ~0.001 (entropy
+            # collapse -> unstable full runs). Keep it above the collapse regime.
+            "ent_coef":        trial.suggest_float("ent_coef", 5e-3, 5e-2, log=True),
             "clip_eps":        trial.suggest_categorical("clip_eps", [0.1, 0.2, 0.3]),
             "gae_lambda":      trial.suggest_float("gae_lambda", 0.9, 0.99),
             "vf_coef":         trial.suggest_float("vf_coef", 0.3, 1.0),
@@ -145,8 +158,10 @@ def build_trial_config(algorithm, params, proxy_steps):
     cfg.update(params)
     cfg["max_env_steps"] = proxy_steps
     if algorithm in ("dqn", "rainbow"):
+        # Keep warmup well under Hyperband's first rung (~proxy/9) so trials actually learn
+        # before the first prune decision (the first study pruned everything at ~13k steps).
         cfg["start_learning_after"] = min(cfg.get("start_learning_after", 20000),
-                                          max(500, proxy_steps // 10))
+                                          max(1000, proxy_steps // 30))
         if cfg.get("use_per"):
             cfg["per_beta_frames"] = proxy_steps  # anneal beta over the proxy horizon
     return cfg
@@ -181,16 +196,24 @@ def objective(trial, a):
         run_name = os.path.join("hpo", study_name, "trials", f"t{trial.number}{suffix}")
         agent = make_agent(cfg, f"t{trial.number}", run_name)
         try:
+            last_report = [0]
+
             def report_cb(step, metric):
                 # Intermediate reporting + pruning only in single-seed mode (unambiguous curve).
-                if a.search_seeds == 1:
-                    trial.report(metric, step)
-                    if trial.should_prune():
-                        raise optuna.TrialPruned()
+                # Throttled to REPORT_INTERVAL_STEPS so per-episode DQN/Rainbow calls don't
+                # hammer the shared journal lock.
+                if a.search_seeds != 1:
+                    return
+                if step - last_report[0] < REPORT_INTERVAL_STEPS:
+                    return
+                last_report[0] = step
+                trial.report(metric, step)
+                if trial.should_prune():
+                    raise optuna.TrialPruned()
 
             agent.train(report_cb=report_cb, record_video=False)
             metrics = agent.evaluate(num_episodes=a.eval_episodes, record_artifacts=False)
-            seed_means.append(metrics["eval_reward_mean"])
+            seed_means.append(metrics[OBJECTIVE_KEYS[a.objective]])
         finally:
             del agent
             if torch.cuda.is_available():
@@ -302,7 +325,7 @@ def run_report(a):
         f"study: {a.study}",
         f"algorithm: {a.algorithm}",
         f"completed trials: {len(completed)} / {len(study.get_trials(deepcopy=False))} total",
-        f"best value (mean greedy reward): {best.value:.4f}",
+        f"best value ({a.objective} greedy reward): {best.value:.4f}",
         f"best trial: #{best.number}",
         "best params:",
         *[f"  {k}: {v}" for k, v in best.params.items()],
@@ -320,6 +343,8 @@ def main():
     p.add_argument("--n-trials", type=int, default=400, help="target total trials in the study")
     p.add_argument("--proxy-steps", type=int, default=300000, help="env steps per trial (proxy budget)")
     p.add_argument("--eval-episodes", type=int, default=30, help="greedy episodes for the objective")
+    p.add_argument("--objective", default="p25", choices=list(OBJECTIVE_KEYS),
+                   help="eval statistic to maximize (p25=robust, default)")
     p.add_argument("--full-steps", type=int, default=10_000_000,
                    help="max_env_steps written into the exported winner config")
     p.add_argument("--search-seeds", type=int, default=1,

@@ -92,14 +92,18 @@ Create a new set in `hyperparams.yml` with `algorithm: "ppo"`. Key PPO parameter
 
 ```bash
 # Search one algorithm (dqn | rainbow | ppo). Args: <algorithm> [n_trials] [trials_per_gpu]
-sbatch hyperparametertune.sh rainbow 400
+sbatch --time=48:00:00 hyperparametertune.sh rainbow 400   # Rainbow: give it 48h (see below)
 sbatch hyperparametertune.sh dqn 400
 
 # PPO is replay-free — request less RAM/CPU:
 sbatch --mem=64000 --cpus-per-task=24 hyperparametertune.sh ppo 400
 ```
 
-**Objective:** mean greedy reward over `--eval-episodes` (default 30) deterministic episodes. **What's tuned vs fixed:** fast-acting knobs (learning rate, batch size, PPO `ent_coef`/`clip_eps`/`ppo_epochs`, etc.) are searched; horizon-dependent ones are handled specially — `replay_memory_size` is **fixed** (a short proxy can't fill a large buffer, so it has no signal), while epsilon decay is searched as a **horizon-relative fraction** (`epsilon_frac`) that transfers from the proxy to the full run.
+**Packing (`trials_per_gpu`) defaults per algorithm:** PPO / vanilla DQN are env-bound (GPU near-idle), so they pack **3/GPU**. Rainbow is GPU-compute-bound (C51 + noisy nets + dueling saturate the card), so it packs **1/GPU** — overpacking it just slows every trial. You can override with the 3rd arg.
+
+**Objective:** the **25th-percentile** greedy reward over `--eval-episodes` (default 30) deterministic episodes (`--objective p25|median|mean`, default `p25`). p25 is deliberately robust: it ignores lucky one-off long episodes and penalizes unstable configs (those that collapse on some seeds) — a plain mean gets inflated by a single tail episode and selects for entropy-collapse-prone configs. **What's tuned vs fixed:** fast-acting knobs (learning rate, batch size, PPO `ent_coef`/`clip_eps`/`ppo_epochs`, etc.) are searched; horizon-dependent ones are handled specially — `replay_memory_size` is **fixed** (a short proxy can't fill a large buffer, so it has no signal), while epsilon decay is searched as a **horizon-relative fraction** (`epsilon_frac`) that transfers from the proxy to the full run.
+
+**Fairness across algorithms:** the yardstick is identical for all three (same proxy budget, same p25 eval, same `--n-trials`, same pruner) — that's what makes the comparison valid. Because Rainbow is slower and packs 1/GPU, it completes fewer trials in a fixed wall-clock, so give it the full 48h and check `completed trials` in each `summary.txt`; compare studies at roughly equal completed-trial counts.
 
 **Results** land in `runs/hpo/<study>/`:
 

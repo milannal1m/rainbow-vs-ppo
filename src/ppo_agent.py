@@ -29,6 +29,11 @@ class PPOAgent(BaseAgent):
         self.vf_coef        = hyperparams.get("vf_coef", 0.5)
         self.ent_coef       = hyperparams.get("ent_coef", 0.01)
         self.max_grad_norm  = hyperparams.get("max_grad_norm", 0.5)
+        # Linear LR annealing (PPO standard): ramp lr_init -> lr_min over lr_anneal_steps
+        # env-steps, then hold at lr_min and keep training (no max_env_steps required).
+        # When lr_anneal_steps is unset, fall back to the base ReduceLROnPlateau.
+        self.lr_anneal_steps = hyperparams.get("lr_anneal_steps", None)
+        self.lr_min          = hyperparams.get("lr_min", 1e-5)
 
     def _build_model(self, num_states, num_actions):
         cls = PPO_NETWORK_REGISTRY[self.network_type]
@@ -81,9 +86,13 @@ class PPOAgent(BaseAgent):
         actor_critic = self._build_model(num_states, num_actions)
 
         optimizer = torch.optim.Adam(actor_critic.parameters(), lr=self.learning_rate_a, eps=1e-5)
+        # Prefer linear LR annealing for PPO: its reward signal is too noisy for reliable
+        # plateau detection. ReduceLROnPlateau is kept only as a fallback when annealing is off.
+        use_lr_anneal   = bool(self.lr_anneal_steps)
+        lr_floor_logged = False
         lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
             optimizer, mode='max', factor=0.5, patience=self.lr_decay_patience, min_lr=1e-6
-        ) if self.lr_decay_patience else None
+        ) if (self.lr_decay_patience and not use_lr_anneal) else None
 
         buffer = RolloutBuffer(self.rollout_steps, self.discount_factor_g, self.gae_lambda)
 
@@ -118,6 +127,17 @@ class PPOAgent(BaseAgent):
             for _ in itertools.count():
                 if self.max_env_steps and global_step >= self.max_env_steps:
                     break
+
+                # ── linear LR annealing → floor, then hold ───────────────────
+                if use_lr_anneal:
+                    frac   = max(0.0, 1.0 - global_step / self.lr_anneal_steps)
+                    new_lr = self.lr_min + frac * (self.learning_rate_a - self.lr_min)
+                    for pg in optimizer.param_groups:
+                        pg['lr'] = new_lr
+                    if not lr_floor_logged and frac == 0.0:
+                        lr_floor_logged = True
+                        log(f"{datetime.now().strftime(DATE_FORMAT)} Episode {episode}: LR reached floor {self.lr_min:.2e} (step {global_step}), holding.", self.LOG_FILE)
+
                 buffer.reset()
 
                 # ── collect rollout ──────────────────────────────────────────

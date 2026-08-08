@@ -71,6 +71,7 @@ PPO_BASE = {
     "stop_on_reward": 100000,
     "seed": BASE_SEED,
     "max_grad_norm": 0.5,
+    "lr_min": 1e-5,          # floor for linear LR annealing (see build_*_config)
 }
 
 DQN_BASE = {
@@ -126,7 +127,9 @@ def suggest_params(trial, algorithm):
             "clip_eps":        trial.suggest_categorical("clip_eps", [0.1, 0.2, 0.3]),
             "gae_lambda":      trial.suggest_float("gae_lambda", 0.9, 0.99),
             "vf_coef":         trial.suggest_float("vf_coef", 0.3, 1.0),
-            "rollout_steps":   trial.suggest_categorical("rollout_steps", [1024, 2048, 4096]),
+            # Floor raised to 4096: small rollouts (1024) give high-variance advantage
+            # estimates -> jittery policy over a long run. Larger rollouts smooth updates.
+            "rollout_steps":   trial.suggest_categorical("rollout_steps", [4096, 8192]),
             "minibatch_size":  trial.suggest_categorical("minibatch_size", [64, 128, 256]),
             "hidden_dim":      trial.suggest_categorical("hidden_dim", [256, 512]),
         }
@@ -157,6 +160,10 @@ def build_trial_config(algorithm, params, proxy_steps):
     cfg = dict(BASE[algorithm])
     cfg.update(params)
     cfg["max_env_steps"] = proxy_steps
+    if algorithm == "ppo":
+        # Anneal LR over the proxy horizon so trials train in the same decaying-LR regime
+        # the exported run will use — params are then selected for annealing, not a fixed LR.
+        cfg["lr_anneal_steps"] = proxy_steps
     if algorithm in ("dqn", "rainbow"):
         # Keep warmup well under Hyperband's first rung (~proxy/9) so trials actually learn
         # before the first prune decision (the first study pruned everything at ~13k steps).
@@ -171,7 +178,12 @@ def build_export_config(algorithm, params, full_steps):
     """The winner config for a full-length run: full-horizon values, no proxy scaling."""
     cfg = dict(BASE[algorithm])
     cfg.update(params)
-    cfg["max_env_steps"] = full_steps  # needed for epsilon_frac -> decay at full scale
+    if algorithm == "ppo":
+        # Open-ended run: anneal LR over full_steps, then hold at lr_min and keep training.
+        # No hard max_env_steps stop (LR floor replaces it).
+        cfg["lr_anneal_steps"] = full_steps
+    else:
+        cfg["max_env_steps"] = full_steps  # needed for epsilon_frac -> decay at full scale
     return cfg
 
 
@@ -341,7 +353,9 @@ def main():
     p = argparse.ArgumentParser(description="Optuna HPO for DQN / Rainbow / PPO.")
     p.add_argument("--algorithm", required=True, choices=["dqn", "rainbow", "ppo"])
     p.add_argument("--n-trials", type=int, default=400, help="target total trials in the study")
-    p.add_argument("--proxy-steps", type=int, default=300000, help="env steps per trial (proxy budget)")
+    p.add_argument("--proxy-steps", type=int, default=1000000,
+                   help="env steps per trial (proxy budget). Raised 300k->1M so selected params "
+                        "suit the long-horizon run rather than a 300k sprint.")
     p.add_argument("--eval-episodes", type=int, default=30, help="greedy episodes for the objective")
     p.add_argument("--objective", default="p25", choices=list(OBJECTIVE_KEYS),
                    help="eval statistic to maximize (p25=robust, default)")

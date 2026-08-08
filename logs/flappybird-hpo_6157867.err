@@ -1,0 +1,326 @@
+/home/ul/ul_student/ul_lmm50/.conda/envs/dqn-flappy-bird-cuda/lib/python3.11/site-packages/optuna/_experimental.py:33: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+  optuna_warn(
+/home/ul/ul_student/ul_lmm50/.conda/envs/dqn-flappy-bird-cuda/lib/python3.11/site-packages/optuna/_experimental.py:33: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+  optuna_warn(
+/home/ul/ul_student/ul_lmm50/.conda/envs/dqn-flappy-bird-cuda/lib/python3.11/site-packages/optuna/_experimental.py:33: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+  optuna_warn(
+/home/ul/ul_student/ul_lmm50/.conda/envs/dqn-flappy-bird-cuda/lib/python3.11/site-packages/optuna/_experimental.py:33: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+  optuna_warn(
+[I 2026-08-06 08:33:15,917] A new study created in Journal with name: rainbow_6157867
+[I 2026-08-06 08:33:15,934] Using an existing study with name 'rainbow_6157867' instead of creating a new one.
+[I 2026-08-06 08:33:15,954] Using an existing study with name 'rainbow_6157867' instead of creating a new one.
+[I 2026-08-06 08:33:15,975] Using an existing study with name 'rainbow_6157867' instead of creating a new one.
+/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/dqn_agent.py:78: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  policy_dqn.load_state_dict(torch.load(self.MODEL_FILE, map_location=device))
+[I 2026-08-06 09:53:15,914] Trial 1 finished with value: 23.675000000000075 and parameters: {'learning_rate_a': 0.00030037942122376255, 'batch_size': 32, 'network_sync_rate': 1000, 'n_step': 3, 'per_alpha': 0.43235014707543995, 'per_beta_init': 0.3152925395862888, 'sigma_init': 0.30222075174229307, 'v_max': 15.0}. Best is trial 1 with value: 23.675000000000075.
+/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/dqn_agent.py:78: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  policy_dqn.load_state_dict(torch.load(self.MODEL_FILE, map_location=device))
+[I 2026-08-06 09:54:34,300] Trial 0 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 6.036108911393459e-05, 'batch_size': 64, 'network_sync_rate': 2000, 'n_step': 3, 'per_alpha': 0.6070507214467178, 'per_beta_init': 0.5241334621343597, 'sigma_init': 0.49017336051879545, 'v_max': 20.0}. Best is trial 1 with value: 23.675000000000075.
+/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/dqn_agent.py:78: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  policy_dqn.load_state_dict(torch.load(self.MODEL_FILE, map_location=device))
+/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/dqn_agent.py:78: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  policy_dqn.load_state_dict(torch.load(self.MODEL_FILE, map_location=device))
+[I 2026-08-06 09:54:56,290] Trial 3 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 2.5979035369911582e-05, 'batch_size': 64, 'network_sync_rate': 2000, 'n_step': 5, 'per_alpha': 0.4771021710824921, 'per_beta_init': 0.5914898534676181, 'sigma_init': 0.3725873690642139, 'v_max': 30.0}. Best is trial 1 with value: 23.675000000000075.
+[I 2026-08-06 09:57:13,482] Trial 2 finished with value: 41.17500000000027 and parameters: {'learning_rate_a': 1.3378110832824e-05, 'batch_size': 64, 'network_sync_rate': 2000, 'n_step': 5, 'per_alpha': 0.6499205324663067, 'per_beta_init': 0.5581472968997927, 'sigma_init': 0.362075009124633, 'v_max': 15.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-06 10:01:55,643] Trial 4 pruned. 
+[I 2026-08-06 10:05:47,895] Trial 7 pruned. 
+[I 2026-08-06 10:10:15,052] Trial 8 pruned. 
+[I 2026-08-06 10:21:17,033] Trial 5 pruned. 
+[I 2026-08-06 10:29:29,856] Trial 11 pruned. 
+[I 2026-08-06 10:37:36,300] Trial 12 pruned. 
+[I 2026-08-06 11:05:34,078] Trial 13 pruned. 
+[I 2026-08-06 11:27:17,597] Trial 10 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.00043013851777429603, 'batch_size': 32, 'network_sync_rate': 500, 'n_step': 3, 'per_alpha': 0.3024542676471545, 'per_beta_init': 0.5106632453114283, 'sigma_init': 0.37524552839995773, 'v_max': 30.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-06 11:28:19,482] Trial 6 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 9.935207803339166e-05, 'batch_size': 128, 'network_sync_rate': 1000, 'n_step': 3, 'per_alpha': 0.5303207508503713, 'per_beta_init': 0.51136309420371, 'sigma_init': 0.4609178001519585, 'v_max': 15.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-06 11:31:22,155] Trial 14 pruned. 
+[I 2026-08-06 11:37:29,190] Trial 16 pruned. 
+[I 2026-08-06 11:39:57,193] Trial 9 finished with value: 6.024999999999995 and parameters: {'learning_rate_a': 0.00044832646132841577, 'batch_size': 128, 'network_sync_rate': 8000, 'n_step': 3, 'per_alpha': 0.6820392585249472, 'per_beta_init': 0.43474909241251436, 'sigma_init': 0.3677574295321997, 'v_max': 20.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-06 11:45:58,146] Trial 18 pruned. 
+[I 2026-08-06 11:48:44,454] Trial 19 pruned. 
+[I 2026-08-06 11:57:01,475] Trial 17 pruned. 
+[I 2026-08-06 11:58:11,546] Trial 21 pruned. 
+[I 2026-08-06 12:05:11,750] Trial 22 pruned. 
+[I 2026-08-06 12:06:40,323] Trial 23 pruned. 
+[I 2026-08-06 12:14:23,992] Trial 24 pruned. 
+[I 2026-08-06 12:36:19,372] Trial 25 pruned. 
+[I 2026-08-06 12:44:02,518] Trial 15 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.00026107916391512317, 'batch_size': 32, 'network_sync_rate': 1000, 'n_step': 3, 'per_alpha': 0.36863789350368137, 'per_beta_init': 0.36469365196094045, 'sigma_init': 0.3689225938389765, 'v_max': 15.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-06 12:52:31,334] Trial 28 pruned. 
+[I 2026-08-06 13:05:58,485] Trial 20 finished with value: 3.8999999999999986 and parameters: {'learning_rate_a': 0.00013858983911664195, 'batch_size': 32, 'network_sync_rate': 1000, 'n_step': 1, 'per_alpha': 0.38592691185098305, 'per_beta_init': 0.37400107910060343, 'sigma_init': 0.3784735970849969, 'v_max': 15.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-06 13:16:13,513] Trial 30 pruned. 
+[I 2026-08-06 13:22:10,597] Trial 29 pruned. 
+[I 2026-08-06 13:39:21,996] Trial 26 finished with value: 40.90000000000026 and parameters: {'learning_rate_a': 0.0002903363358913758, 'batch_size': 64, 'network_sync_rate': 500, 'n_step': 3, 'per_alpha': 0.6813387868979277, 'per_beta_init': 0.46437402332743627, 'sigma_init': 0.33610426291066064, 'v_max': 20.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-06 13:47:13,789] Trial 32 pruned. 
+[I 2026-08-06 13:55:05,710] Trial 27 finished with value: 15.249999999999986 and parameters: {'learning_rate_a': 0.0003915463473126042, 'batch_size': 32, 'network_sync_rate': 1000, 'n_step': 3, 'per_alpha': 0.6881741529882507, 'per_beta_init': 0.47865285786089573, 'sigma_init': 0.32696395994272254, 'v_max': 20.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-06 14:07:34,367] Trial 33 pruned. 
+[I 2026-08-06 14:19:45,322] Trial 35 pruned. 
+[I 2026-08-06 14:27:40,577] Trial 37 pruned. 
+[I 2026-08-06 14:33:06,719] Trial 36 pruned. 
+[I 2026-08-06 14:33:10,371] Trial 31 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 8.571099650528331e-05, 'batch_size': 32, 'network_sync_rate': 1000, 'n_step': 3, 'per_alpha': 0.5593577454096117, 'per_beta_init': 0.3022217078224872, 'sigma_init': 0.3716308058684602, 'v_max': 15.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-06 15:01:22,839] Trial 39 pruned. 
+[I 2026-08-06 15:08:05,577] Trial 34 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 9.609033585706014e-05, 'batch_size': 64, 'network_sync_rate': 500, 'n_step': 3, 'per_alpha': 0.6554999930006762, 'per_beta_init': 0.49066608722653543, 'sigma_init': 0.34553935966657034, 'v_max': 20.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-06 15:27:14,209] Trial 41 pruned. 
+[I 2026-08-06 15:33:43,962] Trial 42 pruned. 
+[I 2026-08-06 15:47:44,516] Trial 38 pruned. 
+[I 2026-08-06 15:56:10,275] Trial 45 pruned. 
+[I 2026-08-06 15:58:43,376] Trial 40 finished with value: 15.549999999999976 and parameters: {'learning_rate_a': 0.0003936410370961806, 'batch_size': 64, 'network_sync_rate': 500, 'n_step': 5, 'per_alpha': 0.6196542309807929, 'per_beta_init': 0.5199083844253376, 'sigma_init': 0.3771346647643838, 'v_max': 30.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-06 15:59:44,528] Trial 44 pruned. 
+[I 2026-08-06 16:07:35,302] Trial 47 pruned. 
+[I 2026-08-06 16:26:41,308] Trial 48 pruned. 
+[I 2026-08-06 16:34:39,768] Trial 49 pruned. 
+[I 2026-08-06 16:35:12,215] Trial 50 pruned. 
+[I 2026-08-06 16:48:03,602] Trial 43 finished with value: 15.649999999999993 and parameters: {'learning_rate_a': 0.00048495092055803144, 'batch_size': 32, 'network_sync_rate': 2000, 'n_step': 3, 'per_alpha': 0.5994250987024099, 'per_beta_init': 0.4436410016448925, 'sigma_init': 0.4254741454026083, 'v_max': 15.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-06 17:00:52,339] Trial 51 pruned. 
+[I 2026-08-06 17:15:37,563] Trial 53 pruned. 
+[I 2026-08-06 17:18:36,893] Trial 46 finished with value: 3.8999999999999986 and parameters: {'learning_rate_a': 0.0003150520790280664, 'batch_size': 64, 'network_sync_rate': 2000, 'n_step': 1, 'per_alpha': 0.6050247084716817, 'per_beta_init': 0.4421818736586696, 'sigma_init': 0.3901205965648134, 'v_max': 20.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-06 17:23:44,021] Trial 55 pruned. 
+[I 2026-08-06 17:26:22,995] Trial 54 pruned. 
+[I 2026-08-06 17:27:04,574] Trial 56 pruned. 
+[I 2026-08-06 17:32:04,871] Trial 57 pruned. 
+[I 2026-08-06 17:35:36,877] Trial 59 pruned. 
+[I 2026-08-06 17:44:05,717] Trial 61 pruned. 
+[I 2026-08-06 17:54:35,257] Trial 52 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 1.96167596161959e-05, 'batch_size': 64, 'network_sync_rate': 500, 'n_step': 5, 'per_alpha': 0.585762901827375, 'per_beta_init': 0.5540828492374029, 'sigma_init': 0.38507208880244154, 'v_max': 30.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-06 19:00:29,561] Trial 58 finished with value: 8.399999999999986 and parameters: {'learning_rate_a': 0.0003619531660076866, 'batch_size': 128, 'network_sync_rate': 2000, 'n_step': 3, 'per_alpha': 0.5617245212393461, 'per_beta_init': 0.4206133815539871, 'sigma_init': 0.4253222822021958, 'v_max': 30.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-06 19:04:53,369] Trial 60 finished with value: 6.7249999999999925 and parameters: {'learning_rate_a': 0.0004352633480537578, 'batch_size': 128, 'network_sync_rate': 1000, 'n_step': 3, 'per_alpha': 0.5924783699856948, 'per_beta_init': 0.4553197065110662, 'sigma_init': 0.32646176154041556, 'v_max': 30.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-06 19:05:31,712] Trial 62 pruned. 
+[I 2026-08-06 19:10:35,906] Trial 64 pruned. 
+[I 2026-08-06 19:16:33,697] Trial 63 pruned. 
+[I 2026-08-06 19:19:46,248] Trial 67 pruned. 
+[I 2026-08-06 19:27:50,653] Trial 69 pruned. 
+[I 2026-08-06 19:36:21,743] Trial 70 pruned. 
+[I 2026-08-06 19:37:09,810] Trial 65 pruned. 
+[I 2026-08-06 19:46:39,956] Trial 72 pruned. 
+[I 2026-08-06 20:06:56,006] Trial 71 pruned. 
+[I 2026-08-06 20:13:27,180] Trial 73 pruned. 
+[I 2026-08-06 20:15:12,202] Trial 74 pruned. 
+[I 2026-08-06 20:23:25,316] Trial 66 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.000185659601852496, 'batch_size': 32, 'network_sync_rate': 1000, 'n_step': 3, 'per_alpha': 0.47428859415961633, 'per_beta_init': 0.3364741284134703, 'sigma_init': 0.4252031013204429, 'v_max': 30.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-06 20:33:10,177] Trial 77 pruned. 
+[I 2026-08-06 20:49:25,108] Trial 68 finished with value: 21.050000000000047 and parameters: {'learning_rate_a': 0.00020118076804035275, 'batch_size': 128, 'network_sync_rate': 2000, 'n_step': 3, 'per_alpha': 0.5659132532229427, 'per_beta_init': 0.5131383859376736, 'sigma_init': 0.574054685274955, 'v_max': 30.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-06 21:03:03,484] Trial 78 pruned. 
+[I 2026-08-06 21:19:10,329] Trial 79 pruned. 
+[I 2026-08-06 21:32:42,761] Trial 75 finished with value: 9.024999999999984 and parameters: {'learning_rate_a': 0.00027111784735623864, 'batch_size': 32, 'network_sync_rate': 1000, 'n_step': 5, 'per_alpha': 0.45285218177751935, 'per_beta_init': 0.3578650487686311, 'sigma_init': 0.31664669076330354, 'v_max': 15.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-06 21:45:28,629] Trial 76 pruned. 
+[I 2026-08-06 21:49:06,627] Trial 81 pruned. 
+[I 2026-08-06 21:57:13,717] Trial 84 pruned. 
+[I 2026-08-06 22:11:57,715] Trial 83 pruned. 
+[I 2026-08-06 22:20:05,428] Trial 86 pruned. 
+[I 2026-08-06 22:24:31,332] Trial 80 finished with value: 23.350000000000065 and parameters: {'learning_rate_a': 0.0004978935843251589, 'batch_size': 32, 'network_sync_rate': 1000, 'n_step': 3, 'per_alpha': 0.45666378655259954, 'per_beta_init': 0.41992579626449406, 'sigma_init': 0.3069851938446859, 'v_max': 15.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-06 22:55:44,964] Trial 88 pruned. 
+[I 2026-08-06 22:55:58,481] Trial 82 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.00013546149649958653, 'batch_size': 64, 'network_sync_rate': 2000, 'n_step': 3, 'per_alpha': 0.6387723410910309, 'per_beta_init': 0.5669631641084504, 'sigma_init': 0.62353385263848, 'v_max': 30.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-06 23:28:03,467] Trial 85 finished with value: 26.90000000000011 and parameters: {'learning_rate_a': 0.00014745080820407753, 'batch_size': 128, 'network_sync_rate': 2000, 'n_step': 3, 'per_alpha': 0.5020150966882339, 'per_beta_init': 0.5499854395193458, 'sigma_init': 0.5496969322228584, 'v_max': 30.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-06 23:52:13,420] Trial 87 finished with value: 8.924999999999985 and parameters: {'learning_rate_a': 0.00029326371870671576, 'batch_size': 128, 'network_sync_rate': 2000, 'n_step': 3, 'per_alpha': 0.5349495997918693, 'per_beta_init': 0.4856533826773781, 'sigma_init': 0.6831249254136545, 'v_max': 15.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-06 23:55:24,172] Trial 91 pruned. 
+[I 2026-08-07 00:16:17,594] Trial 89 finished with value: 27.925000000000118 and parameters: {'learning_rate_a': 0.00046149638385502105, 'batch_size': 32, 'network_sync_rate': 1000, 'n_step': 3, 'per_alpha': 0.46083710204835043, 'per_beta_init': 0.31286278242099286, 'sigma_init': 0.3360109842690047, 'v_max': 15.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-07 00:17:27,530] Trial 90 finished with value: 36.975000000000215 and parameters: {'learning_rate_a': 0.00045368350305995207, 'batch_size': 32, 'network_sync_rate': 2000, 'n_step': 3, 'per_alpha': 0.4094241219018975, 'per_beta_init': 0.44057477500343023, 'sigma_init': 0.3318396439865855, 'v_max': 15.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-07 00:21:17,126] Trial 93 pruned. 
+[I 2026-08-07 00:29:30,113] Trial 96 pruned. 
+[I 2026-08-07 00:38:53,500] Trial 97 pruned. 
+[I 2026-08-07 00:44:34,312] Trial 95 pruned. 
+[I 2026-08-07 00:46:45,210] Trial 94 pruned. 
+[I 2026-08-07 00:48:00,162] Trial 98 pruned. 
+[I 2026-08-07 00:55:07,788] Trial 100 pruned. 
+[I 2026-08-07 00:57:11,356] Trial 101 pruned. 
+[I 2026-08-07 01:06:18,390] Trial 103 pruned. 
+[I 2026-08-07 01:15:23,707] Trial 99 pruned. 
+[I 2026-08-07 01:22:32,847] Trial 102 pruned. 
+[I 2026-08-07 01:25:44,716] Trial 92 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.00012173251834223774, 'batch_size': 128, 'network_sync_rate': 2000, 'n_step': 3, 'per_alpha': 0.4095803647226927, 'per_beta_init': 0.5179377906060335, 'sigma_init': 0.5722765893373589, 'v_max': 30.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-07 01:31:55,295] Trial 104 pruned. 
+[I 2026-08-07 01:42:26,472] Trial 105 pruned. 
+[I 2026-08-07 01:52:14,126] Trial 107 pruned. 
+[I 2026-08-07 02:00:18,542] Trial 110 pruned. 
+[I 2026-08-07 02:07:22,103] Trial 109 pruned. 
+[I 2026-08-07 02:15:16,602] Trial 112 pruned. 
+[I 2026-08-07 02:26:09,015] Trial 111 pruned. 
+[I 2026-08-07 02:37:16,571] Trial 106 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.0002593484786718398, 'batch_size': 32, 'network_sync_rate': 500, 'n_step': 3, 'per_alpha': 0.45763645053951196, 'per_beta_init': 0.4754262637555432, 'sigma_init': 0.38742355597333816, 'v_max': 15.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-07 02:41:36,771] Trial 113 pruned. 
+[I 2026-08-07 02:47:10,915] Trial 108 pruned. 
+[I 2026-08-07 02:50:08,228] Trial 116 pruned. 
+[I 2026-08-07 02:51:22,002] Trial 114 pruned. 
+[I 2026-08-07 02:55:31,927] Trial 117 pruned. 
+[I 2026-08-07 03:03:41,578] Trial 120 pruned. 
+[I 2026-08-07 03:04:18,170] Trial 115 pruned. 
+[I 2026-08-07 03:16:16,580] Trial 119 pruned. 
+[I 2026-08-07 03:29:08,533] Trial 122 pruned. 
+[I 2026-08-07 03:38:19,666] Trial 124 pruned. 
+[I 2026-08-07 04:03:12,654] Trial 125 pruned. 
+[I 2026-08-07 04:08:44,836] Trial 118 finished with value: 37.550000000000225 and parameters: {'learning_rate_a': 0.0004200625403017236, 'batch_size': 32, 'network_sync_rate': 1000, 'n_step': 3, 'per_alpha': 0.49657463616810216, 'per_beta_init': 0.3212316686739835, 'sigma_init': 0.3005287877925136, 'v_max': 15.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-07 04:12:30,529] Trial 126 pruned. 
+[I 2026-08-07 04:18:29,054] Trial 127 pruned. 
+[I 2026-08-07 04:22:25,844] Trial 121 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.00012405865756622236, 'batch_size': 64, 'network_sync_rate': 1000, 'n_step': 3, 'per_alpha': 0.6876379837017121, 'per_beta_init': 0.4861674679274934, 'sigma_init': 0.41657696782299736, 'v_max': 20.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-07 04:33:13,668] Trial 123 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.00021059103456912723, 'batch_size': 32, 'network_sync_rate': 500, 'n_step': 3, 'per_alpha': 0.6682050502572204, 'per_beta_init': 0.4546754911306099, 'sigma_init': 0.33125295728413945, 'v_max': 20.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-07 04:47:17,089] Trial 130 pruned. 
+[I 2026-08-07 04:55:19,173] Trial 132 pruned. 
+[I 2026-08-07 05:00:33,006] Trial 131 pruned. 
+[I 2026-08-07 05:08:52,249] Trial 134 pruned. 
+[I 2026-08-07 05:17:56,248] Trial 135 pruned. 
+[I 2026-08-07 05:20:13,635] Trial 133 pruned. 
+[I 2026-08-07 05:27:12,135] Trial 136 pruned. 
+[I 2026-08-07 05:27:19,598] Trial 128 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.00027458629313908625, 'batch_size': 32, 'network_sync_rate': 2000, 'n_step': 3, 'per_alpha': 0.49418916375403005, 'per_beta_init': 0.5127533981442984, 'sigma_init': 0.49645990502158177, 'v_max': 30.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-07 05:29:25,662] Trial 137 pruned. 
+[I 2026-08-07 05:33:51,952] Trial 129 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.0001607138616686479, 'batch_size': 32, 'network_sync_rate': 2000, 'n_step': 3, 'per_alpha': 0.45916752881821343, 'per_beta_init': 0.5954711899268343, 'sigma_init': 0.5082570810110895, 'v_max': 30.0}. Best is trial 2 with value: 41.17500000000027.
+[I 2026-08-07 05:43:09,500] Trial 141 pruned. 
+[I 2026-08-07 05:52:32,419] Trial 142 pruned. 
+[I 2026-08-07 05:57:26,821] Trial 138 pruned. 
+[I 2026-08-07 05:57:47,157] Trial 139 pruned. 
+[I 2026-08-07 05:58:52,873] Trial 140 pruned. 
+[I 2026-08-07 06:18:01,218] Trial 143 pruned. 
+[I 2026-08-07 06:43:20,857] Trial 147 pruned. 
+[I 2026-08-07 07:09:44,758] Trial 148 pruned. 
+[I 2026-08-07 07:18:25,631] Trial 144 finished with value: 41.50000000000026 and parameters: {'learning_rate_a': 0.0003714126307898821, 'batch_size': 32, 'network_sync_rate': 1000, 'n_step': 3, 'per_alpha': 0.46899670588966225, 'per_beta_init': 0.3034685123025852, 'sigma_init': 0.3405189844238343, 'v_max': 15.0}. Best is trial 144 with value: 41.50000000000026.
+[I 2026-08-07 07:20:34,457] Trial 146 finished with value: 41.62500000000026 and parameters: {'learning_rate_a': 0.0004917968267578614, 'batch_size': 32, 'network_sync_rate': 1000, 'n_step': 3, 'per_alpha': 0.4348156889250845, 'per_beta_init': 0.4014688434652125, 'sigma_init': 0.31175353667721123, 'v_max': 15.0}. Best is trial 146 with value: 41.62500000000026.
+[I 2026-08-07 07:30:14,612] Trial 151 pruned. 
+[I 2026-08-07 07:30:32,217] Trial 145 finished with value: 51.12500000000038 and parameters: {'learning_rate_a': 0.00035961831443182403, 'batch_size': 128, 'network_sync_rate': 2000, 'n_step': 1, 'per_alpha': 0.4822794400423753, 'per_beta_init': 0.37209968034913193, 'sigma_init': 0.38096966950058025, 'v_max': 30.0}. Best is trial 145 with value: 51.12500000000038.
+[I 2026-08-07 08:29:25,418] Trial 149 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.0003758423921913808, 'batch_size': 64, 'network_sync_rate': 500, 'n_step': 3, 'per_alpha': 0.6912933513918944, 'per_beta_init': 0.5346016812040958, 'sigma_init': 0.3839471013172125, 'v_max': 30.0}. Best is trial 145 with value: 51.12500000000038.
+[I 2026-08-07 08:42:08,915] Trial 150 finished with value: 18.450000000000017 and parameters: {'learning_rate_a': 0.00033234001834790813, 'batch_size': 64, 'network_sync_rate': 8000, 'n_step': 5, 'per_alpha': 0.525451784657934, 'per_beta_init': 0.5405029091468774, 'sigma_init': 0.31176300989129374, 'v_max': 30.0}. Best is trial 145 with value: 51.12500000000038.
+[I 2026-08-07 08:45:25,956] Trial 152 pruned. 
+[I 2026-08-07 08:49:59,683] Trial 153 finished with value: 56.225000000000435 and parameters: {'learning_rate_a': 0.0004112506010941837, 'batch_size': 32, 'network_sync_rate': 1000, 'n_step': 3, 'per_alpha': 0.4644318544964554, 'per_beta_init': 0.4205343516595986, 'sigma_init': 0.32820067238251877, 'v_max': 15.0}. Best is trial 153 with value: 56.225000000000435.
+[I 2026-08-07 08:51:02,222] Trial 155 pruned. 
+[I 2026-08-07 08:54:45,843] Trial 156 pruned. 
+[I 2026-08-07 08:59:50,707] Trial 157 pruned. 
+[I 2026-08-07 09:03:55,860] Trial 159 pruned. 
+[I 2026-08-07 09:17:09,062] Trial 158 pruned. 
+[I 2026-08-07 09:25:29,695] Trial 160 pruned. 
+[I 2026-08-07 09:25:41,060] Trial 162 pruned. 
+[I 2026-08-07 09:55:34,371] Trial 164 pruned. 
+[I 2026-08-07 10:01:17,096] Trial 154 finished with value: 13.474999999999973 and parameters: {'learning_rate_a': 0.0004004089820902754, 'batch_size': 128, 'network_sync_rate': 2000, 'n_step': 1, 'per_alpha': 0.4155731135437214, 'per_beta_init': 0.4392418558726574, 'sigma_init': 0.31384924601218694, 'v_max': 30.0}. Best is trial 153 with value: 56.225000000000435.
+[I 2026-08-07 10:19:21,344] Trial 161 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.00015488293288409285, 'batch_size': 32, 'network_sync_rate': 1000, 'n_step': 3, 'per_alpha': 0.4585654589660868, 'per_beta_init': 0.43523405137553994, 'sigma_init': 0.38818465930957924, 'v_max': 15.0}. Best is trial 153 with value: 56.225000000000435.
+[I 2026-08-07 10:46:15,494] Trial 163 finished with value: 45.45000000000028 and parameters: {'learning_rate_a': 0.00042858136243511375, 'batch_size': 32, 'network_sync_rate': 2000, 'n_step': 3, 'per_alpha': 0.4480342729620398, 'per_beta_init': 0.36968714565578237, 'sigma_init': 0.46172957988487107, 'v_max': 15.0}. Best is trial 153 with value: 56.225000000000435.
+[I 2026-08-07 11:12:19,504] Trial 168 pruned. 
+[I 2026-08-07 11:15:22,827] Trial 165 finished with value: 34.15000000000019 and parameters: {'learning_rate_a': 0.00047486891284741716, 'batch_size': 32, 'network_sync_rate': 2000, 'n_step': 3, 'per_alpha': 0.6492267143638861, 'per_beta_init': 0.39889206165415453, 'sigma_init': 0.3783078087269467, 'v_max': 15.0}. Best is trial 153 with value: 56.225000000000435.
+[I 2026-08-07 11:16:57,127] Trial 166 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.00037319806256833364, 'batch_size': 32, 'network_sync_rate': 1000, 'n_step': 3, 'per_alpha': 0.4393673288025449, 'per_beta_init': 0.31132950020186717, 'sigma_init': 0.38320853758935547, 'v_max': 15.0}. Best is trial 153 with value: 56.225000000000435.
+[I 2026-08-07 11:21:25,052] Trial 169 pruned. 
+[I 2026-08-07 11:29:17,466] Trial 172 pruned. 
+[I 2026-08-07 11:37:03,948] Trial 167 finished with value: 15.949999999999982 and parameters: {'learning_rate_a': 0.0004591647463995633, 'batch_size': 32, 'network_sync_rate': 2000, 'n_step': 3, 'per_alpha': 0.6137350651748694, 'per_beta_init': 0.3951793231040497, 'sigma_init': 0.38343473913073595, 'v_max': 15.0}. Best is trial 153 with value: 56.225000000000435.
+[I 2026-08-07 11:42:59,065] Trial 171 pruned. 
+[I 2026-08-07 11:50:56,762] Trial 175 pruned. 
+[I 2026-08-07 12:02:55,043] Trial 174 pruned. 
+[I 2026-08-07 12:11:19,054] Trial 177 pruned. 
+[I 2026-08-07 12:19:31,116] Trial 178 pruned. 
+[I 2026-08-07 12:27:24,677] Trial 179 pruned. 
+[I 2026-08-07 12:32:34,318] Trial 170 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.00026197048840849354, 'batch_size': 32, 'network_sync_rate': 2000, 'n_step': 3, 'per_alpha': 0.5610377236252949, 'per_beta_init': 0.3867645450755758, 'sigma_init': 0.4129383557926963, 'v_max': 15.0}. Best is trial 153 with value: 56.225000000000435.
+[I 2026-08-07 12:44:17,790] Trial 173 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.00017967494639661448, 'batch_size': 32, 'network_sync_rate': 2000, 'n_step': 3, 'per_alpha': 0.6636106743461088, 'per_beta_init': 0.31872574841516865, 'sigma_init': 0.3440906680393041, 'v_max': 15.0}. Best is trial 153 with value: 56.225000000000435.
+[I 2026-08-07 13:00:17,474] Trial 181 pruned. 
+[I 2026-08-07 13:09:39,182] Trial 183 pruned. 
+[I 2026-08-07 13:11:57,789] Trial 176 finished with value: 39.700000000000244 and parameters: {'learning_rate_a': 0.0003022380087682379, 'batch_size': 32, 'network_sync_rate': 2000, 'n_step': 3, 'per_alpha': 0.5834248516140518, 'per_beta_init': 0.3551810098338022, 'sigma_init': 0.4288167611300862, 'v_max': 15.0}. Best is trial 153 with value: 56.225000000000435.
+[I 2026-08-07 13:20:44,320] Trial 185 pruned. 
+[I 2026-08-07 13:39:16,740] Trial 184 pruned. 
+[I 2026-08-07 13:46:11,338] Trial 186 pruned. 
+[I 2026-08-07 13:49:33,717] Trial 180 finished with value: 14.799999999999988 and parameters: {'learning_rate_a': 0.00048651749831934445, 'batch_size': 64, 'network_sync_rate': 1000, 'n_step': 3, 'per_alpha': 0.6521095073049766, 'per_beta_init': 0.40361545888192485, 'sigma_init': 0.3589252948985098, 'v_max': 15.0}. Best is trial 153 with value: 56.225000000000435.
+[I 2026-08-07 13:55:25,758] Trial 188 pruned. 
+[I 2026-08-07 14:03:16,916] Trial 182 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.0004888978474653986, 'batch_size': 32, 'network_sync_rate': 2000, 'n_step': 1, 'per_alpha': 0.5036857013943342, 'per_beta_init': 0.47142698765685326, 'sigma_init': 0.3763900103388175, 'v_max': 15.0}. Best is trial 153 with value: 56.225000000000435.
+[I 2026-08-07 14:03:35,906] Trial 190 pruned. 
+[I 2026-08-07 14:04:35,821] Trial 187 pruned. 
+[I 2026-08-07 14:13:45,789] Trial 193 pruned. 
+[I 2026-08-07 14:22:03,487] Trial 194 pruned. 
+[I 2026-08-07 14:30:24,955] Trial 195 pruned. 
+[I 2026-08-07 15:07:02,947] Trial 189 finished with value: 16.024999999999984 and parameters: {'learning_rate_a': 0.0004324554552654774, 'batch_size': 32, 'network_sync_rate': 1000, 'n_step': 3, 'per_alpha': 0.4649897304285596, 'per_beta_init': 0.3353541511224421, 'sigma_init': 0.31987712158462733, 'v_max': 15.0}. Best is trial 153 with value: 56.225000000000435.
+[I 2026-08-07 15:18:44,728] Trial 192 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.0003111219670874985, 'batch_size': 32, 'network_sync_rate': 2000, 'n_step': 3, 'per_alpha': 0.6899485203401675, 'per_beta_init': 0.4433264098071644, 'sigma_init': 0.38224263413948417, 'v_max': 30.0}. Best is trial 153 with value: 56.225000000000435.
+[I 2026-08-07 15:19:41,524] Trial 191 pruned. 
+[I 2026-08-07 15:27:53,136] Trial 199 pruned. 
+[I 2026-08-07 15:28:24,317] Trial 198 pruned. 
+[I 2026-08-07 15:54:18,002] Trial 201 pruned. 
+[I 2026-08-07 16:01:24,467] Trial 196 finished with value: 12.899999999999974 and parameters: {'learning_rate_a': 0.00014657167069403188, 'batch_size': 128, 'network_sync_rate': 2000, 'n_step': 3, 'per_alpha': 0.5684707658431685, 'per_beta_init': 0.3570751866901218, 'sigma_init': 0.37692193096640275, 'v_max': 15.0}. Best is trial 153 with value: 56.225000000000435.
+[I 2026-08-07 16:10:38,777] Trial 203 pruned. 
+[I 2026-08-07 16:22:06,678] Trial 202 pruned. 
+[I 2026-08-07 16:32:15,471] Trial 197 finished with value: 93.97499999999908 and parameters: {'learning_rate_a': 0.0004961781397365116, 'batch_size': 32, 'network_sync_rate': 1000, 'n_step': 3, 'per_alpha': 0.46286662002021783, 'per_beta_init': 0.330746431781281, 'sigma_init': 0.32056864008378166, 'v_max': 30.0}. Best is trial 197 with value: 93.97499999999908.
+[I 2026-08-07 16:56:38,726] Trial 200 pruned. 
+[I 2026-08-07 17:06:13,256] Trial 207 pruned. 
+[I 2026-08-07 17:42:05,530] Trial 204 finished with value: 29.32500000000013 and parameters: {'learning_rate_a': 1.890857273110198e-05, 'batch_size': 128, 'network_sync_rate': 2000, 'n_step': 3, 'per_alpha': 0.5526060899325578, 'per_beta_init': 0.5998980344091249, 'sigma_init': 0.5849043257610281, 'v_max': 30.0}. Best is trial 197 with value: 93.97499999999908.
+[I 2026-08-07 17:49:52,444] Trial 206 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.0004662218872733251, 'batch_size': 32, 'network_sync_rate': 1000, 'n_step': 3, 'per_alpha': 0.5077796983265248, 'per_beta_init': 0.3161941592565656, 'sigma_init': 0.37412471525869273, 'v_max': 30.0}. Best is trial 197 with value: 93.97499999999908.
+[I 2026-08-07 17:51:29,504] Trial 205 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.00033931201920236315, 'batch_size': 128, 'network_sync_rate': 500, 'n_step': 1, 'per_alpha': 0.5557336439471967, 'per_beta_init': 0.3439707106006302, 'sigma_init': 0.45267147970394817, 'v_max': 30.0}. Best is trial 197 with value: 93.97499999999908.
+[I 2026-08-07 18:22:32,552] Trial 208 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.0003808161382878696, 'batch_size': 32, 'network_sync_rate': 1000, 'n_step': 3, 'per_alpha': 0.40415523527890856, 'per_beta_init': 0.3197659740305106, 'sigma_init': 0.3366908215820646, 'v_max': 30.0}. Best is trial 197 with value: 93.97499999999908.
+[I 2026-08-07 18:32:26,712] Trial 212 pruned. 
+[I 2026-08-07 18:41:39,197] Trial 213 pruned. 
+[I 2026-08-07 18:49:59,730] Trial 214 pruned. 
+[I 2026-08-07 18:58:22,631] Trial 215 pruned. 
+[I 2026-08-07 19:06:51,130] Trial 216 pruned. 
+[I 2026-08-07 19:09:10,324] Trial 211 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.00019897586103236913, 'batch_size': 32, 'network_sync_rate': 1000, 'n_step': 3, 'per_alpha': 0.41372111444529086, 'per_beta_init': 0.35540920695432865, 'sigma_init': 0.31291186613597616, 'v_max': 30.0}. Best is trial 197 with value: 93.97499999999908.
+[I 2026-08-07 19:12:32,854] Trial 209 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.0002508069955917776, 'batch_size': 128, 'network_sync_rate': 500, 'n_step': 1, 'per_alpha': 0.5623102643935524, 'per_beta_init': 0.3764136315248879, 'sigma_init': 0.35782238658363275, 'v_max': 30.0}. Best is trial 197 with value: 93.97499999999908.
+[I 2026-08-07 19:14:55,096] Trial 217 pruned. 
+[I 2026-08-07 19:24:03,359] Trial 220 pruned. 
+[I 2026-08-07 19:35:34,417] Trial 210 finished with value: 242.02499999999338 and parameters: {'learning_rate_a': 1.5925852332118225e-05, 'batch_size': 128, 'network_sync_rate': 2000, 'n_step': 3, 'per_alpha': 0.45227013282139505, 'per_beta_init': 0.551927367724301, 'sigma_init': 0.5461247384733374, 'v_max': 30.0}. Best is trial 210 with value: 242.02499999999338.
+[I 2026-08-07 19:44:41,957] Trial 222 pruned. 
+[I 2026-08-07 19:48:51,207] Trial 221 pruned. 
+[I 2026-08-07 20:15:15,786] Trial 224 pruned. 
+[I 2026-08-07 20:23:09,397] Trial 225 pruned. 
+[I 2026-08-07 20:28:10,386] Trial 218 finished with value: 30.875000000000146 and parameters: {'learning_rate_a': 0.00041368748706620793, 'batch_size': 32, 'network_sync_rate': 1000, 'n_step': 3, 'per_alpha': 0.5381410960199632, 'per_beta_init': 0.3109606576167373, 'sigma_init': 0.31731092545048295, 'v_max': 15.0}. Best is trial 210 with value: 242.02499999999338.
+[I 2026-08-07 20:32:24,265] Trial 219 finished with value: 42.90000000000029 and parameters: {'learning_rate_a': 0.0003226113280876006, 'batch_size': 32, 'network_sync_rate': 2000, 'n_step': 3, 'per_alpha': 0.5394018094141653, 'per_beta_init': 0.37567327978157183, 'sigma_init': 0.3356503148370278, 'v_max': 30.0}. Best is trial 210 with value: 242.02499999999338.
+[I 2026-08-07 20:52:13,274] Trial 226 pruned. 
+[I 2026-08-07 20:57:56,630] Trial 227 pruned. 
+[I 2026-08-07 20:58:29,864] Trial 228 pruned. 
+[I 2026-08-07 21:01:09,797] Trial 223 finished with value: 7.874999999999989 and parameters: {'learning_rate_a': 0.00014710505907519848, 'batch_size': 32, 'network_sync_rate': 8000, 'n_step': 5, 'per_alpha': 0.5922793349864343, 'per_beta_init': 0.5630177859580008, 'sigma_init': 0.32161472930653373, 'v_max': 30.0}. Best is trial 210 with value: 242.02499999999338.
+[I 2026-08-07 21:05:52,139] Trial 230 pruned. 
+[I 2026-08-07 21:09:55,358] Trial 232 pruned. 
+[I 2026-08-07 21:18:56,838] Trial 234 pruned. 
+[I 2026-08-07 21:24:29,710] Trial 231 pruned. 
+[I 2026-08-07 21:34:33,812] Trial 233 pruned. 
+[I 2026-08-07 21:42:46,428] Trial 237 pruned. 
+[I 2026-08-07 21:49:50,454] Trial 236 pruned. 
+[I 2026-08-07 21:51:48,377] Trial 238 pruned. 
+[I 2026-08-07 21:59:01,267] Trial 239 pruned. 
+[I 2026-08-07 22:07:59,628] Trial 229 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.00042794340182579266, 'batch_size': 32, 'network_sync_rate': 2000, 'n_step': 3, 'per_alpha': 0.5389692983894838, 'per_beta_init': 0.4383809058837008, 'sigma_init': 0.3541147007281871, 'v_max': 30.0}. Best is trial 210 with value: 242.02499999999338.
+[I 2026-08-07 22:16:04,558] Trial 240 pruned. 
+[I 2026-08-07 22:33:39,690] Trial 235 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.0001856048218027736, 'batch_size': 32, 'network_sync_rate': 2000, 'n_step': 3, 'per_alpha': 0.4406469262189223, 'per_beta_init': 0.33758134629853476, 'sigma_init': 0.32851967278762206, 'v_max': 30.0}. Best is trial 210 with value: 242.02499999999338.
+[I 2026-08-07 22:34:14,546] Trial 242 pruned. 
+[I 2026-08-07 22:42:14,402] Trial 245 pruned. 
+[I 2026-08-07 22:50:06,056] Trial 246 pruned. 
+[I 2026-08-07 22:58:54,103] Trial 244 pruned. 
+[I 2026-08-07 23:14:44,116] Trial 241 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.0003634970745843148, 'batch_size': 32, 'network_sync_rate': 2000, 'n_step': 3, 'per_alpha': 0.42595814807610477, 'per_beta_init': 0.3880124218551145, 'sigma_init': 0.36738886630879064, 'v_max': 30.0}. Best is trial 210 with value: 242.02499999999338.
+[I 2026-08-07 23:19:02,065] Trial 247 pruned. 
+[I 2026-08-07 23:23:52,341] Trial 249 pruned. 
+[I 2026-08-07 23:28:15,128] Trial 250 pruned. 
+[I 2026-08-07 23:32:07,310] Trial 243 finished with value: 12.224999999999977 and parameters: {'learning_rate_a': 0.0004525478317333343, 'batch_size': 32, 'network_sync_rate': 8000, 'n_step': 3, 'per_alpha': 0.5110811115853534, 'per_beta_init': 0.3347115251957035, 'sigma_init': 0.3920934509535769, 'v_max': 15.0}. Best is trial 210 with value: 242.02499999999338.
+[I 2026-08-07 23:32:14,974] Trial 251 pruned. 
+[I 2026-08-07 23:40:14,840] Trial 254 pruned. 
+[I 2026-08-07 23:52:33,507] Trial 252 pruned. 
+[I 2026-08-07 23:59:21,734] Trial 253 pruned. 
+[I 2026-08-08 00:15:27,218] Trial 248 finished with value: 34.90000000000019 and parameters: {'learning_rate_a': 0.0003898488200840878, 'batch_size': 32, 'network_sync_rate': 1000, 'n_step': 3, 'per_alpha': 0.45389541653459, 'per_beta_init': 0.3892482630173205, 'sigma_init': 0.33392228881954383, 'v_max': 15.0}. Best is trial 210 with value: 242.02499999999338.
+[I 2026-08-08 00:17:54,997] Trial 256 pruned. 
+[I 2026-08-08 00:24:05,734] Trial 257 pruned. 
+[I 2026-08-08 00:33:00,896] Trial 260 pruned. 
+[I 2026-08-08 01:02:54,520] Trial 255 finished with value: 18.600000000000016 and parameters: {'learning_rate_a': 0.00039079908487161906, 'batch_size': 64, 'network_sync_rate': 8000, 'n_step': 5, 'per_alpha': 0.4834640678682695, 'per_beta_init': 0.45955650393528574, 'sigma_init': 0.4066697443975105, 'v_max': 30.0}. Best is trial 210 with value: 242.02499999999338.
+[I 2026-08-08 01:11:59,451] Trial 262 pruned. 
+[I 2026-08-08 01:30:52,162] Trial 258 pruned. 
+[I 2026-08-08 01:36:07,605] Trial 259 finished with value: 22.725000000000065 and parameters: {'learning_rate_a': 0.00036451808569165395, 'batch_size': 32, 'network_sync_rate': 1000, 'n_step': 3, 'per_alpha': 0.4995036366883487, 'per_beta_init': 0.43853724691546614, 'sigma_init': 0.36513920247665227, 'v_max': 15.0}. Best is trial 210 with value: 242.02499999999338.
+[I 2026-08-08 01:45:04,469] Trial 265 pruned. 
+[I 2026-08-08 01:56:35,856] Trial 264 pruned. 
+[I 2026-08-08 02:02:47,963] Trial 261 finished with value: 14.99999999999998 and parameters: {'learning_rate_a': 0.0002303281217485808, 'batch_size': 128, 'network_sync_rate': 500, 'n_step': 3, 'per_alpha': 0.6118233872980166, 'per_beta_init': 0.4741079089896135, 'sigma_init': 0.31163774539833733, 'v_max': 20.0}. Best is trial 210 with value: 242.02499999999338.
+[I 2026-08-08 02:11:19,652] Trial 268 pruned. 
+[I 2026-08-08 02:19:44,674] Trial 269 pruned. 
+[I 2026-08-08 02:23:19,491] Trial 267 pruned. 
+[I 2026-08-08 02:35:00,498] Trial 263 finished with value: 4.799999999999995 and parameters: {'learning_rate_a': 0.00017262705197898046, 'batch_size': 64, 'network_sync_rate': 8000, 'n_step': 5, 'per_alpha': 0.5463613572243889, 'per_beta_init': 0.43099041620562367, 'sigma_init': 0.4599772185701407, 'v_max': 30.0}. Best is trial 210 with value: 242.02499999999338.
+[I 2026-08-08 02:49:11,407] Trial 270 pruned. 
+[I 2026-08-08 03:13:39,390] Trial 266 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 1.7510965546410027e-05, 'batch_size': 128, 'network_sync_rate': 2000, 'n_step': 3, 'per_alpha': 0.4099874164807198, 'per_beta_init': 0.5366619978506351, 'sigma_init': 0.6063419690736651, 'v_max': 30.0}. Best is trial 210 with value: 242.02499999999338.
+[I 2026-08-08 03:15:29,997] Trial 273 pruned. 
+[I 2026-08-08 03:39:09,639] Trial 271 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.00040240742541557915, 'batch_size': 32, 'network_sync_rate': 1000, 'n_step': 3, 'per_alpha': 0.47762325709326275, 'per_beta_init': 0.42737968385726405, 'sigma_init': 0.31190397533964453, 'v_max': 15.0}. Best is trial 210 with value: 242.02499999999338.
+[I 2026-08-08 03:41:01,863] Trial 275 pruned. 
+[I 2026-08-08 03:54:41,750] Trial 272 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.00035944913703028157, 'batch_size': 32, 'network_sync_rate': 2000, 'n_step': 1, 'per_alpha': 0.6834292438519928, 'per_beta_init': 0.4008834998910312, 'sigma_init': 0.31863597433265023, 'v_max': 15.0}. Best is trial 210 with value: 242.02499999999338.
+[I 2026-08-08 04:06:46,930] Trial 277 pruned. 
+[I 2026-08-08 04:22:05,766] Trial 278 pruned. 
+[I 2026-08-08 04:44:34,821] Trial 274 finished with value: 15.724999999999978 and parameters: {'learning_rate_a': 0.0003446910953511882, 'batch_size': 128, 'network_sync_rate': 2000, 'n_step': 1, 'per_alpha': 0.5176639698636543, 'per_beta_init': 0.30012937081544994, 'sigma_init': 0.3535348315645981, 'v_max': 30.0}. Best is trial 210 with value: 242.02499999999338.
+[I 2026-08-08 04:48:26,471] Trial 280 pruned. 
+[I 2026-08-08 05:10:13,222] Trial 276 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 3.955564756946934e-05, 'batch_size': 128, 'network_sync_rate': 2000, 'n_step': 3, 'per_alpha': 0.48688833185205604, 'per_beta_init': 0.48718294967493186, 'sigma_init': 0.557035674414688, 'v_max': 15.0}. Best is trial 210 with value: 242.02499999999338.
+[I 2026-08-08 05:11:54,839] Trial 281 pruned. 
+[I 2026-08-08 05:19:34,445] Trial 282 pruned. 
+[I 2026-08-08 05:27:53,175] Trial 285 pruned. 
+[I 2026-08-08 05:36:11,592] Trial 279 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.0001094302146870647, 'batch_size': 128, 'network_sync_rate': 2000, 'n_step': 3, 'per_alpha': 0.5675680232852146, 'per_beta_init': 0.5544088165646138, 'sigma_init': 0.6225058046005013, 'v_max': 30.0}. Best is trial 210 with value: 242.02499999999338.
+[I 2026-08-08 05:36:28,631] Trial 286 pruned. 
+[I 2026-08-08 05:37:27,375] Trial 283 pruned. 
+[I 2026-08-08 05:41:51,474] Trial 284 pruned. 
+[I 2026-08-08 06:03:45,843] Trial 288 pruned. 
+[I 2026-08-08 06:13:15,662] Trial 290 pruned. 
+[I 2026-08-08 06:38:44,399] Trial 292 pruned. 
+[I 2026-08-08 07:06:36,334] Trial 287 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 1.8781755699726495e-05, 'batch_size': 128, 'network_sync_rate': 500, 'n_step': 3, 'per_alpha': 0.39472982673256274, 'per_beta_init': 0.4883863967593275, 'sigma_init': 0.5084769797361368, 'v_max': 30.0}. Best is trial 210 with value: 242.02499999999338.
+[I 2026-08-08 07:06:48,454] Trial 289 pruned. 
+[I 2026-08-08 07:08:22,453] Trial 293 pruned. 
+[I 2026-08-08 07:16:20,819] Trial 296 pruned. 
+[I 2026-08-08 07:21:26,750] Trial 291 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.00017074405155492902, 'batch_size': 32, 'network_sync_rate': 1000, 'n_step': 3, 'per_alpha': 0.6031042727896055, 'per_beta_init': 0.43340558582103, 'sigma_init': 0.34717705717572217, 'v_max': 15.0}. Best is trial 210 with value: 242.02499999999338.
+[I 2026-08-08 07:29:52,552] Trial 298 pruned. 
+[I 2026-08-08 07:32:46,009] Trial 294 pruned. 
+[I 2026-08-08 07:38:19,819] Trial 299 pruned. 
+[I 2026-08-08 07:43:09,675] Trial 297 pruned. 
+[I 2026-08-08 07:47:29,599] Trial 301 pruned. 
+[I 2026-08-08 07:56:39,968] Trial 303 pruned. 
+[I 2026-08-08 08:00:18,024] Trial 300 pruned. 
+[I 2026-08-08 08:05:51,650] Trial 304 pruned. 
+[I 2026-08-08 08:14:22,657] Trial 306 pruned. 
+[I 2026-08-08 08:23:20,877] Trial 295 finished with value: 2.0000000000000013 and parameters: {'learning_rate_a': 0.0004306782499356723, 'batch_size': 32, 'network_sync_rate': 2000, 'n_step': 3, 'per_alpha': 0.47594126949057264, 'per_beta_init': 0.4487577533519978, 'sigma_init': 0.4227718803640175, 'v_max': 15.0}. Best is trial 210 with value: 242.02499999999338.
+[2026-08-08T08:32:18.101] error: *** JOB 6157867 ON uc2n909 CANCELLED AT 2026-08-08T08:32:18 DUE TO TIME LIMIT ***

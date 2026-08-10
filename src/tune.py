@@ -353,9 +353,11 @@ def main():
     p = argparse.ArgumentParser(description="Optuna HPO for DQN / Rainbow / PPO.")
     p.add_argument("--algorithm", required=True, choices=["dqn", "rainbow", "ppo"])
     p.add_argument("--n-trials", type=int, default=400, help="target total trials in the study")
-    p.add_argument("--proxy-steps", type=int, default=1000000,
-                   help="env steps per trial (proxy budget). Raised 300k->1M so selected params "
-                        "suit the long-horizon run rather than a 300k sprint.")
+    p.add_argument("--proxy-steps", type=int, default=None,
+                   help="env steps per trial (proxy budget). Default is algorithm-aware: 300k for "
+                        "dqn/rainbow (Rainbow is slow, ~1 trial/GPU — a long proxy starves the trial "
+                        "count), 1M for ppo (cheaper per step, benefits from the longer horizon). "
+                        "Override explicitly to change.")
     p.add_argument("--eval-episodes", type=int, default=30, help="greedy episodes for the objective")
     p.add_argument("--objective", default="p25", choices=list(OBJECTIVE_KEYS),
                    help="eval statistic to maximize (p25=robust, default)")
@@ -371,6 +373,8 @@ def main():
                    help="load the study, write artifacts + export winner; do not optimize")
     a = p.parse_args()
 
+    if a.proxy_steps is None:
+        a.proxy_steps = 1_000_000 if a.algorithm == "ppo" else 300_000
     if a.study is None:
         a.study = a.algorithm
     if a.storage is None:

@@ -8,9 +8,11 @@
 #SBATCH --output=logs/%x_%j.out
 #SBATCH --error=logs/%x_%j.err
 
-# Usage: sbatch evaluate.sh [hyperparams_set]
+# Usage: sbatch evaluate.sh [hyperparams_set] [extra agent.py flags...]
+#          sbatch evaluate.sh mario_ppo --evaluate-levels
 # Example: sbatch evaluate.sh flappybird_cnn2
 HYPERPARAMS=${1:-flappybird_cnn2}
+shift || true
 
 mkdir -p logs
 
@@ -23,4 +25,4 @@ conda activate "$CONDA_ENV"
 
 export HEADLESS=1
 
-python src/agent.py "$HYPERPARAMS" --evaluate
+python src/agent.py "$HYPERPARAMS" "${@:---evaluate}"

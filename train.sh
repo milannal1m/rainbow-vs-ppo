@@ -8,9 +8,11 @@
 #SBATCH --output=logs/%x_%j.out
 #SBATCH --error=logs/%x_%j.err
 
-# Usage: sbatch train.sh [hyperparams_set]
+# Usage: sbatch train.sh [hyperparams_set] [extra agent.py flags...]
 # Example: sbatch train.sh flappybird_cnn1
+#          sbatch train.sh mario_rainbow --resume
 HYPERPARAMS=${1:-flappybird_cnn1}
+shift || true
 
 mkdir -p logs
 
@@ -23,7 +25,7 @@ conda activate "$CONDA_ENV"
 
 export HEADLESS=1
 
-python src/agent.py "$HYPERPARAMS" --train &
+python src/agent.py "$HYPERPARAMS" --train "$@" &
 TRAIN_PID=$!
 
 sleep 3600

@@ -1,0 +1,285 @@
+/home/ul/ul_student/ul_lmm50/.conda/envs/dqn-flappy-bird-cuda/lib/python3.11/site-packages/optuna/_experimental.py:33: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+  optuna_warn(
+/home/ul/ul_student/ul_lmm50/.conda/envs/dqn-flappy-bird-cuda/lib/python3.11/site-packages/optuna/_experimental.py:33: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+  optuna_warn(
+/home/ul/ul_student/ul_lmm50/.conda/envs/dqn-flappy-bird-cuda/lib/python3.11/site-packages/optuna/_experimental.py:33: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+  optuna_warn(
+/home/ul/ul_student/ul_lmm50/.conda/envs/dqn-flappy-bird-cuda/lib/python3.11/site-packages/optuna/_experimental.py:33: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+  optuna_warn(
+/home/ul/ul_student/ul_lmm50/.conda/envs/dqn-flappy-bird-cuda/lib/python3.11/site-packages/optuna/_experimental.py:33: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+  optuna_warn(
+/home/ul/ul_student/ul_lmm50/.conda/envs/dqn-flappy-bird-cuda/lib/python3.11/site-packages/optuna/_experimental.py:33: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+  optuna_warn(
+/home/ul/ul_student/ul_lmm50/.conda/envs/dqn-flappy-bird-cuda/lib/python3.11/site-packages/optuna/_experimental.py:33: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+  optuna_warn(
+/home/ul/ul_student/ul_lmm50/.conda/envs/dqn-flappy-bird-cuda/lib/python3.11/site-packages/optuna/_experimental.py:33: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+  optuna_warn(
+/home/ul/ul_student/ul_lmm50/.conda/envs/dqn-flappy-bird-cuda/lib/python3.11/site-packages/optuna/_experimental.py:33: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+  optuna_warn(
+/home/ul/ul_student/ul_lmm50/.conda/envs/dqn-flappy-bird-cuda/lib/python3.11/site-packages/optuna/_experimental.py:33: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+  optuna_warn(
+/home/ul/ul_student/ul_lmm50/.conda/envs/dqn-flappy-bird-cuda/lib/python3.11/site-packages/optuna/_experimental.py:33: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+  optuna_warn(
+/home/ul/ul_student/ul_lmm50/.conda/envs/dqn-flappy-bird-cuda/lib/python3.11/site-packages/optuna/_experimental.py:33: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+  optuna_warn(
+[I 2026-08-08 21:53:00,301] A new study created in Journal with name: ppo_6214659
+[I 2026-08-08 21:53:00,317] Using an existing study with name 'ppo_6214659' instead of creating a new one.
+[I 2026-08-08 21:53:00,334] Using an existing study with name 'ppo_6214659' instead of creating a new one.
+[I 2026-08-08 21:53:00,351] Using an existing study with name 'ppo_6214659' instead of creating a new one.
+[I 2026-08-08 21:53:00,370] Using an existing study with name 'ppo_6214659' instead of creating a new one.
+[I 2026-08-08 21:53:00,413] Using an existing study with name 'ppo_6214659' instead of creating a new one.
+[I 2026-08-08 21:53:00,520] Using an existing study with name 'ppo_6214659' instead of creating a new one.
+[I 2026-08-08 21:53:00,539] Using an existing study with name 'ppo_6214659' instead of creating a new one.
+[I 2026-08-08 21:53:00,547] Using an existing study with name 'ppo_6214659' instead of creating a new one.
+[I 2026-08-08 21:53:00,591] Using an existing study with name 'ppo_6214659' instead of creating a new one.
+[I 2026-08-08 21:53:00,734] Using an existing study with name 'ppo_6214659' instead of creating a new one.
+[I 2026-08-08 21:53:00,883] Using an existing study with name 'ppo_6214659' instead of creating a new one.
+[I 2026-08-08 22:10:13,298] Trial 10 pruned. 
+[I 2026-08-08 22:40:05,985] Trial 5 pruned. 
+[I 2026-08-08 22:40:06,314] Trial 0 pruned. 
+[I 2026-08-08 22:40:16,146] Trial 4 pruned. 
+[I 2026-08-08 22:44:32,383] Trial 6 pruned. 
+[I 2026-08-08 22:57:37,232] Trial 12 pruned. 
+[I 2026-08-08 23:01:56,586] Trial 16 pruned. 
+[I 2026-08-08 23:15:11,378] Trial 17 pruned. 
+[I 2026-08-08 23:27:34,772] Trial 14 pruned. 
+[I 2026-08-08 23:28:50,123] Trial 13 pruned. 
+[I 2026-08-08 23:32:14,756] Trial 15 pruned. 
+/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/ppo_agent.py:48: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  actor_critic.load_state_dict(torch.load(self.MODEL_FILE, map_location=device))
+/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/ppo_agent.py:48: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  actor_critic.load_state_dict(torch.load(self.MODEL_FILE, map_location=device))
+/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/ppo_agent.py:48: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  actor_critic.load_state_dict(torch.load(self.MODEL_FILE, map_location=device))
+/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/ppo_agent.py:48: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  actor_critic.load_state_dict(torch.load(self.MODEL_FILE, map_location=device))
+/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/ppo_agent.py:48: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  actor_critic.load_state_dict(torch.load(self.MODEL_FILE, map_location=device))
+[I 2026-08-09 00:21:29,118] Trial 22 pruned. 
+/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/ppo_agent.py:48: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  actor_critic.load_state_dict(torch.load(self.MODEL_FILE, map_location=device))
+[I 2026-08-09 00:24:52,638] Trial 7 finished with value: 99.27499999999887 and parameters: {'learning_rate_a': 0.0001224543371164257, 'ppo_epochs': 3, 'ent_coef': 0.017994858485225106, 'clip_eps': 0.1, 'gae_lambda': 0.9866135337033878, 'vf_coef': 0.9853913914460815, 'rollout_steps': 4096, 'minibatch_size': 128, 'hidden_dim': 512}. Best is trial 7 with value: 99.27499999999887.
+/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/ppo_agent.py:48: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  actor_critic.load_state_dict(torch.load(self.MODEL_FILE, map_location=device))
+[I 2026-08-09 00:32:31,867] Trial 3 finished with value: 211.39999999999384 and parameters: {'learning_rate_a': 5.119009404544678e-05, 'ppo_epochs': 6, 'ent_coef': 0.02313816767338701, 'clip_eps': 0.3, 'gae_lambda': 0.9870695458262618, 'vf_coef': 0.37723090249331825, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 256}. Best is trial 3 with value: 211.39999999999384.
+[I 2026-08-09 00:37:14,169] Trial 2 finished with value: 98.47499999999891 and parameters: {'learning_rate_a': 5.239833087165617e-05, 'ppo_epochs': 10, 'ent_coef': 0.03839760372883201, 'clip_eps': 0.1, 'gae_lambda': 0.9157494871954747, 'vf_coef': 0.8257759044856565, 'rollout_steps': 4096, 'minibatch_size': 64, 'hidden_dim': 256}. Best is trial 3 with value: 211.39999999999384.
+[I 2026-08-09 00:37:54,010] Trial 11 finished with value: 195.64999999999455 and parameters: {'learning_rate_a': 0.00014963928832065516, 'ppo_epochs': 4, 'ent_coef': 0.04944198702504183, 'clip_eps': 0.2, 'gae_lambda': 0.9863228162761042, 'vf_coef': 0.5250340928485424, 'rollout_steps': 8192, 'minibatch_size': 128, 'hidden_dim': 512}. Best is trial 3 with value: 211.39999999999384.
+[I 2026-08-09 00:40:06,137] Trial 1 finished with value: 307.6750000000012 and parameters: {'learning_rate_a': 0.00038596492747064687, 'ppo_epochs': 6, 'ent_coef': 0.02275637689967871, 'clip_eps': 0.1, 'gae_lambda': 0.9294124295435597, 'vf_coef': 0.994852489271566, 'rollout_steps': 8192, 'minibatch_size': 128, 'hidden_dim': 512}. Best is trial 1 with value: 307.6750000000012.
+[I 2026-08-09 00:48:11,890] Trial 25 pruned. 
+[I 2026-08-09 01:04:20,417] Trial 8 finished with value: 430.55000000002315 and parameters: {'learning_rate_a': 4.6610383230186e-05, 'ppo_epochs': 4, 'ent_coef': 0.02930268919633313, 'clip_eps': 0.1, 'gae_lambda': 0.9055259978328806, 'vf_coef': 0.32917147628246324, 'rollout_steps': 8192, 'minibatch_size': 128, 'hidden_dim': 256}. Best is trial 8 with value: 430.55000000002315.
+[I 2026-08-09 01:12:26,090] Trial 23 pruned. 
+/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/ppo_agent.py:48: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  actor_critic.load_state_dict(torch.load(self.MODEL_FILE, map_location=device))
+[I 2026-08-09 01:20:04,593] Trial 30 pruned. 
+[I 2026-08-09 01:24:16,369] Trial 26 pruned. 
+[I 2026-08-09 01:26:53,764] Trial 28 pruned. 
+[I 2026-08-09 01:33:30,542] Trial 29 pruned. 
+[I 2026-08-09 01:40:19,389] Trial 33 pruned. 
+[I 2026-08-09 01:42:27,678] Trial 18 finished with value: 281.27499999999725 and parameters: {'learning_rate_a': 0.000655462071311832, 'ppo_epochs': 3, 'ent_coef': 0.03215014625439476, 'clip_eps': 0.2, 'gae_lambda': 0.948265978985011, 'vf_coef': 0.7916945424517503, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 512}. Best is trial 8 with value: 430.55000000002315.
+[I 2026-08-09 01:42:56,444] Trial 34 pruned. 
+/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/ppo_agent.py:48: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  actor_critic.load_state_dict(torch.load(self.MODEL_FILE, map_location=device))
+[I 2026-08-09 01:52:24,305] Trial 21 pruned. 
+[I 2026-08-09 01:55:53,231] Trial 36 pruned. 
+[I 2026-08-09 01:58:56,610] Trial 31 pruned. 
+[I 2026-08-09 02:39:45,187] Trial 39 pruned. 
+[I 2026-08-09 02:47:14,063] Trial 20 finished with value: 404.95000000001863 and parameters: {'learning_rate_a': 0.00022687050215195324, 'ppo_epochs': 4, 'ent_coef': 0.014036854166774422, 'clip_eps': 0.1, 'gae_lambda': 0.9751860489826711, 'vf_coef': 0.633466192898076, 'rollout_steps': 8192, 'minibatch_size': 64, 'hidden_dim': 512}. Best is trial 8 with value: 430.55000000002315.
+/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/ppo_agent.py:48: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  actor_critic.load_state_dict(torch.load(self.MODEL_FILE, map_location=device))
+[I 2026-08-09 02:57:53,463] Trial 27 pruned. 
+[I 2026-08-09 03:00:31,086] Trial 24 finished with value: 279.87499999999636 and parameters: {'learning_rate_a': 0.0002152372758773806, 'ppo_epochs': 3, 'ent_coef': 0.010174318474700307, 'clip_eps': 0.1, 'gae_lambda': 0.9812509160115235, 'vf_coef': 0.9248785282100542, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 512}. Best is trial 8 with value: 430.55000000002315.
+[I 2026-08-09 03:03:10,862] Trial 43 pruned. 
+[I 2026-08-09 03:16:20,171] Trial 45 pruned. 
+[I 2026-08-09 03:20:17,832] Trial 9 finished with value: 2191.7999999992935 and parameters: {'learning_rate_a': 7.764867417635691e-05, 'ppo_epochs': 10, 'ent_coef': 0.027816882969354046, 'clip_eps': 0.1, 'gae_lambda': 0.9400389522380331, 'vf_coef': 0.5058465085973265, 'rollout_steps': 4096, 'minibatch_size': 64, 'hidden_dim': 256}. Best is trial 9 with value: 2191.7999999992935.
+[I 2026-08-09 03:47:37,602] Trial 32 finished with value: 78.3749999999998 and parameters: {'learning_rate_a': 8.107584854920836e-05, 'ppo_epochs': 6, 'ent_coef': 0.018635703431087513, 'clip_eps': 0.3, 'gae_lambda': 0.984675513926994, 'vf_coef': 0.43284109142606636, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 256}. Best is trial 9 with value: 2191.7999999992935.
+[I 2026-08-09 03:49:41,431] Trial 46 pruned. 
+[I 2026-08-09 03:55:23,951] Trial 35 pruned. 
+[I 2026-08-09 04:07:32,893] Trial 38 finished with value: 23.450000000000074 and parameters: {'learning_rate_a': 0.0005924349178430618, 'ppo_epochs': 3, 'ent_coef': 0.04240574177518617, 'clip_eps': 0.2, 'gae_lambda': 0.9492064636019024, 'vf_coef': 0.6877324809452139, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 512}. Best is trial 9 with value: 2191.7999999992935.
+[I 2026-08-09 04:12:20,106] Trial 37 finished with value: 137.89999999999714 and parameters: {'learning_rate_a': 0.0005519519870298932, 'ppo_epochs': 4, 'ent_coef': 0.023169702604526988, 'clip_eps': 0.2, 'gae_lambda': 0.9396755621391385, 'vf_coef': 0.856761603968553, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 512}. Best is trial 9 with value: 2191.7999999992935.
+[I 2026-08-09 04:13:11,031] Trial 40 finished with value: 24.20000000000008 and parameters: {'learning_rate_a': 0.0007416310348054168, 'ppo_epochs': 3, 'ent_coef': 0.02245160781510536, 'clip_eps': 0.2, 'gae_lambda': 0.9530375201720762, 'vf_coef': 0.6629073400616727, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 512}. Best is trial 9 with value: 2191.7999999992935.
+/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/ppo_agent.py:48: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  actor_critic.load_state_dict(torch.load(self.MODEL_FILE, map_location=device))
+[I 2026-08-09 04:23:34,202] Trial 52 pruned. 
+[I 2026-08-09 04:30:30,321] Trial 54 pruned. 
+[I 2026-08-09 04:33:55,248] Trial 41 finished with value: 138.5499999999971 and parameters: {'learning_rate_a': 0.00038858765347274214, 'ppo_epochs': 6, 'ent_coef': 0.029867568363271556, 'clip_eps': 0.2, 'gae_lambda': 0.9261425347091581, 'vf_coef': 0.7978488917204368, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 512}. Best is trial 9 with value: 2191.7999999992935.
+[I 2026-08-09 04:38:54,074] Trial 49 pruned. 
+[I 2026-08-09 04:40:53,581] Trial 55 pruned. 
+[I 2026-08-09 04:56:39,218] Trial 59 pruned. 
+/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/ppo_agent.py:48: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  actor_critic.load_state_dict(torch.load(self.MODEL_FILE, map_location=device))
+[I 2026-08-09 04:59:51,226] Trial 42 finished with value: 15.274999999999972 and parameters: {'learning_rate_a': 0.0007730459063069394, 'ppo_epochs': 6, 'ent_coef': 0.0420395407478815, 'clip_eps': 0.2, 'gae_lambda': 0.9627469345221411, 'vf_coef': 0.9026239247920903, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 512}. Best is trial 9 with value: 2191.7999999992935.
+[I 2026-08-09 04:59:59,829] Trial 53 pruned. 
+[I 2026-08-09 05:15:46,071] Trial 62 pruned. 
+[I 2026-08-09 05:15:51,193] Trial 61 pruned. 
+[I 2026-08-09 05:19:59,704] Trial 44 pruned. 
+[I 2026-08-09 05:21:12,407] Trial 56 pruned. 
+[I 2026-08-09 05:32:08,515] Trial 64 pruned. 
+[I 2026-08-09 05:32:15,470] Trial 63 pruned. 
+[I 2026-08-09 05:35:41,384] Trial 65 pruned. 
+[I 2026-08-09 05:42:22,969] Trial 47 finished with value: 65.52500000000038 and parameters: {'learning_rate_a': 0.0007776052476284885, 'ppo_epochs': 3, 'ent_coef': 0.04819059394016043, 'clip_eps': 0.2, 'gae_lambda': 0.9602519151341377, 'vf_coef': 0.8962765784838869, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 512}. Best is trial 9 with value: 2191.7999999992935.
+[I 2026-08-09 05:59:45,801] Trial 70 pruned. 
+[I 2026-08-09 06:18:34,771] Trial 50 finished with value: 27.700000000000113 and parameters: {'learning_rate_a': 4.9859471456643404e-05, 'ppo_epochs': 10, 'ent_coef': 0.03321252160869037, 'clip_eps': 0.1, 'gae_lambda': 0.942857781397399, 'vf_coef': 0.543073454930786, 'rollout_steps': 4096, 'minibatch_size': 128, 'hidden_dim': 256}. Best is trial 9 with value: 2191.7999999992935.
+[I 2026-08-09 06:21:19,003] Trial 48 finished with value: 433.8000000000238 and parameters: {'learning_rate_a': 6.939442049335298e-05, 'ppo_epochs': 6, 'ent_coef': 0.02254633007440028, 'clip_eps': 0.1, 'gae_lambda': 0.9370079091102467, 'vf_coef': 0.43348543550885077, 'rollout_steps': 4096, 'minibatch_size': 64, 'hidden_dim': 256}. Best is trial 9 with value: 2191.7999999992935.
+[I 2026-08-09 06:30:55,675] Trial 51 finished with value: 41.850000000000264 and parameters: {'learning_rate_a': 6.008642998785537e-05, 'ppo_epochs': 10, 'ent_coef': 0.0440891080119032, 'clip_eps': 0.2, 'gae_lambda': 0.9343400569477323, 'vf_coef': 0.5956385223152061, 'rollout_steps': 4096, 'minibatch_size': 64, 'hidden_dim': 256}. Best is trial 9 with value: 2191.7999999992935.
+[I 2026-08-09 06:57:29,217] Trial 58 finished with value: 18.625000000000014 and parameters: {'learning_rate_a': 0.0004977411545195092, 'ppo_epochs': 3, 'ent_coef': 0.012876027963088866, 'clip_eps': 0.1, 'gae_lambda': 0.9821386498015325, 'vf_coef': 0.6751698110834397, 'rollout_steps': 8192, 'minibatch_size': 128, 'hidden_dim': 512}. Best is trial 9 with value: 2191.7999999992935.
+[I 2026-08-09 07:07:02,314] Trial 72 pruned. 
+[I 2026-08-09 07:13:55,376] Trial 75 pruned. 
+[I 2026-08-09 07:19:54,823] Trial 57 finished with value: 126.89999999999765 and parameters: {'learning_rate_a': 0.0001210712841881691, 'ppo_epochs': 10, 'ent_coef': 0.022140089859762273, 'clip_eps': 0.1, 'gae_lambda': 0.9539787619142631, 'vf_coef': 0.43948736188332743, 'rollout_steps': 4096, 'minibatch_size': 128, 'hidden_dim': 256}. Best is trial 9 with value: 2191.7999999992935.
+[I 2026-08-09 07:29:02,394] Trial 60 finished with value: 68.40000000000023 and parameters: {'learning_rate_a': 0.00011474794545848367, 'ppo_epochs': 10, 'ent_coef': 0.03401620640715542, 'clip_eps': 0.1, 'gae_lambda': 0.9478072096710135, 'vf_coef': 0.47251991716489944, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 256}. Best is trial 9 with value: 2191.7999999992935.
+[I 2026-08-09 07:36:08,810] Trial 78 pruned. 
+[I 2026-08-09 07:47:02,314] Trial 66 finished with value: 60.825000000000486 and parameters: {'learning_rate_a': 5.680308522613792e-05, 'ppo_epochs': 3, 'ent_coef': 0.006859726413699712, 'clip_eps': 0.2, 'gae_lambda': 0.9823413979593526, 'vf_coef': 0.8675133924779131, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 512}. Best is trial 9 with value: 2191.7999999992935.
+[I 2026-08-09 07:52:53,442] Trial 80 pruned. 
+[I 2026-08-09 07:55:19,321] Trial 76 pruned. 
+[I 2026-08-09 07:56:22,236] Trial 68 finished with value: 67.50000000000028 and parameters: {'learning_rate_a': 0.0002506786569541719, 'ppo_epochs': 4, 'ent_coef': 0.00943275333327319, 'clip_eps': 0.3, 'gae_lambda': 0.9789339470911721, 'vf_coef': 0.932874065969966, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 512}. Best is trial 9 with value: 2191.7999999992935.
+[I 2026-08-09 08:00:35,541] Trial 69 pruned. 
+[I 2026-08-09 08:08:32,486] Trial 82 pruned. 
+[I 2026-08-09 08:18:29,370] Trial 67 finished with value: 201.89999999999426 and parameters: {'learning_rate_a': 0.00040775431861019717, 'ppo_epochs': 3, 'ent_coef': 0.03987839908288531, 'clip_eps': 0.2, 'gae_lambda': 0.9553034944436878, 'vf_coef': 0.8886996911636268, 'rollout_steps': 4096, 'minibatch_size': 64, 'hidden_dim': 256}. Best is trial 9 with value: 2191.7999999992935.
+[I 2026-08-09 08:25:45,442] Trial 71 pruned. 
+[I 2026-08-09 08:44:37,278] Trial 84 pruned. 
+[I 2026-08-09 09:00:33,197] Trial 74 finished with value: 67.4250000000003 and parameters: {'learning_rate_a': 5.27579586631196e-05, 'ppo_epochs': 6, 'ent_coef': 0.014405750755207078, 'clip_eps': 0.2, 'gae_lambda': 0.9399646033818841, 'vf_coef': 0.3123892364251355, 'rollout_steps': 4096, 'minibatch_size': 64, 'hidden_dim': 256}. Best is trial 9 with value: 2191.7999999992935.
+[I 2026-08-09 09:00:52,540] Trial 89 pruned. 
+[I 2026-08-09 09:21:52,129] Trial 73 finished with value: 520.4000000000393 and parameters: {'learning_rate_a': 7.671984594028778e-05, 'ppo_epochs': 6, 'ent_coef': 0.014354797946179797, 'clip_eps': 0.1, 'gae_lambda': 0.9502919315322644, 'vf_coef': 0.42323854019762425, 'rollout_steps': 4096, 'minibatch_size': 128, 'hidden_dim': 256}. Best is trial 9 with value: 2191.7999999992935.
+[I 2026-08-09 09:33:02,934] Trial 77 pruned. 
+[I 2026-08-09 09:37:57,589] Trial 92 pruned. 
+[I 2026-08-09 09:45:44,769] Trial 79 finished with value: 3.8999999999999986 and parameters: {'learning_rate_a': 0.0006200081084760058, 'ppo_epochs': 3, 'ent_coef': 0.008646963250227764, 'clip_eps': 0.1, 'gae_lambda': 0.9700704250991551, 'vf_coef': 0.860481737447496, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 256}. Best is trial 9 with value: 2191.7999999992935.
+[I 2026-08-09 09:46:39,724] Trial 91 pruned. 
+[I 2026-08-09 09:49:07,011] Trial 93 pruned. 
+[I 2026-08-09 10:04:44,770] Trial 97 pruned. 
+[I 2026-08-09 10:09:36,991] Trial 81 pruned. 
+[I 2026-08-09 10:20:18,982] Trial 85 finished with value: 13.84999999999997 and parameters: {'learning_rate_a': 0.00010195105778769218, 'ppo_epochs': 3, 'ent_coef': 0.01947437245567549, 'clip_eps': 0.3, 'gae_lambda': 0.9600926693257986, 'vf_coef': 0.47405956036675767, 'rollout_steps': 4096, 'minibatch_size': 128, 'hidden_dim': 256}. Best is trial 9 with value: 2191.7999999992935.
+[I 2026-08-09 10:33:07,131] Trial 95 pruned. 
+[I 2026-08-09 10:36:07,361] Trial 100 pruned. 
+[I 2026-08-09 10:42:59,473] Trial 87 pruned. 
+[I 2026-08-09 10:44:13,083] Trial 86 finished with value: 40.37500000000025 and parameters: {'learning_rate_a': 0.00013905990460583346, 'ppo_epochs': 6, 'ent_coef': 0.01154406339428129, 'clip_eps': 0.1, 'gae_lambda': 0.9494712480892402, 'vf_coef': 0.32343866022313755, 'rollout_steps': 4096, 'minibatch_size': 64, 'hidden_dim': 512}. Best is trial 9 with value: 2191.7999999992935.
+[I 2026-08-09 10:56:31,156] Trial 99 pruned. 
+[I 2026-08-09 11:06:37,294] Trial 88 finished with value: 100.52499999999881 and parameters: {'learning_rate_a': 3.298081258303947e-05, 'ppo_epochs': 6, 'ent_coef': 0.019130554737906803, 'clip_eps': 0.3, 'gae_lambda': 0.9741447466514835, 'vf_coef': 0.41105104301748746, 'rollout_steps': 4096, 'minibatch_size': 64, 'hidden_dim': 256}. Best is trial 9 with value: 2191.7999999992935.
+[I 2026-08-09 11:22:28,916] Trial 102 pruned. 
+[I 2026-08-09 11:29:13,343] Trial 103 pruned. 
+[I 2026-08-09 11:29:15,298] Trial 90 finished with value: 35.450000000000195 and parameters: {'learning_rate_a': 0.00012142768458496486, 'ppo_epochs': 6, 'ent_coef': 0.01788440747490619, 'clip_eps': 0.1, 'gae_lambda': 0.9791255577525669, 'vf_coef': 0.49866899212067245, 'rollout_steps': 4096, 'minibatch_size': 64, 'hidden_dim': 256}. Best is trial 9 with value: 2191.7999999992935.
+[I 2026-08-09 11:30:27,024] Trial 104 pruned. 
+[I 2026-08-09 11:38:11,513] Trial 107 pruned. 
+[I 2026-08-09 11:53:18,833] Trial 106 pruned. 
+[I 2026-08-09 12:02:38,154] Trial 94 finished with value: 35.9250000000002 and parameters: {'learning_rate_a': 7.526967713426283e-05, 'ppo_epochs': 6, 'ent_coef': 0.008191789382537415, 'clip_eps': 0.1, 'gae_lambda': 0.9541255443181681, 'vf_coef': 0.3274647954319161, 'rollout_steps': 4096, 'minibatch_size': 128, 'hidden_dim': 256}. Best is trial 9 with value: 2191.7999999992935.
+[I 2026-08-09 12:13:48,835] Trial 96 finished with value: 80.69999999999963 and parameters: {'learning_rate_a': 9.694130798464119e-05, 'ppo_epochs': 6, 'ent_coef': 0.009292534045812414, 'clip_eps': 0.3, 'gae_lambda': 0.9342476903344421, 'vf_coef': 0.429189004961393, 'rollout_steps': 4096, 'minibatch_size': 128, 'hidden_dim': 256}. Best is trial 9 with value: 2191.7999999992935.
+[I 2026-08-09 12:15:53,551] Trial 110 pruned. 
+[I 2026-08-09 12:16:05,070] Trial 109 pruned. 
+[I 2026-08-09 12:29:31,618] Trial 114 pruned. 
+[I 2026-08-09 12:31:39,140] Trial 115 pruned. 
+[I 2026-08-09 12:46:06,561] Trial 98 finished with value: 142.67499999999694 and parameters: {'learning_rate_a': 6.526275050930218e-05, 'ppo_epochs': 6, 'ent_coef': 0.02021478362797982, 'clip_eps': 0.1, 'gae_lambda': 0.9364421997462232, 'vf_coef': 0.5333134770939966, 'rollout_steps': 4096, 'minibatch_size': 64, 'hidden_dim': 512}. Best is trial 9 with value: 2191.7999999992935.
+[I 2026-08-09 12:47:22,734] Trial 118 pruned. 
+[I 2026-08-09 12:52:05,059] Trial 101 finished with value: 8.824999999999985 and parameters: {'learning_rate_a': 2.7807594774941842e-05, 'ppo_epochs': 6, 'ent_coef': 0.020159380646121747, 'clip_eps': 0.1, 'gae_lambda': 0.9799802717444698, 'vf_coef': 0.40566865537607366, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 256}. Best is trial 9 with value: 2191.7999999992935.
+[I 2026-08-09 13:01:40,448] Trial 119 pruned. 
+[I 2026-08-09 13:02:20,979] Trial 116 pruned. 
+[I 2026-08-09 13:03:19,849] Trial 120 pruned. 
+[I 2026-08-09 13:07:29,091] Trial 121 pruned. 
+[I 2026-08-09 13:14:05,135] Trial 117 pruned. 
+[I 2026-08-09 13:19:47,989] Trial 124 pruned. 
+[I 2026-08-09 13:23:22,757] Trial 125 pruned. 
+[I 2026-08-09 13:45:06,862] Trial 105 finished with value: 388.30000000001564 and parameters: {'learning_rate_a': 0.00024299415833627132, 'ppo_epochs': 3, 'ent_coef': 0.03059197951877178, 'clip_eps': 0.2, 'gae_lambda': 0.9607939946116613, 'vf_coef': 0.7892778568279757, 'rollout_steps': 4096, 'minibatch_size': 64, 'hidden_dim': 256}. Best is trial 9 with value: 2191.7999999992935.
+[I 2026-08-09 13:46:59,647] Trial 108 pruned. 
+[I 2026-08-09 13:47:57,771] Trial 123 pruned. 
+[I 2026-08-09 13:49:03,549] Trial 122 pruned. 
+[I 2026-08-09 13:58:42,909] Trial 83 finished with value: 2509.299999999067 and parameters: {'learning_rate_a': 0.000924502070494435, 'ppo_epochs': 3, 'ent_coef': 0.005051802334934222, 'clip_eps': 0.1, 'gae_lambda': 0.9695391418330013, 'vf_coef': 0.954406584905585, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 512}. Best is trial 83 with value: 2509.299999999067.
+[I 2026-08-09 14:01:37,864] Trial 126 pruned. 
+[I 2026-08-09 14:04:24,595] Trial 111 finished with value: 68.57500000000022 and parameters: {'learning_rate_a': 7.237010558032823e-05, 'ppo_epochs': 4, 'ent_coef': 0.02282740984967446, 'clip_eps': 0.1, 'gae_lambda': 0.9614088616384407, 'vf_coef': 0.31565646894776833, 'rollout_steps': 4096, 'minibatch_size': 64, 'hidden_dim': 256}. Best is trial 83 with value: 2509.299999999067.
+[I 2026-08-09 14:04:44,805] Trial 132 pruned. 
+[I 2026-08-09 14:16:58,132] Trial 134 pruned. 
+[I 2026-08-09 14:21:00,522] Trial 113 pruned. 
+[I 2026-08-09 14:25:37,275] Trial 112 finished with value: 141.39999999999696 and parameters: {'learning_rate_a': 0.00024080837467338543, 'ppo_epochs': 3, 'ent_coef': 0.033661006623680816, 'clip_eps': 0.3, 'gae_lambda': 0.9615807673874585, 'vf_coef': 0.978584541383116, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 256}. Best is trial 83 with value: 2509.299999999067.
+[I 2026-08-09 14:32:59,956] Trial 131 pruned. 
+[I 2026-08-09 14:45:35,553] Trial 133 pruned. 
+[I 2026-08-09 14:48:28,002] Trial 140 pruned. 
+[I 2026-08-09 15:07:49,583] Trial 138 pruned. 
+[I 2026-08-09 15:33:36,209] Trial 141 pruned. 
+[I 2026-08-09 16:02:27,544] Trial 127 finished with value: 216.09999999999366 and parameters: {'learning_rate_a': 9.709943201628998e-05, 'ppo_epochs': 4, 'ent_coef': 0.02203943255888995, 'clip_eps': 0.3, 'gae_lambda': 0.9571202514663614, 'vf_coef': 0.7705442485146878, 'rollout_steps': 8192, 'minibatch_size': 64, 'hidden_dim': 512}. Best is trial 83 with value: 2509.299999999067.
+[I 2026-08-09 16:04:27,870] Trial 130 finished with value: 13.674999999999994 and parameters: {'learning_rate_a': 0.0007260692351138191, 'ppo_epochs': 3, 'ent_coef': 0.009668535224814758, 'clip_eps': 0.1, 'gae_lambda': 0.9492204403786176, 'vf_coef': 0.8463481484468938, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 512}. Best is trial 83 with value: 2509.299999999067.
+[I 2026-08-09 16:07:49,612] Trial 129 finished with value: 55.15000000000042 and parameters: {'learning_rate_a': 0.00014855409060462942, 'ppo_epochs': 3, 'ent_coef': 0.03153254974037111, 'clip_eps': 0.3, 'gae_lambda': 0.9413604932336231, 'vf_coef': 0.9152795550717457, 'rollout_steps': 4096, 'minibatch_size': 64, 'hidden_dim': 256}. Best is trial 83 with value: 2509.299999999067.
+[I 2026-08-09 16:18:19,739] Trial 145 pruned. 
+[I 2026-08-09 16:23:22,359] Trial 128 finished with value: 521.1750000000393 and parameters: {'learning_rate_a': 0.00020170220282391703, 'ppo_epochs': 3, 'ent_coef': 0.03145018146410456, 'clip_eps': 0.2, 'gae_lambda': 0.9202910364178174, 'vf_coef': 0.6344193636622428, 'rollout_steps': 4096, 'minibatch_size': 128, 'hidden_dim': 512}. Best is trial 83 with value: 2509.299999999067.
+[I 2026-08-09 16:37:23,226] Trial 136 finished with value: 189.57499999999484 and parameters: {'learning_rate_a': 0.0007621739613710685, 'ppo_epochs': 3, 'ent_coef': 0.03771211028377298, 'clip_eps': 0.2, 'gae_lambda': 0.9327084104635351, 'vf_coef': 0.8797687544875782, 'rollout_steps': 4096, 'minibatch_size': 128, 'hidden_dim': 512}. Best is trial 83 with value: 2509.299999999067.
+[I 2026-08-09 16:39:00,661] Trial 149 pruned. 
+[I 2026-08-09 16:49:16,301] Trial 135 finished with value: 331.40000000000555 and parameters: {'learning_rate_a': 0.0002593073860581822, 'ppo_epochs': 3, 'ent_coef': 0.006491572004986838, 'clip_eps': 0.1, 'gae_lambda': 0.9669566701013327, 'vf_coef': 0.9877487460081058, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 512}. Best is trial 83 with value: 2509.299999999067.
+[I 2026-08-09 16:59:11,927] Trial 139 finished with value: 86.64999999999942 and parameters: {'learning_rate_a': 0.000597199109109506, 'ppo_epochs': 3, 'ent_coef': 0.005336200340680429, 'clip_eps': 0.1, 'gae_lambda': 0.9833966267023181, 'vf_coef': 0.9876339705464755, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 512}. Best is trial 83 with value: 2509.299999999067.
+[I 2026-08-09 17:07:49,186] Trial 142 finished with value: 11.974999999999977 and parameters: {'learning_rate_a': 0.00029649095874965703, 'ppo_epochs': 3, 'ent_coef': 0.03231100778690405, 'clip_eps': 0.1, 'gae_lambda': 0.9131433485935768, 'vf_coef': 0.896788574411272, 'rollout_steps': 4096, 'minibatch_size': 64, 'hidden_dim': 256}. Best is trial 83 with value: 2509.299999999067.
+[I 2026-08-09 17:15:11,569] Trial 153 pruned. 
+[I 2026-08-09 17:23:22,058] Trial 150 pruned. 
+[I 2026-08-09 17:26:24,926] Trial 143 pruned. 
+[I 2026-08-09 17:30:45,253] Trial 155 pruned. 
+[I 2026-08-09 17:38:50,678] Trial 156 pruned. 
+[I 2026-08-09 17:55:30,399] Trial 159 pruned. 
+[I 2026-08-09 18:07:23,178] Trial 144 finished with value: 99.27499999999887 and parameters: {'learning_rate_a': 0.00014326060721834305, 'ppo_epochs': 6, 'ent_coef': 0.024696586618811356, 'clip_eps': 0.1, 'gae_lambda': 0.9361316224447037, 'vf_coef': 0.5684791959259319, 'rollout_steps': 4096, 'minibatch_size': 64, 'hidden_dim': 512}. Best is trial 83 with value: 2509.299999999067.
+[I 2026-08-09 18:22:53,929] Trial 146 pruned. 
+[I 2026-08-09 18:29:20,964] Trial 147 finished with value: 13.82499999999997 and parameters: {'learning_rate_a': 7.948144073511432e-05, 'ppo_epochs': 4, 'ent_coef': 0.018950953022131154, 'clip_eps': 0.3, 'gae_lambda': 0.9518432206773769, 'vf_coef': 0.7542221938637482, 'rollout_steps': 8192, 'minibatch_size': 64, 'hidden_dim': 512}. Best is trial 83 with value: 2509.299999999067.
+[I 2026-08-09 18:38:03,462] Trial 148 finished with value: 14.374999999999972 and parameters: {'learning_rate_a': 0.000664474885873749, 'ppo_epochs': 3, 'ent_coef': 0.02866234228883546, 'clip_eps': 0.2, 'gae_lambda': 0.9399720055944751, 'vf_coef': 0.81510653187693, 'rollout_steps': 4096, 'minibatch_size': 128, 'hidden_dim': 512}. Best is trial 83 with value: 2509.299999999067.
+[I 2026-08-09 18:42:18,988] Trial 160 pruned. 
+[I 2026-08-09 18:53:36,943] Trial 161 pruned. 
+[I 2026-08-09 19:09:47,571] Trial 166 pruned. 
+[I 2026-08-09 19:12:36,030] Trial 152 finished with value: 149.6499999999966 and parameters: {'learning_rate_a': 0.00015924462286067228, 'ppo_epochs': 3, 'ent_coef': 0.01749433755126753, 'clip_eps': 0.2, 'gae_lambda': 0.9193287504096249, 'vf_coef': 0.48383522300786497, 'rollout_steps': 4096, 'minibatch_size': 128, 'hidden_dim': 512}. Best is trial 83 with value: 2509.299999999067.
+[I 2026-08-09 19:21:03,638] Trial 164 pruned. 
+[I 2026-08-09 19:27:24,681] Trial 168 pruned. 
+[I 2026-08-09 19:31:09,808] Trial 154 finished with value: 97.44999999999895 and parameters: {'learning_rate_a': 0.00012282323987922847, 'ppo_epochs': 3, 'ent_coef': 0.04697720299765818, 'clip_eps': 0.2, 'gae_lambda': 0.9122228750254656, 'vf_coef': 0.5051861449625914, 'rollout_steps': 4096, 'minibatch_size': 128, 'hidden_dim': 512}. Best is trial 83 with value: 2509.299999999067.
+[I 2026-08-09 19:46:50,732] Trial 171 pruned. 
+[I 2026-08-09 19:48:34,642] Trial 157 pruned. 
+[I 2026-08-09 19:51:54,123] Trial 158 finished with value: 43.27500000000029 and parameters: {'learning_rate_a': 0.0002876443191466882, 'ppo_epochs': 3, 'ent_coef': 0.03537398165398138, 'clip_eps': 0.2, 'gae_lambda': 0.9172377080319521, 'vf_coef': 0.599453631175593, 'rollout_steps': 4096, 'minibatch_size': 128, 'hidden_dim': 512}. Best is trial 83 with value: 2509.299999999067.
+[I 2026-08-09 20:07:22,295] Trial 174 pruned. 
+[I 2026-08-09 20:34:25,913] Trial 173 pruned. 
+[I 2026-08-09 20:45:39,428] Trial 162 finished with value: 12.899999999999974 and parameters: {'learning_rate_a': 0.00032836011654773954, 'ppo_epochs': 4, 'ent_coef': 0.010988130189120945, 'clip_eps': 0.3, 'gae_lambda': 0.9532618853774052, 'vf_coef': 0.792397919984719, 'rollout_steps': 8192, 'minibatch_size': 64, 'hidden_dim': 512}. Best is trial 83 with value: 2509.299999999067.
+[I 2026-08-09 20:49:04,921] Trial 163 finished with value: 24.425000000000082 and parameters: {'learning_rate_a': 0.00016325842358068572, 'ppo_epochs': 3, 'ent_coef': 0.026050792299203523, 'clip_eps': 0.2, 'gae_lambda': 0.9216255554103642, 'vf_coef': 0.6087743585920459, 'rollout_steps': 4096, 'minibatch_size': 128, 'hidden_dim': 256}. Best is trial 83 with value: 2509.299999999067.
+[I 2026-08-09 20:53:13,261] Trial 175 pruned. 
+[I 2026-08-09 21:03:31,713] Trial 165 finished with value: 26.90000000000011 and parameters: {'learning_rate_a': 0.00012022513917795457, 'ppo_epochs': 3, 'ent_coef': 0.00666076410593691, 'clip_eps': 0.1, 'gae_lambda': 0.9609940037232895, 'vf_coef': 0.9308415539243509, 'rollout_steps': 4096, 'minibatch_size': 64, 'hidden_dim': 512}. Best is trial 83 with value: 2509.299999999067.
+[I 2026-08-09 21:08:37,984] Trial 179 pruned. 
+[I 2026-08-09 21:30:22,918] Trial 137 finished with value: 2657.6999999989607 and parameters: {'learning_rate_a': 0.0002783481837523651, 'ppo_epochs': 4, 'ent_coef': 0.028534785186115404, 'clip_eps': 0.1, 'gae_lambda': 0.9436846618444199, 'vf_coef': 0.8449235877900262, 'rollout_steps': 4096, 'minibatch_size': 64, 'hidden_dim': 256}. Best is trial 137 with value: 2657.6999999989607.
+[I 2026-08-09 21:35:57,047] Trial 178 pruned. 
+[I 2026-08-09 21:37:25,824] Trial 169 finished with value: 12.899999999999974 and parameters: {'learning_rate_a': 0.00011325402994162298, 'ppo_epochs': 3, 'ent_coef': 0.017311540618338304, 'clip_eps': 0.1, 'gae_lambda': 0.955701898911362, 'vf_coef': 0.9571491527525938, 'rollout_steps': 8192, 'minibatch_size': 128, 'hidden_dim': 512}. Best is trial 137 with value: 2657.6999999989607.
+[I 2026-08-09 21:51:46,475] Trial 183 pruned. 
+[I 2026-08-09 21:53:07,973] Trial 167 finished with value: 268.399999999995 and parameters: {'learning_rate_a': 0.0002568909280748219, 'ppo_epochs': 3, 'ent_coef': 0.02649017789755394, 'clip_eps': 0.3, 'gae_lambda': 0.909930409569172, 'vf_coef': 0.5794982058504771, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 512}. Best is trial 137 with value: 2657.6999999989607.
+[I 2026-08-09 22:01:50,083] Trial 170 finished with value: 107.3999999999985 and parameters: {'learning_rate_a': 0.0005171905832559186, 'ppo_epochs': 3, 'ent_coef': 0.016987129598765225, 'clip_eps': 0.2, 'gae_lambda': 0.930327001493962, 'vf_coef': 0.8744706555089687, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 512}. Best is trial 137 with value: 2657.6999999989607.
+[I 2026-08-09 22:09:15,621] Trial 172 finished with value: 42.900000000000276 and parameters: {'learning_rate_a': 0.0005235949949928071, 'ppo_epochs': 3, 'ent_coef': 0.04507313744829956, 'clip_eps': 0.2, 'gae_lambda': 0.9124494368804527, 'vf_coef': 0.7812230882137235, 'rollout_steps': 4096, 'minibatch_size': 128, 'hidden_dim': 256}. Best is trial 137 with value: 2657.6999999989607.
+[I 2026-08-09 22:38:02,935] Trial 185 pruned. 
+[I 2026-08-09 22:39:23,884] Trial 186 pruned. 
+[I 2026-08-09 22:52:28,544] Trial 176 finished with value: 13.074999999999973 and parameters: {'learning_rate_a': 4.5999701523156736e-05, 'ppo_epochs': 3, 'ent_coef': 0.037376683968048656, 'clip_eps': 0.2, 'gae_lambda': 0.9398815575093534, 'vf_coef': 0.865661399007169, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 512}. Best is trial 137 with value: 2657.6999999989607.
+[I 2026-08-09 22:54:49,121] Trial 190 pruned. 
+[I 2026-08-09 23:20:18,974] Trial 180 finished with value: 8.399999999999986 and parameters: {'learning_rate_a': 0.00029361584880905207, 'ppo_epochs': 3, 'ent_coef': 0.02142204934351738, 'clip_eps': 0.2, 'gae_lambda': 0.9298808515497733, 'vf_coef': 0.8595115318882112, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 512}. Best is trial 137 with value: 2657.6999999989607.
+[I 2026-08-09 23:34:40,484] Trial 181 finished with value: 79.02499999999975 and parameters: {'learning_rate_a': 0.0004605919858647219, 'ppo_epochs': 3, 'ent_coef': 0.021375048861467107, 'clip_eps': 0.2, 'gae_lambda': 0.9459627663948985, 'vf_coef': 0.8816361210934557, 'rollout_steps': 4096, 'minibatch_size': 64, 'hidden_dim': 512}. Best is trial 137 with value: 2657.6999999989607.
+[I 2026-08-09 23:46:59,750] Trial 182 pruned. 
+[I 2026-08-10 00:21:01,541] Trial 187 finished with value: 27.475000000000115 and parameters: {'learning_rate_a': 0.00039521093785685273, 'ppo_epochs': 3, 'ent_coef': 0.023434942087760594, 'clip_eps': 0.3, 'gae_lambda': 0.9195168487651711, 'vf_coef': 0.3332124441534813, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 512}. Best is trial 137 with value: 2657.6999999989607.
+[I 2026-08-10 00:21:23,488] Trial 194 pruned. 
+[I 2026-08-10 00:36:40,805] Trial 196 pruned. 
+[I 2026-08-10 00:43:47,791] Trial 177 finished with value: 1105.7250000000695 and parameters: {'learning_rate_a': 0.0003215272933363972, 'ppo_epochs': 3, 'ent_coef': 0.008935943575854782, 'clip_eps': 0.3, 'gae_lambda': 0.9691709753965212, 'vf_coef': 0.8279674753922225, 'rollout_steps': 4096, 'minibatch_size': 128, 'hidden_dim': 512}. Best is trial 137 with value: 2657.6999999989607.
+[I 2026-08-10 00:52:28,591] Trial 198 pruned. 
+[I 2026-08-10 00:52:49,091] Trial 184 finished with value: 446.9000000000262 and parameters: {'learning_rate_a': 0.0001897857057449053, 'ppo_epochs': 4, 'ent_coef': 0.02892915038605515, 'clip_eps': 0.1, 'gae_lambda': 0.9507912637660384, 'vf_coef': 0.9310306276605008, 'rollout_steps': 4096, 'minibatch_size': 64, 'hidden_dim': 256}. Best is trial 137 with value: 2657.6999999989607.
+[I 2026-08-10 00:55:28,862] Trial 189 finished with value: 18.00000000000001 and parameters: {'learning_rate_a': 0.0001898868768502508, 'ppo_epochs': 3, 'ent_coef': 0.029390028241201575, 'clip_eps': 0.3, 'gae_lambda': 0.9360305782804572, 'vf_coef': 0.6781095728209358, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 512}. Best is trial 137 with value: 2657.6999999989607.
+[I 2026-08-10 01:13:58,933] Trial 191 finished with value: 41.17500000000027 and parameters: {'learning_rate_a': 0.00031227594386089655, 'ppo_epochs': 3, 'ent_coef': 0.025292130919719297, 'clip_eps': 0.3, 'gae_lambda': 0.9001022605984913, 'vf_coef': 0.48167688871553405, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 512}. Best is trial 137 with value: 2657.6999999989607.
+[I 2026-08-10 01:15:23,025] Trial 192 finished with value: 53.90000000000038 and parameters: {'learning_rate_a': 0.0002470444251846503, 'ppo_epochs': 3, 'ent_coef': 0.03494714190369749, 'clip_eps': 0.3, 'gae_lambda': 0.9173804708023877, 'vf_coef': 0.7857044370134337, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 512}. Best is trial 137 with value: 2657.6999999989607.
+[I 2026-08-10 01:26:34,259] Trial 188 finished with value: 596.2750000000528 and parameters: {'learning_rate_a': 0.00017789334291175513, 'ppo_epochs': 3, 'ent_coef': 0.01818118805034709, 'clip_eps': 0.3, 'gae_lambda': 0.9105622719551334, 'vf_coef': 0.6030810734281198, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 512}. Best is trial 137 with value: 2657.6999999989607.
+[I 2026-08-10 01:30:07,460] Trial 199 pruned. 
+[I 2026-08-10 01:38:15,415] Trial 200 pruned. 
+[I 2026-08-10 01:42:30,672] Trial 205 pruned. 
+[I 2026-08-10 02:00:18,856] Trial 203 pruned. 
+[I 2026-08-10 02:01:37,571] Trial 204 pruned. 
+[I 2026-08-10 02:06:25,325] Trial 195 finished with value: 23.05000000000006 and parameters: {'learning_rate_a': 0.0006167952401660163, 'ppo_epochs': 4, 'ent_coef': 0.005044724632480471, 'clip_eps': 0.1, 'gae_lambda': 0.9551593320240378, 'vf_coef': 0.8100269431412295, 'rollout_steps': 4096, 'minibatch_size': 128, 'hidden_dim': 512}. Best is trial 137 with value: 2657.6999999989607.
+[I 2026-08-10 02:15:42,717] Trial 193 finished with value: 274.79999999999563 and parameters: {'learning_rate_a': 0.00024784915392903967, 'ppo_epochs': 3, 'ent_coef': 0.018030237610644546, 'clip_eps': 0.3, 'gae_lambda': 0.9088000623129048, 'vf_coef': 0.5514045765214294, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 512}. Best is trial 137 with value: 2657.6999999989607.
+[I 2026-08-10 02:17:16,314] Trial 210 pruned. 
+[I 2026-08-10 02:22:50,728] Trial 211 pruned. 
+[I 2026-08-10 02:23:56,920] Trial 207 pruned. 
+[I 2026-08-10 02:31:14,509] Trial 212 pruned. 
+[I 2026-08-10 02:39:35,822] Trial 215 pruned. 
+[I 2026-08-10 02:42:17,809] Trial 197 finished with value: 68.90000000000022 and parameters: {'learning_rate_a': 0.00015197766308171546, 'ppo_epochs': 3, 'ent_coef': 0.03167076162640398, 'clip_eps': 0.3, 'gae_lambda': 0.9052408957600421, 'vf_coef': 0.6832642843606975, 'rollout_steps': 8192, 'minibatch_size': 256, 'hidden_dim': 512}. Best is trial 137 with value: 2657.6999999989607.
+[I 2026-08-10 02:45:36,991] Trial 209 pruned. 
+[I 2026-08-10 02:46:45,253] Trial 216 pruned. 
+[I 2026-08-10 02:58:36,833] Trial 218 pruned. 
+[I 2026-08-10 03:02:05,397] Trial 220 pruned. 
+[I 2026-08-10 03:02:59,440] Trial 213 pruned. 
+[I 2026-08-10 03:29:04,475] Trial 201 finished with value: 225.2749999999932 and parameters: {'learning_rate_a': 0.00038596915976402737, 'ppo_epochs': 3, 'ent_coef': 0.007142185422292827, 'clip_eps': 0.3, 'gae_lambda': 0.9610431439200927, 'vf_coef': 0.7733048437745236, 'rollout_steps': 4096, 'minibatch_size': 128, 'hidden_dim': 512}. Best is trial 137 with value: 2657.6999999989607.
+[I 2026-08-10 03:36:13,804] Trial 219 pruned. 
+[I 2026-08-10 03:51:20,897] Trial 206 finished with value: 53.7000000000004 and parameters: {'learning_rate_a': 0.00028915347261696466, 'ppo_epochs': 3, 'ent_coef': 0.012353032387081216, 'clip_eps': 0.3, 'gae_lambda': 0.965277955711602, 'vf_coef': 0.9607211016561441, 'rollout_steps': 4096, 'minibatch_size': 128, 'hidden_dim': 512}. Best is trial 137 with value: 2657.6999999989607.
+[I 2026-08-10 04:07:36,034] Trial 226 pruned. 
+[I 2026-08-10 04:22:57,773] Trial 208 finished with value: 281.27499999999657 and parameters: {'learning_rate_a': 0.0002607867604889725, 'ppo_epochs': 3, 'ent_coef': 0.013592021313691962, 'clip_eps': 0.3, 'gae_lambda': 0.9139918062118634, 'vf_coef': 0.6258930123390694, 'rollout_steps': 4096, 'minibatch_size': 64, 'hidden_dim': 512}. Best is trial 137 with value: 2657.6999999989607.
+[I 2026-08-10 04:23:15,557] Trial 225 pruned. 
+[I 2026-08-10 04:47:15,100] Trial 214 finished with value: 46.775000000000304 and parameters: {'learning_rate_a': 0.0005645047772010475, 'ppo_epochs': 4, 'ent_coef': 0.019786776087638992, 'clip_eps': 0.1, 'gae_lambda': 0.9741476388281428, 'vf_coef': 0.7008435665372758, 'rollout_steps': 4096, 'minibatch_size': 64, 'hidden_dim': 512}. Best is trial 137 with value: 2657.6999999989607.
+[I 2026-08-10 05:10:38,440] Trial 229 pruned. 
+[I 2026-08-10 05:15:08,827] Trial 217 finished with value: 154.92499999999637 and parameters: {'learning_rate_a': 0.00013924469125337573, 'ppo_epochs': 3, 'ent_coef': 0.007540587923131155, 'clip_eps': 0.3, 'gae_lambda': 0.9115332288447318, 'vf_coef': 0.7090628218263852, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 512}. Best is trial 137 with value: 2657.6999999989607.
+[I 2026-08-10 05:21:38,297] Trial 223 finished with value: 6.399999999999993 and parameters: {'learning_rate_a': 0.00026729261373696227, 'ppo_epochs': 4, 'ent_coef': 0.020263862651319076, 'clip_eps': 0.3, 'gae_lambda': 0.900542681653686, 'vf_coef': 0.6887657471258832, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 512}. Best is trial 137 with value: 2657.6999999989607.
+[I 2026-08-10 05:21:39,655] Trial 222 finished with value: 16.32499999999999 and parameters: {'learning_rate_a': 0.00028145000217227634, 'ppo_epochs': 3, 'ent_coef': 0.007596893879409395, 'clip_eps': 0.3, 'gae_lambda': 0.9824356294608807, 'vf_coef': 0.7854754541818303, 'rollout_steps': 4096, 'minibatch_size': 128, 'hidden_dim': 512}. Best is trial 137 with value: 2657.6999999989607.
+[I 2026-08-10 05:23:31,941] Trial 221 finished with value: 50.650000000000375 and parameters: {'learning_rate_a': 0.00013901948353703985, 'ppo_epochs': 6, 'ent_coef': 0.019436540150635846, 'clip_eps': 0.3, 'gae_lambda': 0.9229689664654975, 'vf_coef': 0.571246286054956, 'rollout_steps': 4096, 'minibatch_size': 256, 'hidden_dim': 512}. Best is trial 137 with value: 2657.6999999989607.
+[2026-08-10T05:51:56.099] error: *** JOB 6214659 ON uc2n912 CANCELLED AT 2026-08-10T05:51:56 DUE TO TIME LIMIT ***

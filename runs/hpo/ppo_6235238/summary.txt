@@ -1,0 +1,17 @@
+study: ppo_6235238
+algorithm: ppo
+completed trials: 73 / 200 total
+best value (p25 greedy reward): 1769.5000
+best trial: #172
+best params:
+  learning_rate_a: 0.00020338613967543344
+  ppo_epochs: 4
+  ent_coef: 0.01513546348816664
+  clip_eps: 0.1
+  gae_lambda: 0.9581592637911547
+  vf_coef: 0.7205156007003908
+  rollout_steps: 4096
+  minibatch_size: 256
+  hidden_dim: 512
+exported to hyperparams.yml as: flappybird_ppo_tuned_3
+run it with: sbatch train.sh flappybird_ppo_tuned_3

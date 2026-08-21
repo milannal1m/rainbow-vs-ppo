@@ -1,155 +1,4 @@
-cartpole1:
-  env_id: CartPole-v1
-  replay_memory_size: 10000
-  batch_size: 32
-  epsilon_init: 1.0
-  epsilon_decay: 0.99995
-  epsilon_min: 0.05
-  network_sync_rate: 500
-  learning_rate_a: 0.001
-  discount_factor_g: 0.99
-  stop_on_reward: 100000
-  hidden_dim: 10
-  enable_double_dqn: False
-  network_type: "dqn"
-
-flappybird_tutorial:
-  env_id: FlappyBird-v0
-  replay_memory_size: 10000
-  batch_size: 32
-  epsilon_init: 1.0
-  epsilon_decay: 0.99995
-  epsilon_min: 0.05
-  network_sync_rate: 10
-  learning_rate_a: 0.0001
-  discount_factor_g: 0.99
-  stop_on_reward: 100000
-  hidden_dim: 512
-  env_make_params:
-    use_lidar: False
-  enable_double_dqn: False
-  network_type: "dqn"
-
-flappybird1:
-  env_id: FlappyBird-v0
-  replay_memory_size: 10000
-  batch_size: 32
-  epsilon_init: 1.0
-  epsilon_decay: 0.99995
-  epsilon_min: 0.05
-  network_sync_rate: 10
-  learning_rate_a: 0.0001
-  discount_factor_g: 0.99
-  stop_on_reward: 100000
-  hidden_dim: 512
-  env_make_params:
-    use_lidar: False
-  enable_double_dqn: False
-  network_type: "dqn"
-
-flappybird2:
-  env_id: FlappyBird-v0
-  replay_memory_size: 10000
-  batch_size: 32
-  epsilon_init: 1.0
-  epsilon_decay: 0.99999
-  epsilon_min: 0.05
-  network_sync_rate: 10
-  learning_rate_a: 0.0001
-  discount_factor_g: 0.99
-  stop_on_reward: 100000
-  hidden_dim: 512
-  env_make_params:
-    use_lidar: False
-  enable_double_dqn: False
-  network_type: "dqn"
-
-flappybird3:
-  env_id: FlappyBird-v0
-  replay_memory_size: 10000
-  batch_size: 32
-  epsilon_init: 1.0
-  epsilon_decay: 0.99995
-  epsilon_min: 0.05
-  network_sync_rate: 500
-  learning_rate_a: 0.0001
-  discount_factor_g: 0.99
-  stop_on_reward: 100000
-  hidden_dim: 512
-  env_make_params:
-    use_lidar: False
-  enable_double_dqn: False
-  network_type: "dqn"
-
-flappybird4:
-  env_id: FlappyBird-v0
-  replay_memory_size: 10000
-  batch_size: 32
-  epsilon_init: 1.0
-  epsilon_decay: 0.999995
-  epsilon_min: 0.05
-  network_sync_rate: 500
-  learning_rate_a: 0.0001
-  discount_factor_g: 0.99
-  stop_on_reward: 100000
-  hidden_dim: 512
-  env_make_params:
-    use_lidar: False
-  enable_double_dqn: False
-  network_type: "dqn"
-
-flappybird5:
-  env_id: FlappyBird-v0
-  replay_memory_size: 50000
-  batch_size: 64
-  epsilon_init: 1.0
-  epsilon_decay: 0.999995
-  epsilon_min: 0.02
-  network_sync_rate: 500
-  learning_rate_a: 0.0001
-  discount_factor_g: 0.99
-  stop_on_reward: 100000
-  hidden_dim: 512
-  env_make_params:
-    use_lidar: False
-  enable_double_dqn: False
-  network_type: "dqn"
-
-flappybird6:
-  env_id: FlappyBird-v0
-  replay_memory_size: 50000
-  batch_size: 64
-  epsilon_init: 1.0
-  epsilon_decay: 0.999995
-  epsilon_min: 0.01
-  network_sync_rate: 500
-  learning_rate_a: 0.0001
-  discount_factor_g: 0.99
-  stop_on_reward: 100000
-  hidden_dim: 512
-  env_make_params:
-    use_lidar: False
-  enable_double_dqn: False
-  network_type: "dqn"
-
-flappybird7:
-  env_id: FlappyBird-v0
-  replay_memory_size: 50000
-  batch_size: 64
-  epsilon_init: 1.0
-  epsilon_decay: 0.999995
-  epsilon_min: 0.02
-  network_sync_rate: 500
-  learning_rate_a: 0.0001
-  discount_factor_g: 0.99
-  stop_on_reward: 100000
-  hidden_dim: 512
-  env_make_params:
-    use_lidar: False
-  enable_double_dqn: True
-  network_type: "dqn"
-
-flappybird8:
+flappybird_no_image:
   env_id: FlappyBird-v0
   replay_memory_size: 200000
   batch_size: 64
@@ -166,70 +15,8 @@ flappybird8:
   enable_double_dqn: True
   network_type: "dueling_dqn"
 
-flappybird_cnn1:
-  env_id: FlappyBird-v0
-  replay_memory_size: 200000
-  batch_size: 512
-  epsilon_init: 1.0
-  epsilon_decay: 0.999995
-  epsilon_min: 0.05
-  network_sync_rate: 500
-  learning_rate_a: 0.0001
-  discount_factor_g: 0.99
-  stop_on_reward: 100000
-  hidden_dim: 512
-  enable_double_dqn: True
-  network_type: "cnn_dqn"
-  frame_stack: 4
-  obs_size: 80
-  rgb_wrapper: true
-  env_make_params:
-    use_lidar: False
-    background: null
 
-flappybird_cnn2:
-  env_id: FlappyBird-v0
-  replay_memory_size: 200000
-  batch_size: 512
-  epsilon_init: 1.0
-  epsilon_decay: 0.999995
-  epsilon_min: 0.02
-  network_sync_rate: 500
-  learning_rate_a: 0.0001
-  discount_factor_g: 0.99
-  stop_on_reward: 100000
-  hidden_dim: 512
-  enable_double_dqn: True
-  network_type: "cnn_dqn"
-  frame_stack: 4
-  obs_size: 80
-  rgb_wrapper: true
-  env_make_params:
-    use_lidar: False
-    background: null
-
-flappybird_cnn3:
-  env_id: FlappyBird-v0
-  replay_memory_size: 200000
-  batch_size: 512
-  epsilon_init: 1.0
-  epsilon_decay: 0.999995
-  epsilon_min: 0.001
-  network_sync_rate: 500
-  learning_rate_a: 0.0001
-  discount_factor_g: 0.99
-  stop_on_reward: 100000
-  hidden_dim: 512
-  enable_double_dqn: True
-  network_type: "cnn_dqn"
-  frame_stack: 4
-  obs_size: 80
-  rgb_wrapper: true
-  env_make_params:
-    use_lidar: False
-    background: null
-
-flappybird_cnn4:
+flappybird_dqn_hand:
   env_id: FlappyBird-v0
   replay_memory_size: 200000
   batch_size: 512
@@ -247,52 +34,6 @@ flappybird_cnn4:
   obs_size: 80
   rgb_wrapper: true
   lr_decay_patience: 1000
-  env_make_params:
-    use_lidar: False
-    background: null
-
-flappybird_cnn4-2:
-  env_id: FlappyBird-v0
-  replay_memory_size: 200000
-  batch_size: 512
-  epsilon_init: 1.0
-  epsilon_decay: 0.999995
-  epsilon_min: 0.001
-  network_sync_rate: 500
-  learning_rate_a: 0.0001
-  discount_factor_g: 0.99
-  stop_on_reward: 100000
-  hidden_dim: 512
-  enable_double_dqn: True
-  network_type: "cnn_dqn"
-  frame_stack: 4
-  obs_size: 80
-  rgb_wrapper: true
-  lr_decay_patience: 1000
-  seed: 42
-  env_make_params:
-    use_lidar: False
-    background: null
-
-flappybird_cnn5:
-  env_id: FlappyBird-v0
-  replay_memory_size: 200000
-  batch_size: 512
-  epsilon_init: 1.0
-  epsilon_decay: 0.999995
-  epsilon_min: 0.001
-  network_sync_rate: 500
-  learning_rate_a: 0.0001
-  discount_factor_g: 0.99
-  stop_on_reward: 100000
-  hidden_dim: 512
-  enable_double_dqn: True
-  network_type: "cnn_dqn"
-  frame_stack: 4
-  obs_size: 80
-  rgb_wrapper: true
-  lr_decay_patience: 1000
-  start_learning_after: 10000
   seed: 42
   env_make_params:
     use_lidar: False
@@ -300,346 +41,8 @@ flappybird_cnn5:
 
 # Rainbow DQN — paper hyperparameters (Hessel et al. 2017)
 # All six extensions enabled: Double DQN, Dueling, PER, Noisy Nets, n-step, Distributional RL
-flappybird_rainbow:
-  env_id: FlappyBird-v0
-  replay_memory_size: 1000000   # uint8 storage: 1M * ~50KB = ~50GB CPU RAM
-  batch_size: 32                # paper: 32
-  # epsilon unused — Noisy Nets handle exploration (auto-set to 0 when use_noisy: true)
-  epsilon_init: 1.0
-  epsilon_decay: 1.0
-  epsilon_min: 0.0
-  network_sync_rate: 32000      # paper: target net updated every 32k steps
-  learning_rate_a: 0.0000625    # paper: 6.25e-5 (Adam)
-  discount_factor_g: 0.99       # paper: 0.99
-  stop_on_reward: 100000
-  hidden_dim: 512
-  start_learning_after: 80000   # paper: 80k steps before first update
-  network_type: "rainbow_cnn_dqn"
-  frame_stack: 4
-  obs_size: 80
-  rgb_wrapper: true
-  env_make_params:
-    use_lidar: False
-    background: null
-  # Rainbow extension flags
-  enable_double_dqn: true       # Double DQN (action selection from online net)
-  use_dueling: true             # Dueling network streams
-  use_per: true                 # Prioritized Experience Replay
-  use_nstep: true               # Multi-step returns
-  use_noisy: true               # Noisy Nets (replaces epsilon-greedy)
-  use_distributional: true      # C51 distributional RL
-  # PER parameters (paper: alpha=0.5, beta 0.4→1 over 10M steps)
-  per_alpha: 0.5
-  per_beta_init: 0.4
-  per_beta_frames: 10000000
-  # n-step returns
-  n_step: 3                     # paper: n=3
-  # Distributional RL (C51)
-  n_atoms: 51                   # paper: 51 atoms
-  v_min: -5.0                   # paper uses -10 for Atari; FlappyBird rarely goes negative
-  v_max: 30.0                   # 0.1/step*(1/(1-0.99))=10, plus pipe bonuses; needs headroom
-  # Noisy Nets
-  sigma_init: 0.5               # paper: σ_0=0.5 (factorised)
-  seed: 42
 
-flappybird_rainbow2:
-  env_id: FlappyBird-v0
-  replay_memory_size: 1000000   # uint8 storage: 1M * ~50KB = ~50GB CPU RAM
-  batch_size: 512                # paper: 32
-  # epsilon unused — Noisy Nets handle exploration (auto-set to 0 when use_noisy: true)
-  epsilon_init: 1.0
-  epsilon_decay: 1.0
-  epsilon_min: 0.0
-  network_sync_rate: 500       # paper uses 32k for Atari;
-  learning_rate_a: 0.0000625    # paper: 6.25e-5 (Adam)
-  discount_factor_g: 0.99       # paper: 0.99
-  stop_on_reward: 100000
-  hidden_dim: 512
-  start_learning_after: 20000   # paper uses 80k for Atari; FlappyBird warms up much faster
-  network_type: "rainbow_cnn_dqn"
-  frame_stack: 4
-  obs_size: 80
-  rgb_wrapper: true
-  env_make_params:
-    use_lidar: False
-    background: null
-  # Rainbow extension flags
-  enable_double_dqn: true       # Double DQN (action selection from online net)
-  use_dueling: true             # Dueling network streams
-  use_per: true                 # Prioritized Experience Replay
-  use_nstep: true               # Multi-step returns
-  use_noisy: true               # Noisy Nets (replaces epsilon-greedy)
-  use_distributional: true      # C51 distributional RL
-  # PER parameters (paper: alpha=0.5, beta 0.4→1 over 10M steps)
-  per_alpha: 0.5
-  per_beta_init: 0.4
-  per_beta_frames: 2000000      # anneal β to 1.0 within a typical 24h run (~2M steps)
-  # n-step returns
-  n_step: 3                     # paper: n=3
-  # Distributional RL (C51)
-  n_atoms: 51                   # paper: 51 atoms
-  v_min: -5.0                   # paper uses -10 for Atari; FlappyBird rarely goes negative
-  v_max: 30.0                   # 0.1/step*(1/(1-0.99))=10, plus pipe bonuses; needs headroom
-  # Noisy Nets
-  sigma_init: 0.5               # paper: σ_0=0.5 (factorised)
-  seed: 42
-
-flappybird_rainbow3:
-  env_id: FlappyBird-v0
-  replay_memory_size: 1000000   # uint8 storage: 1M * ~50KB = ~50GB CPU RAM
-  batch_size: 512                # paper: 32
-  # epsilon unused — Noisy Nets handle exploration (auto-set to 0 when use_noisy: true)
-  epsilon_init: 1.0
-  epsilon_decay: 1.0
-  epsilon_min: 0.0
-  network_sync_rate: 1000       # paper uses 32k for Atari;
-  learning_rate_a: 0.0000625    # paper: 6.25e-5 (Adam)
-  discount_factor_g: 0.99       # paper: 0.99
-  stop_on_reward: 100000
-  hidden_dim: 512
-  start_learning_after: 20000   # paper uses 80k for Atari; FlappyBird warms up much faster
-  network_type: "rainbow_cnn_dqn"
-  frame_stack: 4
-  obs_size: 80
-  rgb_wrapper: true
-  lr_decay_patience: 300
-  env_make_params:
-    use_lidar: False
-    background: null
-  # Rainbow extension flags
-  enable_double_dqn: true       # Double DQN (action selection from online net)
-  use_dueling: true             # Dueling network streams
-  use_per: true                 # Prioritized Experience Replay
-  use_nstep: true               # Multi-step returns
-  use_noisy: true               # Noisy Nets (replaces epsilon-greedy)
-  use_distributional: true      # C51 distributional RL
-  # PER parameters (paper: alpha=0.5, beta 0.4→1 over 10M steps)
-  per_alpha: 0.5
-  per_beta_init: 0.4
-  per_beta_frames: 2000000      # anneal β to 1.0 within a typical 24h run (~2M steps)
-  # n-step returns
-  n_step: 3                     # paper: n=3
-  # Distributional RL (C51)
-  n_atoms: 51                   # paper: 51 atoms
-  v_min: -5.0                   # paper uses -10 for Atari; FlappyBird rarely goes negative
-  v_max: 20.0                   # 0.1/step*(1/(1-0.99))=10, plus pipe bonuses; needs headroom
-  # Noisy Nets
-  sigma_init: 0.5               # paper: σ_0=0.5 (factorised)
-  seed: 42
-
-flappybird_rainbow4:
-  env_id: FlappyBird-v0
-  replay_memory_size: 200000   # uint8 storage: 1M * ~50KB = ~50GB CPU RAM
-  batch_size: 512                # paper: 32
-  # epsilon unused — Noisy Nets handle exploration (auto-set to 0 when use_noisy: true)
-  epsilon_init: 1.0
-  epsilon_decay: 1.0
-  epsilon_min: 0.0
-  network_sync_rate: 500       # paper uses 32k for Atari;
-  learning_rate_a: 0.0001    # paper: 6.25e-5 (Adam)
-  discount_factor_g: 0.99       # paper: 0.99
-  stop_on_reward: 100000
-  hidden_dim: 512
-  start_learning_after: 20000   # paper uses 80k for Atari; FlappyBird warms up much faster
-  network_type: "rainbow_cnn_dqn"
-  frame_stack: 4
-  obs_size: 80
-  rgb_wrapper: true
-  lr_decay_patience: 300
-  env_make_params:
-    use_lidar: False
-    background: null
-  # Rainbow extension flags
-  enable_double_dqn: true       # Double DQN (action selection from online net)
-  use_dueling: true             # Dueling network streams
-  use_per: true                 # Prioritized Experience Replay
-  use_nstep: true               # Multi-step returns
-  use_noisy: true               # Noisy Nets (replaces epsilon-greedy)
-  use_distributional: true      # C51 distributional RL
-  # PER parameters (paper: alpha=0.5, beta 0.4→1 over 10M steps)
-  per_alpha: 0.5
-  per_beta_init: 0.4
-  per_beta_frames: 2000000      # anneal β to 1.0 within a typical 24h run (~2M steps)
-  # n-step returns
-  n_step: 3                     # paper: n=3
-  # Distributional RL (C51)
-  n_atoms: 51                   # paper: 51 atoms
-  v_min: -5.0                   # paper uses -10 for Atari; FlappyBird rarely goes negative
-  v_max: 20.0                   # 0.1/step*(1/(1-0.99))=10, plus pipe bonuses; needs headroom
-  # Noisy Nets
-  sigma_init: 0.5               # paper: σ_0=0.5 (factorised)
-  seed: 42
-
-flappybird_rainbow5:
-  env_id: FlappyBird-v0
-  replay_memory_size: 1000000   # uint8 storage: 1M * ~50KB = ~50GB CPU RAM
-  batch_size: 512                # paper: 32
-  # epsilon unused — Noisy Nets handle exploration (auto-set to 0 when use_noisy: true)
-  epsilon_init: 1.0
-  epsilon_decay: 1.0
-  epsilon_min: 0.0
-  network_sync_rate: 500       # paper uses 32k for Atari;
-  learning_rate_a: 0.0000625    # paper: 6.25e-5 (Adam)
-  discount_factor_g: 0.99       # paper: 0.99
-  stop_on_reward: 100000
-  hidden_dim: 512
-  start_learning_after: 20000   # paper uses 80k for Atari; FlappyBird warms up much faster
-  network_type: "rainbow_cnn_dqn"
-  frame_stack: 4
-  obs_size: 80
-  rgb_wrapper: true
-  lr_decay_patience: 300
-  env_make_params:
-    use_lidar: False
-    background: null
-  # Rainbow extension flags
-  enable_double_dqn: true       # Double DQN (action selection from online net)
-  use_dueling: true             # Dueling network streams
-  use_per: true                 # Prioritized Experience Replay
-  use_nstep: true               # Multi-step returns
-  use_noisy: true               # Noisy Nets (replaces epsilon-greedy)
-  use_distributional: true      # C51 distributional RL
-  # PER parameters (paper: alpha=0.5, beta 0.4→1 over 10M steps)
-  per_alpha: 0.5
-  per_beta_init: 0.4
-  per_beta_frames: 2000000      # anneal β to 1.0 within a typical 24h run (~2M steps)
-  # n-step returns
-  n_step: 3                     # paper: n=3
-  # Distributional RL (C51)
-  n_atoms: 51                   # paper: 51 atoms
-  v_min: -5.0                   # paper uses -10 for Atari; FlappyBird rarely goes negative
-  v_max: 20.0                   # 0.1/step*(1/(1-0.99))=10, plus pipe bonuses; needs headroom
-  # Noisy Nets
-  sigma_init: 0.5               # paper: σ_0=0.5 (factorised)
-  seed: 42
-
-flappybird_rainbow6:
-  env_id: FlappyBird-v0
-  replay_memory_size: 1000000   # uint8 storage: 1M * ~50KB = ~50GB CPU RAM
-  batch_size: 32                # paper: 32
-  # epsilon unused — Noisy Nets handle exploration (auto-set to 0 when use_noisy: true)
-  epsilon_init: 1.0
-  epsilon_decay: 1.0
-  epsilon_min: 0.0
-  network_sync_rate: 1000      # paper: target net updated every 32k steps
-  learning_rate_a: 0.0000625    # paper: 6.25e-5 (Adam)
-  discount_factor_g: 0.99       # paper: 0.99
-  stop_on_reward: 100000
-  hidden_dim: 512
-  start_learning_after: 80000   # paper: 80k steps before first update
-  network_type: "rainbow_cnn_dqn"
-  frame_stack: 4
-  obs_size: 80
-  rgb_wrapper: true
-  env_make_params:
-    use_lidar: False
-    background: null
-  # Rainbow extension flags
-  enable_double_dqn: true       # Double DQN (action selection from online net)
-  use_dueling: true             # Dueling network streams
-  use_per: true                 # Prioritized Experience Replay
-  use_nstep: true               # Multi-step returns
-  use_noisy: true               # Noisy Nets (replaces epsilon-greedy)
-  use_distributional: true      # C51 distributional RL
-  # PER parameters (paper: alpha=0.5, beta 0.4→1 over 10M steps)
-  per_alpha: 0.5
-  per_beta_init: 0.4
-  per_beta_frames: 10000000
-  # n-step returns
-  n_step: 3                     # paper: n=3
-  # Distributional RL (C51)
-  n_atoms: 51                   # paper: 51 atoms
-  v_min: -5.0                   # paper uses -10 for Atari; FlappyBird rarely goes negative
-  v_max: 15.0                   # 0.1/step*(1/(1-0.99))=10, plus pipe bonuses; needs headroom
-  # Noisy Nets
-  sigma_init: 0.5               # paper: σ_0=0.5 (factorised)
-  seed: 42
-
-flappybird_rainbow7:
-  env_id: FlappyBird-v0
-  replay_memory_size: 1000000   # uint8 storage: 1M * ~50KB = ~50GB CPU RAM
-  batch_size: 512                # paper: 32
-  # epsilon unused — Noisy Nets handle exploration (auto-set to 0 when use_noisy: true)
-  epsilon_init: 1.0
-  epsilon_decay: 1.0
-  epsilon_min: 0.0
-  network_sync_rate: 1000      # paper: target net updated every 32k steps
-  learning_rate_a: 0.0000625    # paper: 6.25e-5 (Adam)
-  discount_factor_g: 0.99       # paper: 0.99
-  stop_on_reward: 100000
-  hidden_dim: 512
-  start_learning_after: 80000   # paper: 80k steps before first update
-  network_type: "rainbow_cnn_dqn"
-  frame_stack: 4
-  obs_size: 80
-  rgb_wrapper: true
-  env_make_params:
-    use_lidar: False
-    background: null
-  # Rainbow extension flags
-  enable_double_dqn: true       # Double DQN (action selection from online net)
-  use_dueling: true             # Dueling network streams
-  use_per: true                 # Prioritized Experience Replay
-  use_nstep: true               # Multi-step returns
-  use_noisy: true               # Noisy Nets (replaces epsilon-greedy)
-  use_distributional: true      # C51 distributional RL
-  # PER parameters (paper: alpha=0.5, beta 0.4→1 over 10M steps)
-  per_alpha: 0.5
-  per_beta_init: 0.4
-  per_beta_frames: 10000000
-  # n-step returns
-  n_step: 3                     # paper: n=3
-  # Distributional RL (C51)
-  n_atoms: 51                   # paper: 51 atoms
-  v_min: -5.0                   # paper uses -10 for Atari; FlappyBird rarely goes negative
-  v_max: 15.0                   # 0.1/step*(1/(1-0.99))=10, plus pipe bonuses; needs headroom
-  # Noisy Nets
-  sigma_init: 0.5               # paper: σ_0=0.5 (factorised)
-  seed: 42
-
-flappybird_rainbow8:
-  env_id: FlappyBird-v0
-  replay_memory_size: 1000000   # uint8 storage: 1M * ~50KB = ~50GB CPU RAM
-  batch_size: 32                # paper: 32
-  # epsilon unused — Noisy Nets handle exploration (auto-set to 0 when use_noisy: true)
-  epsilon_init: 1.0
-  epsilon_decay: 1.0
-  epsilon_min: 0.0
-  network_sync_rate: 500      # paper: target net updated every 32k steps
-  learning_rate_a: 0.0000625    # paper: 6.25e-5 (Adam)
-  discount_factor_g: 0.99       # paper: 0.99
-  stop_on_reward: 100000
-  hidden_dim: 512
-  start_learning_after: 80000   # paper: 80k steps before first update
-  network_type: "rainbow_cnn_dqn"
-  frame_stack: 4
-  obs_size: 80
-  rgb_wrapper: true
-  env_make_params:
-    use_lidar: False
-    background: null
-  # Rainbow extension flags
-  enable_double_dqn: true       # Double DQN (action selection from online net)
-  use_dueling: true             # Dueling network streams
-  use_per: true                 # Prioritized Experience Replay
-  use_nstep: true               # Multi-step returns
-  use_noisy: true               # Noisy Nets (replaces epsilon-greedy)
-  use_distributional: true      # C51 distributional RL
-  # PER parameters (paper: alpha=0.5, beta 0.4→1 over 10M steps)
-  per_alpha: 0.5
-  per_beta_init: 0.4
-  per_beta_frames: 10000000
-  # n-step returns
-  n_step: 3                     # paper: n=3
-  # Distributional RL (C51)
-  n_atoms: 51                   # paper: 51 atoms
-  v_min: -5.0                   # paper uses -10 for Atari; FlappyBird rarely goes negative
-  v_max: 15.0                   # 0.1/step*(1/(1-0.99))=10, plus pipe bonuses; needs headroom
-  # Noisy Nets
-  sigma_init: 0.5               # paper: σ_0=0.5 (factorised)
-  seed: 42
-
-flappybird_rainbow9:
+flappybird_rainbow_hand:
   env_id: FlappyBird-v0
   replay_memory_size: 1000000   # uint8 storage: 1M * ~50KB = ~50GB CPU RAM
   batch_size: 32                # paper: 32
@@ -682,200 +85,8 @@ flappybird_rainbow9:
   sigma_init: 0.5               # paper: σ_0=0.5 (factorised)
   seed: 42
 
-flappybird_rainbow10:
-  env_id: FlappyBird-v0
-  replay_memory_size: 1000000   # uint8 storage: 1M * ~50KB = ~50GB CPU RAM
-  batch_size: 32                # paper: 32
-  # epsilon unused — Noisy Nets handle exploration (auto-set to 0 when use_noisy: true)
-  epsilon_init: 1.0
-  epsilon_decay: 1.0
-  epsilon_min: 0.0
-  network_sync_rate: 1000      # paper: target net updated every 32k steps
-  learning_rate_a: 0.0000625    # paper: 6.25e-5 (Adam)
-  discount_factor_g: 0.99       # paper: 0.99
-  stop_on_reward: 100000
-  hidden_dim: 512
-  start_learning_after: 20000   # paper: 80k steps before first update
-  network_type: "rainbow_cnn_dqn"
-  frame_stack: 4
-  obs_size: 80
-  rgb_wrapper: true
-  lr_decay_patience: 300
-  env_make_params:
-    use_lidar: False
-    background: null
-  # Rainbow extension flags
-  enable_double_dqn: true       # Double DQN (action selection from online net)
-  use_dueling: true             # Dueling network streams
-  use_per: true                 # Prioritized Experience Replay
-  use_nstep: true               # Multi-step returns
-  use_noisy: true               # Noisy Nets (replaces epsilon-greedy)
-  use_distributional: true      # C51 distributional RL
-  # PER parameters (paper: alpha=0.5, beta 0.4→1 over 10M steps)
-  per_alpha: 0.5
-  per_beta_init: 0.4
-  per_beta_frames: 2000000
-  # n-step returns
-  n_step: 5                     # paper: n=3
-  # Distributional RL (C51)
-  n_atoms: 51                   # paper: 51 atoms
-  v_min: -5.0                   # paper uses -10 for Atari; FlappyBird rarely goes negative
-  v_max: 20.0                   # 0.1/step*(1/(1-0.99))=10, plus pipe bonuses; needs headroom
-  # Noisy Nets
-  sigma_init: 0.5               # paper: σ_0=0.5 (factorised)
-  seed: 42
-
-flappybird_rainbow11:
-  env_id: FlappyBird-v0
-  replay_memory_size: 1000000   # uint8 storage: 1M * ~50KB = ~50GB CPU RAM
-  batch_size: 32                # paper: 32
-  # epsilon unused — Noisy Nets handle exploration (auto-set to 0 when use_noisy: true)
-  epsilon_init: 1.0
-  epsilon_decay: 1.0
-  epsilon_min: 0.0
-  network_sync_rate: 1000      # paper: target net updated every 32k steps
-  learning_rate_a: 0.0000625    # paper: 6.25e-5 (Adam)
-  discount_factor_g: 0.99       # paper: 0.99
-  stop_on_reward: 100000
-  hidden_dim: 512
-  start_learning_after: 20000   # paper: 80k steps before first update
-  network_type: "rainbow_cnn_dqn"
-  frame_stack: 4
-  obs_size: 80
-  rgb_wrapper: true
-  lr_decay_patience: 200
-  env_make_params:
-    use_lidar: False
-    background: null
-  # Rainbow extension flags
-  enable_double_dqn: true       # Double DQN (action selection from online net)
-  use_dueling: true             # Dueling network streams
-  use_per: true                 # Prioritized Experience Replay
-  use_nstep: true               # Multi-step returns
-  use_noisy: true               # Noisy Nets (replaces epsilon-greedy)
-  use_distributional: true      # C51 distributional RL
-  # PER parameters (paper: alpha=0.5, beta 0.4→1 over 10M steps)
-  per_alpha: 0.5
-  per_beta_init: 0.4
-  per_beta_frames: 2000000
-  # n-step returns
-  n_step: 3                     # paper: n=3
-  # Distributional RL (C51)
-  n_atoms: 51                   # paper: 51 atoms
-  v_min: -5.0                   # paper uses -10 for Atari; FlappyBird rarely goes negative
-  v_max: 20.0                   # 0.1/step*(1/(1-0.99))=10, plus pipe bonuses; needs headroom
-  # Noisy Nets
-  sigma_init: 0.5               # paper: σ_0=0.5 (factorised)
-  seed: 42
-
-flappybird_rainbow12:
-  env_id: FlappyBird-v0
-  replay_memory_size: 1000000   # uint8 storage: 1M * ~50KB = ~50GB CPU RAM
-  batch_size: 16                # paper: 32
-  # epsilon unused — Noisy Nets handle exploration (auto-set to 0 when use_noisy: true)
-  epsilon_init: 1.0
-  epsilon_decay: 1.0
-  epsilon_min: 0.0
-  network_sync_rate: 1000      # paper: target net updated every 32k steps
-  learning_rate_a: 0.0000625    # paper: 6.25e-5 (Adam)
-  discount_factor_g: 0.99       # paper: 0.99
-  stop_on_reward: 100000
-  hidden_dim: 512
-  start_learning_after: 20000   # paper: 80k steps before first update
-  network_type: "rainbow_cnn_dqn"
-  frame_stack: 4
-  obs_size: 80
-  rgb_wrapper: true
-  lr_decay_patience: 300
-  env_make_params:
-    use_lidar: False
-    background: null
-  # Rainbow extension flags
-  enable_double_dqn: true       # Double DQN (action selection from online net)
-  use_dueling: true             # Dueling network streams
-  use_per: true                 # Prioritized Experience Replay
-  use_nstep: true               # Multi-step returns
-  use_noisy: true               # Noisy Nets (replaces epsilon-greedy)
-  use_distributional: true      # C51 distributional RL
-  # PER parameters (paper: alpha=0.5, beta 0.4→1 over 10M steps)
-  per_alpha: 0.5
-  per_beta_init: 0.4
-  per_beta_frames: 2000000
-  # n-step returns
-  n_step: 3                     # paper: n=3
-  # Distributional RL (C51)
-  n_atoms: 51                   # paper: 51 atoms
-  v_min: -5.0                   # paper uses -10 for Atari; FlappyBird rarely goes negative
-  v_max: 20.0                   # 0.1/step*(1/(1-0.99))=10, plus pipe bonuses; needs headroom
-  # Noisy Nets
-  sigma_init: 0.5               # paper: σ_0=0.5 (factorised)
-  seed: 42
-  
-flappybird_ppo:
-  # ── Environment (pixel observations) ──────────────────────────
-  env_id: FlappyBird-v0
-  env_make_params:
-    use_lidar: False            # not used; obs come from rendered frames
-    background: null            # remove background for cleaner pixel input
-  frame_stack: 4                # stack 4 consecutive frames (motion cues)
-  obs_size: 80                  # frames resized to 80x80
-  rgb_wrapper: true             # render RGB frames as the observation
-  # ── Base / shared ─────────────────────────────────────────────
-  algorithm: "ppo"              # dispatches to PPOAgent (agent.py keys on this)
-  network_type: "ppo_cnn"       # CNNActorCritic (shared conv backbone, separate heads)
-  hidden_dim: 512               # width of the actor/critic head MLPs
-  learning_rate_a: 0.00025      # Adam LR (canonical PPO default, used with eps=1e-5)
-  discount_factor_g: 0.99       # gamma — reward discount for GAE & returns
-  stop_on_reward: 100000        # effectively no early stop; run until killed (24h)
-  seed: 42                       # reproducibility
-  # lr_decay_patience omitted → LR stays fixed (clean canonical PPO baseline)
-  # ── PPO-specific ──────────────────────────────────────────────
-  rollout_steps: 2048           # env steps collected per iteration
-  ppo_epochs: 10                # passes over the buffer per iteration
-  minibatch_size: 64            # SGD minibatch size (2048/64 = 32 minibatches/epoch)
-  clip_eps: 0.2                 # PPO clip range epsilon (the "proximal" safety belt)
-  gae_lambda: 0.95              # GAE bias/variance knob
-  vf_coef: 0.5                  # value-loss weight (c1)
-  ent_coef: 0.01                # entropy bonus weight (c2) — the exploration knob
-  max_grad_norm: 0.5            # global gradient-norm clip
-
-# PPO run 2 — fixes for run 1's early collapse (see PPO.md).
-# Same pixel pipeline as flappybird_ppo; orthogonal init is now on by default for
-# all PPO nets (ppo.py). Changes vs run 1: fewer epochs (less off-policy drift),
-# stronger entropy bonus (slower premature commit).
-flappybird_ppo2:
-  # ── Environment (pixel observations) ──────────────────────────
-  env_id: FlappyBird-v0
-  env_make_params:
-    use_lidar: False            # not used; obs come from rendered frames
-    background: null            # remove background for cleaner pixel input
-  frame_stack: 4                # stack 4 consecutive frames (motion cues)
-  obs_size: 80                  # frames resized to 80x80
-  rgb_wrapper: true             # render RGB frames as the observation
-  # ── Base / shared ─────────────────────────────────────────────
-  algorithm: "ppo"              # dispatches to PPOAgent (agent.py keys on this)
-  network_type: "ppo_cnn"       # CNNActorCritic (shared conv backbone, separate heads)
-  hidden_dim: 512               # width of the actor/critic head MLPs
-  learning_rate_a: 0.00025      # Adam LR (canonical PPO default, used with eps=1e-5)
-  discount_factor_g: 0.99       # gamma — reward discount for GAE & returns
-  stop_on_reward: 100000        # effectively no early stop; run until killed (24h)
-  seed: 42                       # reproducibility
-  # lr_decay_patience omitted → LR stays fixed (clean canonical PPO baseline)
-  # ── PPO-specific ──────────────────────────────────────────────
-  rollout_steps: 2048           # env steps collected per iteration
-  ppo_epochs: 4                 # run 1 used 10 → too many passes over correlated
-                                # single-env pixel data drove off-policy drift &
-                                # early entropy collapse; 3-4 is the Atari norm
-  minibatch_size: 64            # SGD minibatch size (2048/64 = 32 minibatches/epoch)
-  clip_eps: 0.2                 # PPO clip range epsilon (the "proximal" safety belt)
-  gae_lambda: 0.95              # GAE bias/variance knob
-  vf_coef: 0.5                  # value-loss weight (c1)
-  ent_coef: 0.02                # run 1 used 0.01 → entropy collapsed 0.69→0.25
-                                # with no reward gain; raise to slow premature commit
-  max_grad_norm: 0.5            # global gradient-norm clip
-
-# Auto-generated by tune.py from study 'ppo_5841602' (best trial)
-flappybird_ppo_tuned:
+  # Auto-generated by tune.py from study 'rainbow_6235237' (best trial)
+flappybird_rainbow_tuned:
   env_id: FlappyBird-v0
   env_make_params:
     use_lidar: false
@@ -883,25 +94,39 @@ flappybird_ppo_tuned:
   frame_stack: 4
   obs_size: 80
   rgb_wrapper: true
-  algorithm: ppo
-  network_type: ppo_cnn
+  algorithm: dqn
+  network_type: rainbow_cnn_dqn
   hidden_dim: 512
   discount_factor_g: 0.99
   stop_on_reward: 100000
   seed: 42
-  max_grad_norm: 0.5
-  learning_rate_a: 0.00046795361557161886
-  ppo_epochs: 3
-  ent_coef: 0.0016714398762244184
-  clip_eps: 0.2
-  gae_lambda: 0.9240035046770071
-  vf_coef: 0.6651351269934721
-  rollout_steps: 4096
-  minibatch_size: 128
+  replay_memory_size: 1000000
+  batch_size: 128
+  epsilon_init: 1.0
+  epsilon_decay: 1.0
+  epsilon_min: 0.0
+  network_sync_rate: 1000
+  start_learning_after: 20000
+  enable_double_dqn: true
+  use_dueling: true
+  use_per: true
+  use_nstep: true
+  use_noisy: true
+  use_distributional: true
+  n_atoms: 51
+  v_min: -5.0
+  v_max: 30.0
+  per_alpha: 0.6047954232513175
+  per_beta_init: 0.31933864297930303
+  per_beta_frames: 2000000
+  sigma_init: 0.33073140000026846
+  learning_rate_a: 3.551904276323297e-05
+  n_step: 1
   max_env_steps: 10000000
 
-# Auto-generated by tune.py from study 'ppo_6157866' (best trial)
-flappybird_ppo_tuned_2:
+
+# Auto-generated by tune.py from study 'ppo_6235238' (best trial)
+flappybird_ppo_tuned_3:
   env_id: FlappyBird-v0
   env_make_params:
     use_lidar: false
@@ -911,17 +136,18 @@ flappybird_ppo_tuned_2:
   rgb_wrapper: true
   algorithm: ppo
   network_type: ppo_cnn
-  hidden_dim: 256
+  hidden_dim: 512
   discount_factor_g: 0.99
   stop_on_reward: 100000
   seed: 42
   max_grad_norm: 0.5
-  learning_rate_a: 0.000989424828795126
-  ppo_epochs: 3
-  ent_coef: 0.027248731052681042
+  lr_min: 1.0e-05
+  learning_rate_a: 0.00020338613967543344
+  ppo_epochs: 4
+  ent_coef: 0.01513546348816664
   clip_eps: 0.1
-  gae_lambda: 0.9121446879205366
-  vf_coef: 0.8854626426539564
-  rollout_steps: 1024
-  minibatch_size: 64
-  max_env_steps: 10000000
+  gae_lambda: 0.9581592637911547
+  vf_coef: 0.7205156007003908
+  rollout_steps: 4096
+  minibatch_size: 256
+  lr_anneal_steps: 10000000

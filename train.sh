@@ -16,7 +16,10 @@ mkdir -p logs
 
 module load devel/miniforge/25.3.1-python-3.12
 source "$(conda info --base)/etc/profile.d/conda.sh"
-conda activate dqn-flappy-bird-cuda
+# Mario configs need the python 3.13 env (gym-super-mario-bros requires >= 3.13):
+#   sbatch --export=ALL,CONDA_ENV=mario-rl-cuda train.sh mario_rainbow
+CONDA_ENV=${CONDA_ENV:-dqn-flappy-bird-cuda}
+conda activate "$CONDA_ENV"
 
 export HEADLESS=1
 

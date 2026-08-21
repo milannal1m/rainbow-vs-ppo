@@ -62,11 +62,10 @@ def save_preprocessed_sanity_check(env_id, env_make_params, obs_size, frame_stac
     sample_dir = os.path.join(run_dir, "sanity_check")
     os.makedirs(sample_dir, exist_ok=True)
 
-    env = gym.make(env_id, render_mode="rgb_array", **env_make_params)
-    env = FlappyBirdResetFix(env)
-    if rgb_wrapper:
-        env = RGBObservationWrapper(env)
-    env = preprocess_env(env, obs_size, frame_stack)
+    # function-local: env_factory imports this module at its top level
+    from env_factory import make_env
+    env = make_env(env_id, env_make_params, render_mode="rgb_array",
+                   obs_size=obs_size, frame_stack=frame_stack, rgb_wrapper=rgb_wrapper)
     state, _ = env.reset(seed=0)
 
     for _ in range(steps):
@@ -107,7 +106,9 @@ def save_graph(rewards_per_episode, pipes_per_episode, lengths_per_episode,
                loss_per_step, q_per_step, epsilon_history, graph_file,
                loss_label="TD Loss", aux_label="Q-Value", exploration_label="Epsilon",
                metric_xlabel="Steps", metric_window="100-step",
-               smooth_exploration=False):
+               smooth_exploration=False,
+               # env-specific labels; the defaults reproduce the FlappyBird figures
+               secondary_label="Pipes passed", fps=30):
     fig, axes = plt.subplots(2, 3, figsize=(15, 8))
     fig.suptitle("Training metrics")
 
@@ -116,12 +117,12 @@ def save_graph(rewards_per_episode, pipes_per_episode, lengths_per_episode,
     axes[0, 0].plot(_rolling_avg(rewards_per_episode), color="#4C72B0")
 
     axes[0, 1].set_xlabel("Episodes")
-    axes[0, 1].set_ylabel("Pipes passed (100-ep)")
+    axes[0, 1].set_ylabel(f"{secondary_label} (100-ep)")
     axes[0, 1].plot(_rolling_avg(pipes_per_episode), color="#55A868")
 
     axes[0, 2].set_xlabel("Episodes")
     axes[0, 2].set_ylabel("Episode length in s (100-ep)")
-    axes[0, 2].plot(_rolling_avg([s / 30 for s in lengths_per_episode]), color="#C44E52")
+    axes[0, 2].plot(_rolling_avg([s / fps for s in lengths_per_episode]), color="#C44E52")
 
     axes[1, 0].set_xlabel(metric_xlabel)
     axes[1, 0].set_ylabel(f"{loss_label} ({metric_window})")
@@ -179,15 +180,14 @@ def _rename_latest_video(video_dir, new_filename):
 
 def record_episode(policy_dqn, env_id, env_make_params, video_dir, name_prefix,
                    stop_on_reward, seed, device, obs_size=None, frame_stack=None, rgb_wrapper=False,
-                   record_video=True):
+                   record_video=True, levels=None):
     # record_video=False runs the same greedy episode and returns its reward, but skips the
     # RecordVideo wrapper (and mp4 write) — used by HPO trials where only the reward matters.
-    env = gym.make(env_id, render_mode="rgb_array", **env_make_params)
-    env = FlappyBirdResetFix(env)
-    if rgb_wrapper:
-        env = RGBObservationWrapper(env)
-    if frame_stack:
-        env = preprocess_env(env, obs_size, frame_stack)
+    # Function-local import: env_factory imports this module at its top level.
+    from env_factory import make_env
+    env = make_env(env_id, env_make_params, render_mode="rgb_array",
+                   obs_size=obs_size, frame_stack=frame_stack, rgb_wrapper=rgb_wrapper,
+                   levels=levels)
     if record_video:
         env = RecordVideo(
             env,

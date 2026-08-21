@@ -26,23 +26,30 @@ class RolloutBuffer:
         self.log_probs = []
         self.values    = []
         self.dones     = []
+        self.bootstraps = []
         self.advantages = None
         self.returns    = None
 
-    def push(self, state, action, reward, log_prob, value, done):
+    def push(self, state, action, reward, log_prob, value, done, bootstrap_value=0.0):
+        """`bootstrap_value` is the future value to use when done[t] is True: 0.0 for a real
+        terminal state, V(s_final) for a truncation (step cap), which was cut short rather than
+        lost — zeroing it would teach the agent that being truncated is worthless."""
         self.states.append(state.cpu())
         self.actions.append(action.cpu() if torch.is_tensor(action) else action)
         self.rewards.append(float(reward))
         self.log_probs.append(log_prob.cpu() if torch.is_tensor(log_prob) else log_prob)
         self.values.append(float(value.item()) if torch.is_tensor(value) else float(value))
         self.dones.append(bool(done))
+        self.bootstraps.append(
+            float(bootstrap_value.item()) if torch.is_tensor(bootstrap_value) else float(bootstrap_value)
+        )
 
     def finalize(self, last_value):
         """Compute GAE advantages and discounted returns in-place.
 
-        last_value: V(s_T) bootstrapped from the state after the last rollout step.
-        When done[t]=True the episode terminated at step t, so the bootstrap for
-        the next step is zeroed out via the mask.
+        last_value: V(s_T) after the last rollout step. At an episode boundary there is no link
+        to t+1, so the recursion is cut and the future value comes from bootstraps[t]. With the
+        default 0.0 this is arithmetically identical to the old mask-based version.
         """
         T = len(self.rewards)
         last_val = float(last_value.item()) if torch.is_tensor(last_value) else float(last_value)
@@ -51,9 +58,13 @@ class RolloutBuffer:
         gae = 0.0
 
         for t in reversed(range(T)):
-            next_val  = last_val if t == T - 1 else self.values[t + 1]
-            mask      = 1.0 - float(self.dones[t])
-            delta     = self.rewards[t] + self.gamma * next_val * mask - self.values[t]
+            if self.dones[t]:
+                next_val = self.bootstraps[t]
+                mask     = 0.0
+            else:
+                next_val = last_val if t == T - 1 else self.values[t + 1]
+                mask     = 1.0
+            delta     = self.rewards[t] + self.gamma * next_val - self.values[t]
             gae       = delta + self.gamma * self.gae_lambda * mask * gae
             advantages[t] = gae
 

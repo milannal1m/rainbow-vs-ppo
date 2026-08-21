@@ -8,11 +8,13 @@ their public hooks (`hyperparams` dict injection, `run_name`, `max_env_steps`, t
 Two modes:
   * worker (default): run `study.optimize()` — many workers share one file-based study.
   * `--report-only`: load a finished study, write trials.csv + plots + summary, and append
-    the best config to hyperparams.yml as `flappybird_<algo>_tuned`.
+    the best config to hyperparams.yml as `<env>_<algo>_tuned`
+    (`flappybird_<algo>_tuned` for the default env).
 
 Run from the repo root, e.g.:
     python src/tune.py --algorithm ppo --n-trials 40 --proxy-steps 300000
     python src/tune.py --algorithm ppo --study ppo_123 --report-only
+    python src/tune.py --env mario --algorithm rainbow --n-trials 60
 """
 import os
 # Headless rendering for the pixel pipeline (must precede any gym/env import).
@@ -54,7 +56,9 @@ OBJECTIVE_KEYS = {"p25": "eval_reward_p25", "median": "eval_reward_median", "mea
 # ── Base configs (fixed keys per algorithm) ──────────────────────────────────────────
 # Pixel pipeline matching the hand-tuned flappybird_ppo / flappybird_cnn / flappybird_rainbow
 # sets. The tuner overrides the searched keys on top of these.
-_ENV = {
+# Env blocks are merged onto the algorithm base at build time, so the search spaces stay
+# per-algorithm while the env is a separate CLI dimension.
+_ENV_FLAPPYBIRD = {
     "env_id": "FlappyBird-v0",
     "env_make_params": {"use_lidar": False, "background": None},
     "frame_stack": 4,
@@ -62,8 +66,38 @@ _ENV = {
     "rgb_wrapper": True,
 }
 
+# Mario trials use the 4-level smb1_hpo subset. Selection must only ever read training levels —
+# scoring on a held-out tier would be test-set selection.
+_ENV_MARIO = {
+    "env_id": "SuperMarioBros-v0",
+    "env_package": "gym_super_mario_bros",
+    "env_make_params": {
+        "level_split": "smb1_hpo", "level_set": "train", "level_sampler": "seed_hash",
+        "action_set": "COMPLEX_MOVEMENT", "frame_skip": 4,
+        "reward_clip": 15.0, "reward_divisor": 15.0,
+        "noop_max": 30, "sticky_prob": 0.25,
+        "max_episode_steps": 3000, "warp_guard": True,
+    },
+    "frame_stack": 4,
+    "obs_size": 84,
+    "rgb_wrapper": False,
+}
+
+ENVS = {"flappybird": _ENV_FLAPPYBIRD, "mario": _ENV_MARIO}
+
+# Env-specific overrides of algorithm-base keys.
+ENV_ALGO_OVERRIDES = {
+    # Mario's steady-state discounted value is ~59, so FlappyBird's v_max=20 would clamp
+    # essentially every C51 target.
+    ("mario", "rainbow"): {"n_atoms": 101, "v_min": -15.0, "v_max": 100.0,
+                           "replay_memory_size": 300000, "per_beta_frames": 5000000},
+    ("mario", "dqn"):     {"replay_memory_size": 300000},
+    ("mario", "ppo"):     {"rollout_steps": 4096},
+}
+
+_ENV = _ENV_FLAPPYBIRD  # backwards-compatible alias
+
 PPO_BASE = {
-    **_ENV,
     "algorithm": "ppo",
     "network_type": "ppo_cnn",
     "hidden_dim": 512,
@@ -75,7 +109,6 @@ PPO_BASE = {
 }
 
 DQN_BASE = {
-    **_ENV,
     "algorithm": "dqn",
     "network_type": "cnn_dqn",
     "hidden_dim": 512,
@@ -92,7 +125,6 @@ DQN_BASE = {
 }
 
 RAINBOW_BASE = {
-    **_ENV,
     "algorithm": "dqn",
     "network_type": "rainbow_cnn_dqn",
     "hidden_dim": 512,
@@ -114,7 +146,7 @@ RAINBOW_BASE = {
 BASE = {"ppo": PPO_BASE, "dqn": DQN_BASE, "rainbow": RAINBOW_BASE}
 
 
-def suggest_params(trial, algorithm):
+def suggest_params(trial, algorithm, env="flappybird"):
     """Search space per algorithm. Only fast-acting / horizon-relative knobs are tuned;
     proxy-blind params (e.g. replay_memory_size) stay fixed in the base config."""
     if algorithm == "ppo":
@@ -150,14 +182,23 @@ def suggest_params(trial, algorithm):
             "per_alpha":         trial.suggest_float("per_alpha", 0.3, 0.7),
             "per_beta_init":     trial.suggest_float("per_beta_init", 0.3, 0.6),
             "sigma_init":        trial.suggest_float("sigma_init", 0.3, 0.7),
-            "v_max":             trial.suggest_categorical("v_max", [15.0, 20.0, 30.0]),
+            # ~59 on Mario vs ~10 on FlappyBird, so one categorical cannot serve both
+            "v_max":             trial.suggest_categorical(
+                "v_max", [60.0, 100.0, 150.0] if env == "mario" else [15.0, 20.0, 30.0]),
         }
     raise ValueError(f"unknown algorithm: {algorithm}")
 
 
-def build_trial_config(algorithm, params, proxy_steps):
+def _merge_env(cfg, env, algorithm):
+    """Layer the env block and any env-specific base overrides onto an algorithm base."""
+    cfg.update(ENVS[env])
+    cfg.update(ENV_ALGO_OVERRIDES.get((env, algorithm), {}))
+    return cfg
+
+
+def build_trial_config(algorithm, params, proxy_steps, env="flappybird"):
     """Merge searched params onto the base and scale horizon-calibrated knobs to the proxy."""
-    cfg = dict(BASE[algorithm])
+    cfg = _merge_env(dict(BASE[algorithm]), env, algorithm)
     cfg.update(params)
     cfg["max_env_steps"] = proxy_steps
     if algorithm == "ppo":
@@ -174,10 +215,13 @@ def build_trial_config(algorithm, params, proxy_steps):
     return cfg
 
 
-def build_export_config(algorithm, params, full_steps):
+def build_export_config(algorithm, params, full_steps, env="flappybird"):
     """The winner config for a full-length run: full-horizon values, no proxy scaling."""
-    cfg = dict(BASE[algorithm])
+    cfg = _merge_env(dict(BASE[algorithm]), env, algorithm)
     cfg.update(params)
+    if env == "mario":
+        # export against the real training split, not the HPO proxy
+        cfg["env_make_params"] = dict(cfg["env_make_params"], level_split="smb1_stage_holdout")
     if algorithm == "ppo":
         # Open-ended run: anneal LR over full_steps, then hold at lr_min and keep training.
         # No hard max_env_steps stop (LR floor replaces it).
@@ -197,12 +241,12 @@ def make_agent(cfg, label, run_name):
 
 
 def objective(trial, a):
-    params = suggest_params(trial, a.algorithm)
+    params = suggest_params(trial, a.algorithm, env=a.env)
     study_name = trial.study.study_name
     seed_means = []
 
     for si in range(a.search_seeds):
-        cfg = build_trial_config(a.algorithm, params, a.proxy_steps)
+        cfg = build_trial_config(a.algorithm, params, a.proxy_steps, env=a.env)
         cfg["seed"] = BASE_SEED + si
         suffix = f"_s{si}" if a.search_seeds > 1 else ""
         run_name = os.path.join("hpo", study_name, "trials", f"t{trial.number}{suffix}")
@@ -329,8 +373,9 @@ def run_report(a):
         return
 
     best = study.best_trial
-    export_cfg = build_export_config(a.algorithm, best.params, a.full_steps)
-    final_key = append_config_to_yaml("hyperparams.yml", f"flappybird_{a.algorithm}_tuned",
+    export_cfg = build_export_config(a.algorithm, best.params, a.full_steps, env=a.env)
+    prefix = "flappybird" if a.env == "flappybird" else a.env
+    final_key = append_config_to_yaml("hyperparams.yml", f"{prefix}_{a.algorithm}_tuned",
                                       export_cfg, a.study)
 
     lines = [
@@ -352,6 +397,9 @@ def run_report(a):
 def main():
     p = argparse.ArgumentParser(description="Optuna HPO for DQN / Rainbow / PPO.")
     p.add_argument("--algorithm", required=True, choices=["dqn", "rainbow", "ppo"])
+    p.add_argument("--env", default="flappybird", choices=sorted(ENVS),
+                   help="which game to tune on (default flappybird, preserving the "
+                        "existing study names and export keys)")
     p.add_argument("--n-trials", type=int, default=400, help="target total trials in the study")
     p.add_argument("--proxy-steps", type=int, default=None,
                    help="env steps per trial (proxy budget). Default is algorithm-aware: 300k for "
@@ -374,9 +422,15 @@ def main():
     a = p.parse_args()
 
     if a.proxy_steps is None:
-        a.proxy_steps = 1_000_000 if a.algorithm == "ppo" else 300_000
+        if a.env == "mario":
+            # Mario needs far more steps before any signal shows, so the proxy-to-full transfer
+            # assumption is weaker here than it was for FlappyBird.
+            a.proxy_steps = 3_000_000 if a.algorithm == "ppo" else 1_000_000
+        else:
+            a.proxy_steps = 1_000_000 if a.algorithm == "ppo" else 300_000
     if a.study is None:
-        a.study = a.algorithm
+        # unchanged for flappybird, so existing journals still resume by name
+        a.study = a.algorithm if a.env == "flappybird" else f"{a.env}_{a.algorithm}"
     if a.storage is None:
         a.storage = os.path.join(HPO_DIR, a.study, f"{a.study}.journal")
 

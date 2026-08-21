@@ -10,6 +10,8 @@ from base_agent import BaseAgent, device
 from experience_replay import ReplayMemory, PrioritizedReplayMemory, NStepBuffer
 from dqn import NETWORK_REGISTRY, optimize, mean_sigma
 from utils import log, save_graph, record_episode, save_preprocessed_sanity_check
+from checkpointing import (EpisodeCSVLogger, episode_row, load_run_state, metric_stride,
+                           save_run_state, CHECKPOINT_STATE_SECONDS)
 from config import DATE_FORMAT, CHECKPOINT_EVERY, REPLAY_MEMORY_SEED, GRAPH_UPDATE_SECONDS
 
 
@@ -79,13 +81,13 @@ class DQNAgent(BaseAgent):
         policy_dqn.eval()
         return policy_dqn
 
-    def _run_episode_greedy(self, env, policy_dqn, seed, collect_states=False):
+    def _run_episode_greedy(self, env, policy_dqn, seed, collect_states=False, metric=None):
         state, _ = env.reset(seed=seed)
         state = torch.tensor(state, dtype=torch.float32).to(device)
         terminated = False
         truncated  = False
         episode_reward = 0.0
-        episode_pipes  = 0
+        episode_metric = metric if metric is not None else self.metric_spec.new()
         episode_length = 0
         episode_q      = []
         states         = []
@@ -97,19 +99,19 @@ class DQNAgent(BaseAgent):
                 q_vals = policy_dqn(state.unsqueeze(0)).squeeze()
             action = q_vals.argmax().item()
             episode_q.append(q_vals.max().item())
-            new_state, reward, terminated, truncated, _ = env.step(action)
+            new_state, reward, terminated, truncated, info = env.step(action)
             episode_reward += reward
             episode_length += 1
-            if reward >= 1.0:
-                episode_pipes += 1
+            episode_metric.update(reward, info)
             state = torch.tensor(new_state, dtype=torch.float32).to(device)
 
-        return episode_reward, episode_pipes, episode_length, episode_q, states
+        return episode_reward, episode_metric.value(), episode_length, episode_q, states
 
-    def train(self, report_cb=None, record_video=True):
+    def train(self, report_cb=None, record_video=True, resume=False):
         # report_cb(step, metric): optional hook (used by HPO) called once per episode;
         #   it may raise to abort the run early (pruning). record_video=False skips the
         #   checkpoint video writes and sanity-check png for lightweight HPO trials.
+        #   resume=True continues from <base>_state.pt.
         env = self._make_env()
 
         num_actions = env.action_space.n
@@ -143,13 +145,44 @@ class DQNAgent(BaseAgent):
         epsilon_history     = []
         step_count          = 0
         total_steps         = 0
+        start_episode       = 0
+        # The next episode to run. Tracked explicitly rather than as `episode + 1` at save time:
+        # the loop can break at the top of an episode that never ran, which would skip it on resume.
+        next_episode        = 0
         best_reward         = float("-inf")
         best_greedy_reward  = float("-inf")
+        # Stride the per-step series; a 15M-step run would otherwise hold 15M-element lists.
+        stride = metric_stride(self.max_env_steps)
+
+        # ── resume ───────────────────────────────────────────────────────────────
+        refill_until = 0
+        restored = load_run_state(self.STATE_FILE, model=policy_dqn, optimizer=optimizer,
+                                  map_location=device) if resume else None
+        if restored:
+            target_dqn.load_state_dict(policy_dqn.state_dict())
+            total_steps        = restored.get("total_steps", 0)
+            start_episode      = next_episode = restored.get("episode", 0)
+            best_reward        = restored.get("best_reward", float("-inf"))
+            best_greedy_reward = restored.get("best_greedy_reward", float("-inf"))
+            epsilon            = restored.get("epsilon", epsilon)
+            rewards_per_episode = restored.get("rewards_per_episode", [])
+            pipes_per_episode   = restored.get("pipes_per_episode", [])
+            lengths_per_episode = restored.get("lengths_per_episode", [])
+            # buffer is not checkpointed (~17 GB), so gate learning while it refills
+            refill_until = total_steps + self.resume_refill_steps
 
         start_time = datetime.now()
         last_graph_update_time = start_time
-        log(f"{start_time.strftime(DATE_FORMAT)}: Training starting...", self.LOG_FILE, mode='w')
+        last_state_save_time   = start_time
+        log_mode = 'a' if restored else 'w'
+        log(f"{start_time.strftime(DATE_FORMAT)}: Training "
+            f"{'RESUMING' if restored else 'starting'}...", self.LOG_FILE, mode=log_mode)
         log(f"Device: {device}", self.LOG_FILE)
+        if restored:
+            log(f"Resumed at step {total_steps}, episode {start_episode}. Replay buffer was NOT "
+                f"checkpointed: learning is gated until step {refill_until} while it refills — "
+                f"expect a brief off-policy discontinuity here.", self.LOG_FILE)
+        csv_logger = EpisodeCSVLogger(self.EPISODES_CSV, resume=bool(restored))
 
         if self.frame_stack and record_video:
             save_preprocessed_sanity_check(self.env_id, self.env_make_params,
@@ -157,16 +190,18 @@ class DQNAgent(BaseAgent):
                                            rgb_wrapper=self.rgb_wrapper)
 
         try:
-            for episode in itertools.count():
+            for episode in itertools.count(start_episode):
                 if self.max_env_steps and total_steps >= self.max_env_steps:
                     break
+                # seed=episode+1 also picks the Mario level, so resuming at the right index
+                # keeps the level sequence continuous.
                 state, _ = env.reset(seed=episode + 1)
                 state = torch.tensor(state, dtype=torch.float32).to(device)
 
                 terminated     = False
                 truncated      = False
                 episode_reward = 0.0
-                episode_pipes  = 0
+                episode_metric = self.metric_spec.new()
                 episode_length = 0
 
                 while not (terminated or truncated) and episode_reward < self.stop_on_reward:
@@ -180,11 +215,10 @@ class DQNAgent(BaseAgent):
                         with torch.no_grad():
                             action = policy_dqn(state.unsqueeze(0)).squeeze().argmax().item()
 
-                    new_state, reward, terminated, truncated, _ = env.step(action)
+                    new_state, reward, terminated, truncated, info = env.step(action)
                     episode_reward += reward
                     episode_length += 1
-                    if reward >= 1.0:
-                        episode_pipes += 1
+                    episode_metric.update(reward, info)
 
                     new_state_t   = torch.tensor(new_state, dtype=torch.float32).to(device)
                     reward_tensor = torch.tensor(reward, dtype=torch.float32)
@@ -207,7 +241,9 @@ class DQNAgent(BaseAgent):
                     total_steps += 1
                     state = new_state_t
 
-                    if len(memory) > self.batch_size and total_steps > self.start_learning_after:
+                    if (len(memory) > self.batch_size
+                            and total_steps > self.start_learning_after
+                            and total_steps > refill_until):
                         if self.use_per:
                             beta = min(1.0, self.per_beta_init +
                                        total_steps * (1.0 - self.per_beta_init) / self.per_beta_frames)
@@ -221,8 +257,9 @@ class DQNAgent(BaseAgent):
                             mini_batch, policy_dqn, target_dqn, optimizer,
                             effective_gamma, self.enable_double_dqn, device, weights=weights_t
                         )
-                        loss_per_step.append(loss)
-                        q_per_step.append(mean_q)
+                        if total_steps % stride == 0:
+                            loss_per_step.append(loss)
+                            q_per_step.append(mean_q)
 
                         if self.use_per:
                             memory.update_priorities(per_idxs, td_errors)
@@ -233,9 +270,10 @@ class DQNAgent(BaseAgent):
 
                     if not self.use_noisy:
                         epsilon = max(epsilon * self.epsilon_decay, self.epsilon_min)
-                    epsilon_history.append(
-                        mean_sigma(policy_dqn) if self.use_noisy else epsilon
-                    )
+                    if total_steps % stride == 0:
+                        epsilon_history.append(
+                            mean_sigma(policy_dqn) if self.use_noisy else epsilon
+                        )
 
                     if self.max_env_steps and total_steps >= self.max_env_steps:
                         break
@@ -244,8 +282,17 @@ class DQNAgent(BaseAgent):
                     nstep_buf.flush()
 
                 rewards_per_episode.append(episode_reward)
-                pipes_per_episode.append(episode_pipes)
+                pipes_per_episode.append(episode_metric.value())
                 lengths_per_episode.append(episode_length)
+
+                csv_logger.log(**episode_row(
+                    episode=episode, total_steps=total_steps,
+                    wall_s=(datetime.now() - start_time).total_seconds(),
+                    algo=self.network_type, return_scaled=episode_reward,
+                    length=episode_length, secondary=episode_metric.value(),
+                    extras=episode_metric.extras(),
+                ))
+                next_episode = episode + 1   # this episode is complete and logged
 
                 if report_cb is not None:
                     report_cb(total_steps, float(np.mean(rewards_per_episode[-100:])))
@@ -276,7 +323,37 @@ class DQNAgent(BaseAgent):
                 if datetime.now() - last_graph_update_time > timedelta(seconds=GRAPH_UPDATE_SECONDS):
                     save_graph(rewards_per_episode, pipes_per_episode, lengths_per_episode,
                                loss_per_step, q_per_step, epsilon_history, self.GRAPH_FILE,
-                               exploration_label=exploration_label)
+                               exploration_label=exploration_label,
+                               secondary_label=self.metric_spec.label, fps=self.metric_spec.fps)
                     last_graph_update_time = datetime.now()
+
+                # time-based, so a wall-clock kill loses at most CHECKPOINT_STATE_SECONDS
+                if datetime.now() - last_state_save_time > timedelta(seconds=CHECKPOINT_STATE_SECONDS):
+                    save_run_state(self.STATE_FILE, model=policy_dqn, optimizer=optimizer,
+                                   counters={
+                                       "total_steps": total_steps, "episode": next_episode,
+                                       "best_reward": best_reward,
+                                       "best_greedy_reward": best_greedy_reward,
+                                       "epsilon": epsilon,
+                                       "rewards_per_episode": rewards_per_episode,
+                                       "pipes_per_episode": pipes_per_episode,
+                                       "lengths_per_episode": lengths_per_episode,
+                                   })
+                    last_state_save_time = datetime.now()
         finally:
+            # final save, so a clean exit is resumable too
+            try:
+                save_run_state(self.STATE_FILE, model=policy_dqn, optimizer=optimizer,
+                               counters={
+                                   "total_steps": total_steps, "episode": next_episode,
+                                   "best_reward": best_reward,
+                                   "best_greedy_reward": best_greedy_reward,
+                                   "epsilon": epsilon,
+                                   "rewards_per_episode": rewards_per_episode,
+                                   "pipes_per_episode": pipes_per_episode,
+                                   "lengths_per_episode": lengths_per_episode,
+                               })
+            except Exception as exc:  # noqa: BLE001
+                print(f"[checkpoint] final save failed: {exc}")
+            csv_logger.close()
             env.close()

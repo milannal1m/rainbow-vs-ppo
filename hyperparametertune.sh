@@ -38,7 +38,10 @@ mkdir -p logs
 
 module load devel/miniforge/25.3.1-python-3.12
 source "$(conda info --base)/etc/profile.d/conda.sh"
-conda activate dqn-flappy-bird-cuda
+# Mario studies need the python 3.13 env:
+#   sbatch --export=ALL,CONDA_ENV=mario-rl-cuda hyperparametertune.sh rainbow 200
+CONDA_ENV=${CONDA_ENV:-dqn-flappy-bird-cuda}
+conda activate "$CONDA_ENV"
 
 export HEADLESS=1
 export OMP_NUM_THREADS=2          # keep 12 packed processes from oversubscribing the cores

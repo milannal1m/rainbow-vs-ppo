@@ -10,7 +10,9 @@ import numpy as np
 
 from datetime import datetime
 
-from utils import log, save_eval_chart, record_episode, preprocess_env, RGBObservationWrapper, FlappyBirdResetFix
+from utils import log, save_eval_chart, record_episode
+from env_factory import make_env
+from env_metrics import make_metric_spec, action_labels_for
 from config import RUNS_DIR
 
 device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
@@ -53,6 +55,10 @@ class BaseAgent:
 
         importlib.import_module(self.env_package)
 
+        # Secondary metric (pipes vs pages), axis label and frame rate. Derived from env_id, so
+        # a config cannot pick the wrong one.
+        self.metric_spec = make_metric_spec(hyperparams)
+
         # run_name controls the output subdirectory (defaults to the set name for normal
         # runs); HPO passes e.g. "hpo/<study>/trials/t7" to isolate trials under runs/hpo/.
         self.run_name            = run_name if run_name is not None else hyperparams_set
@@ -65,19 +71,20 @@ class BaseAgent:
         self.GRAPH_FILE          = os.path.join(self.RUN_DIR, f"{base}.png")
         self.CHECKPOINT_VIDEO_DIR = os.path.join(self.RUN_DIR, "checkpoint_videos")
         os.makedirs(self.CHECKPOINT_VIDEO_DIR, exist_ok=True)
+        # Resume state and the per-episode metric log — Mario runs exceed the 24 h wall clock.
+        self.STATE_FILE   = os.path.join(self.RUN_DIR, f"{base}_state.pt")
+        self.EPISODES_CSV = os.path.join(self.RUN_DIR, "episodes.csv")
+        # The replay buffer is too large to checkpoint, so after a resume learning is gated for
+        # this many steps while it refills. Unused by PPO.
+        self.resume_refill_steps = hyperparams.get("resume_refill_steps",
+                                                   self.start_learning_after)
 
-    def _make_env(self, render_mode=None):
-        needs_rgb = self.rgb_wrapper or self.frame_stack
-        env = gym.make(self.env_id, render_mode="rgb_array" if needs_rgb else render_mode, **self.env_make_params)
-        env = FlappyBirdResetFix(env)
-        if self.rgb_wrapper:
-            env = RGBObservationWrapper(env)
-        if self.frame_stack:
-            env = preprocess_env(env, self.obs_size, self.frame_stack)
-        if needs_rgb and render_mode == "human":
-            from gymnasium.wrappers import HumanRendering
-            env = HumanRendering(env)
-        return env
+    def _make_env(self, render_mode=None, levels=None):
+        # env_factory owns the wrapper chain; record_episode and save_preprocessed_sanity_check
+        # go through the same call.
+        return make_env(self.env_id, self.env_make_params, render_mode=render_mode,
+                        obs_size=self.obs_size, frame_stack=self.frame_stack,
+                        rgb_wrapper=self.rgb_wrapper, levels=levels)
 
     def train(self):
         raise NotImplementedError
@@ -88,10 +95,20 @@ class BaseAgent:
     def _load_policy(self, env):
         raise NotImplementedError
 
-    def _run_episode_greedy(self, env, model, seed, collect_states=False):
-        """Returns (reward, pipes, length, aux_vals, states).
-        aux_vals is algorithm-specific: Q-values for DQN, value estimates for PPO."""
+    def _run_episode_greedy(self, env, model, seed, collect_states=False, metric=None):
+        """Returns (reward, secondary, length, aux_vals, states).
+
+        `secondary` is metric.value() — pipes for FlappyBird, pages for Mario. aux_vals is
+        algorithm-specific: Q-values for DQN, value estimates for PPO. Pass `metric` to read
+        `extras()` afterwards; the tuple stays a 5-tuple so existing callers are unaffected.
+        """
         raise NotImplementedError
+
+    def _action_label(self, action):
+        labels = getattr(self, "_action_labels", None)
+        if labels is None:
+            return str(action)
+        return labels[action] if 0 <= action < len(labels) else str(action)
 
     def explain(self, num_frames=10):
         from pytorch_grad_cam import GradCAM
@@ -105,6 +122,8 @@ class BaseAgent:
 
         env = self._make_env()
         policy = self._load_policy(env)
+        # 'flap'/'no-flap' would be silently wrong on all 12 Mario actions.
+        self._action_labels = action_labels_for(self.hyperparams, env.action_space.n)
 
         if not hasattr(policy, 'conv3'):
             print("explain() requires a model with conv1/conv2/conv3 layers.")
@@ -139,14 +158,14 @@ class BaseAgent:
 
                     grayscale_cam = cam(input_tensor=inp, targets=[ClassifierOutputTarget(action)])[0]
 
-                    for f in range(4):
+                    for f in range(min(4, s.shape[0])):
                         axes[i, f].imshow(s[f].cpu().numpy(), cmap='gray', vmin=0, vmax=1)
                         axes[i, f].set_title(f"Frame {f + 1}")
                         axes[i, f].axis('off')
 
-                    frame_rgb = np.stack([s[3].cpu().numpy()] * 3, axis=-1)
+                    frame_rgb = np.stack([s[-1].cpu().numpy()] * 3, axis=-1)
                     cam_img   = show_cam_on_image(frame_rgb, grayscale_cam, use_rgb=True)
-                    label = f"{'flap' if action == 1 else 'no-flap'}  {logits[action]:.2f}"
+                    label = f"{self._action_label(action)}  {logits[action]:.2f}"
                     axes[i, 4].imshow(cam_img)
                     axes[i, 4].set_title(label)
                     axes[i, 4].axis('off')
@@ -166,39 +185,46 @@ class BaseAgent:
         policy = self._load_policy(env)
 
         all_rewards, all_pipes, all_lengths, all_aux = [], [], [], []
+        all_extras = []
         best_reward, best_seed = float("-inf"), 1
 
         try:
             for episode in range(num_episodes):
                 seed = episode + 1
-                reward, pipes, length, aux_vals, _ = self._run_episode_greedy(env, policy, seed=seed)
+                metric = self.metric_spec.new()
+                reward, secondary, length, aux_vals, _ = self._run_episode_greedy(
+                    env, policy, seed=seed, metric=metric)
                 all_rewards.append(reward)
-                all_pipes.append(pipes)
+                all_pipes.append(secondary)
                 all_lengths.append(length)
                 all_aux.append(np.mean(aux_vals) if aux_vals else 0.0)
+                all_extras.append(metric.extras())
                 if reward > best_reward:
                     best_reward = reward
                     best_seed   = seed
         finally:
             env.close()
 
-        lengths_s = [l / 30 for l in all_lengths]
+        lengths_s = [l / self.metric_spec.fps for l in all_lengths]
         metrics = {
             "eval_reward_mean":   float(np.mean(all_rewards)),
             "eval_reward_median": float(np.median(all_rewards)),
             "eval_reward_p25":    float(np.percentile(all_rewards, 25)),  # robust objective
             "eval_reward_std":    float(np.std(all_rewards)),
-            "eval_pipes_mean":    float(np.mean(all_pipes)),
+            # eval_pipes_mean for FlappyBird, eval_pages_mean for Mario
+            f"eval_{self.metric_spec.key}_mean": float(np.mean(all_pipes)),
             "eval_length_s_mean": float(np.mean(lengths_s)),
             "n_episodes":         int(num_episodes),
         }
+        # per-env extras (flag rate, death-cause mix); empty for FlappyBird
+        metrics.update(self.metric_spec.aggregate(all_extras))
         with open(os.path.join(self.RUN_DIR, "metrics.json"), "w") as f:
             json.dump(metrics, f, indent=2)
 
         lines = [
             f"Evaluation over {num_episodes} greedy episodes",
             f"Reward:               mean={np.mean(all_rewards):.2f}  std={np.std(all_rewards):.2f}",
-            f"Pipes passed:         mean={np.mean(all_pipes):.2f}  std={np.std(all_pipes):.2f}",
+            f"{self.metric_spec.label + ':':22s}mean={np.mean(all_pipes):.2f}  std={np.std(all_pipes):.2f}",
             f"Episode length (s):   mean={np.mean(lengths_s):.2f}  std={np.std(lengths_s):.2f}",
             f"{self._eval_aux_label}:  mean={np.mean(all_aux):.4f}  std={np.std(all_aux):.4f}",
         ]

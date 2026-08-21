@@ -1,0 +1,27 @@
+name: mario-rl-cuda
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  # gym-super-mario-bros 9.1.0 / nes-py 9.0.1 declare requires_python >= 3.13, which is why
+  # Mario needs its own env: the FlappyBird env is pinned to python 3.11.
+  - python=3.13
+  - numpy
+  - matplotlib
+  - pyyaml
+  - opencv
+  - optuna>=3.4
+  - scikit-learn         # optuna param-importance plots
+  - gymnasium>=1.0
+  - pip
+  - pip:
+    # The conda pytorch channel lags on new python versions; use the CUDA 12.4 pip wheels.
+    - --extra-index-url https://download.pytorch.org/whl/cu124
+    - torch
+    - torchvision
+    - gym-super-mario-bros==9.1.0
+    - nes-py==9.0.1      # prebuilt cp313 manylinux_2_28_x86_64 wheels — no compiler needed
+    - moviepy
+    - grad-cam
+# flappy-bird-gymnasium is deliberately ABSENT. Mario configs set
+# env_package: "gym_super_mario_bros", so BaseAgent.__init__ imports that instead.

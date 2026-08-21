@@ -15,7 +15,6 @@ flappybird_no_image:
   enable_double_dqn: True
   network_type: "dueling_dqn"
 
-
 flappybird_dqn_hand:
   env_id: FlappyBird-v0
   replay_memory_size: 200000
@@ -151,3 +150,96 @@ flappybird_ppo_tuned_3:
   rollout_steps: 4096
   minibatch_size: 256
   lr_anneal_steps: 10000000
+# ── Super Mario Bros ──────────────────────────────────────────────────────────
+# Needs the python 3.13 env: sbatch --export=ALL,CONDA_ENV=mario-rl-cuda train.sh mario_ppo
+# env_make_params must match between the two, else the comparison is void:
+#   python src/mario_probe.py --compare mario_rainbow mario_ppo
+# 12M steps ≈ 30h for Rainbow at ~110 steps/s; set under the 36h ceiling so the LR and
+# PER-beta schedules finish. Level lists live in src/mario_levels.py.
+
+mario_rainbow:
+  env_id: SuperMarioBros-v0        # family marker; per-level ids from mario_levels
+  env_package: "gym_super_mario_bros"
+  env_make_params:
+    level_split: "smb1_small"      # 6 levels, 2M steps each; the 20-level split is only 600k
+    level_set: "train"
+    level_sampler: "seed_hash"     # level = f(seed), so both algorithms see the same order
+    action_set: "COMPLEX_MOVEMENT" # 12 actions; `down` needed for pipes
+    frame_skip: 4
+    reward_clip: 15.0              # r' = clip(sum of 4 frames, ±15)/15 -> [-1, 1]
+    reward_divisor: 15.0
+    noop_max: 30
+    sticky_prob: 0.25              # emulator is deterministic; this is what decorrelates
+    max_episode_steps: 3000        # in-game clock expires at ~2400
+    warp_bonus: 5.0                # warps allowed, paid per stage skipped
+  frame_stack: 4
+  obs_size: 84
+  rgb_wrapper: false               # NES screen already is the observation
+  algorithm: "dqn"
+  network_type: "rainbow_cnn_dqn"
+  hidden_dim: 512
+  learning_rate_a: 0.0000625       # paper: 6.25e-5
+  discount_factor_g: 0.99          # top HPO candidate: Mario PPO often wins with 0.9
+  stop_on_reward: 100000           # effectively off
+  seed: 42
+  max_env_steps: 12000000
+  start_learning_after: 20000
+  resume_refill_steps: 20000       # buffer isn't checkpointed; regate learning after resume
+  # no lr_decay_patience: Mario reward is too noisy for plateau detection
+  replay_memory_size: 400000       # 56KB/transition -> ~23GB of the 128GB requested
+  batch_size: 32
+  network_sync_rate: 8000
+  epsilon_init: 1.0                # unused: use_noisy zeroes these
+  epsilon_decay: 1.0
+  epsilon_min: 0.0
+  enable_double_dqn: true
+  use_dueling: true
+  use_per: true
+  use_nstep: true
+  use_noisy: true
+  use_distributional: true
+  per_alpha: 0.5
+  per_beta_init: 0.4
+  per_beta_frames: 12000000        # anneal over the full horizon
+  n_step: 3
+  n_atoms: 101                     # measured steady-state value ~59, so 51 atoms is too coarse
+  v_min: -15.0
+  v_max: 100.0                     # FlappyBird's 20 would clamp nearly every target
+  sigma_init: 0.5
+
+mario_ppo:
+  env_id: SuperMarioBros-v0
+  env_package: "gym_super_mario_bros"
+  env_make_params:                 # identical to mario_rainbow
+    level_split: "smb1_small"
+    level_set: "train"
+    level_sampler: "seed_hash"
+    action_set: "COMPLEX_MOVEMENT"
+    frame_skip: 4
+    reward_clip: 15.0
+    reward_divisor: 15.0
+    noop_max: 30
+    sticky_prob: 0.25
+    max_episode_steps: 3000
+    warp_bonus: 5.0
+  frame_stack: 4
+  obs_size: 84
+  rgb_wrapper: false
+  algorithm: "ppo"
+  network_type: "ppo_cnn"
+  hidden_dim: 512
+  learning_rate_a: 0.00025
+  discount_factor_g: 0.99
+  stop_on_reward: 100000
+  seed: 42
+  max_env_steps: 12000000
+  rollout_steps: 4096              # single env, so a large rollout smooths advantages
+  ppo_epochs: 4
+  minibatch_size: 256
+  clip_eps: 0.1
+  gae_lambda: 0.95
+  vf_coef: 0.5
+  ent_coef: 0.01                   # raise to 0.02 if entropy collapses early
+  max_grad_norm: 0.5
+  lr_anneal_steps: 12000000
+  lr_min: 0.00001

@@ -507,7 +507,11 @@ class MultiLevelMarioEnv(gym.Env):
         return obs, reward, terminated, truncated, info
 
     def render(self):
-        return self._child(self._current_level).render()
+        # .copy() is load-bearing: nes-py returns a zero-copy view of the emulator's screen
+        # buffer, so RecordVideo's frame list would otherwise hold N aliases of one buffer and
+        # every frame of the mp4 would show the final state.
+        frame = self._child(self._current_level).render()
+        return None if frame is None else frame.copy()
 
     def close(self):
         # nes-py has a history of double-free on close(); pop first so each child closes once.

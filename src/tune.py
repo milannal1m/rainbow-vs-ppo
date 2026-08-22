@@ -293,7 +293,7 @@ def make_storage(path):
 def run_worker(a):
     storage = make_storage(a.storage)
     pruner = optuna.pruners.HyperbandPruner(
-        min_resource=max(1, a.proxy_steps // 9),
+        min_resource=max(1, a.prune_warmup_steps),
         max_resource=a.proxy_steps,
         reduction_factor=3,
     )
@@ -406,9 +406,16 @@ def main():
                         "dqn/rainbow (Rainbow is slow, ~1 trial/GPU — a long proxy starves the trial "
                         "count), 1M for ppo (cheaper per step, benefits from the longer horizon). "
                         "Override explicitly to change.")
-    p.add_argument("--eval-episodes", type=int, default=30, help="greedy episodes for the objective")
+    p.add_argument("--eval-episodes", type=int, default=None,
+                   help="greedy episodes for the objective. Env-aware default: 30 for "
+                        "flappybird, 300 for mario (a 4-level pool makes a 30-episode mean "
+                        "noisier than the signal it has to rank)")
     p.add_argument("--objective", default="p25", choices=list(OBJECTIVE_KEYS),
                    help="eval statistic to maximize (p25=robust, default)")
+    p.add_argument("--prune-warmup-steps", type=int, default=None,
+                   help="steps before Hyperband's first pruning rung. Env-aware default: "
+                        "proxy/9 for flappybird, proxy/3 for mario (proxy/9 lands where "
+                        "learners and non-learners are still <1 sd apart on Mario)")
     p.add_argument("--full-steps", type=int, default=10_000_000,
                    help="max_env_steps written into the exported winner config")
     p.add_argument("--search-seeds", type=int, default=1,
@@ -428,6 +435,10 @@ def main():
             a.proxy_steps = 3_000_000 if a.algorithm == "ppo" else 1_000_000
         else:
             a.proxy_steps = 1_000_000 if a.algorithm == "ppo" else 300_000
+    if a.eval_episodes is None:
+        a.eval_episodes = 300 if a.env == "mario" else 30
+    if a.prune_warmup_steps is None:
+        a.prune_warmup_steps = a.proxy_steps // (3 if a.env == "mario" else 9)
     if a.study is None:
         # unchanged for flappybird, so existing journals still resume by name
         a.study = a.algorithm if a.env == "flappybird" else f"{a.env}_{a.algorithm}"

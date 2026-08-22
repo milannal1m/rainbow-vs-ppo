@@ -76,7 +76,7 @@ _ENV_MARIO = {
         "action_set": "COMPLEX_MOVEMENT", "frame_skip": 4,
         "reward_clip": 15.0, "reward_divisor": 15.0,
         "noop_max": 30, "sticky_prob": 0.25,
-        "max_episode_steps": 3000, "warp_guard": True,
+        "max_episode_steps": 3000, "warp_bonus": 5.0,
     },
     "frame_stack": 4,
     "obs_size": 84,

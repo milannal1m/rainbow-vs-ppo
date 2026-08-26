@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/agent.py", line 43, in <module>
+    from ppo_agent import PPOAgent as AgentClass
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/ppo_agent.py", line 8, in <module>
+    from base_agent import BaseAgent, device
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/base_agent.py", line 13, in <module>
+    from utils import log, save_eval_chart, record_episode
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/utils.py", line 4, in <module>
+    import matplotlib
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/matplotlib/__init__.py", line 161, in <module>
+    from . import _api, _version, cbook, rcsetup
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/matplotlib/cbook.py", line 32, in <module>
+    from matplotlib import _api, _c_internal_utils, mlab
+ImportError: /lib64/libstdc++.so.6: version `CXXABI_1.3.15' not found (required by /home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/matplotlib/_c_internal_utils.cpython-313-x86_64-linux-gnu.so)

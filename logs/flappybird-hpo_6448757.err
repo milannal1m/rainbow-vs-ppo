@@ -1,0 +1,352 @@
+/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/_experimental.py:33: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+  optuna_warn(
+[I 2026-08-22 21:37:23,743] A new study created in Journal with name: mario_rainbow_6448757
+[W 2026-08-22 21:37:25,122] Trial 0 failed with parameters: {'learning_rate_a': 3.243566131729023e-05, 'batch_size': 64, 'network_sync_rate': 1000, 'n_step': 1, 'per_alpha': 0.5488571517457036, 'per_beta_init': 0.304108986882161, 'sigma_init': 0.6357590924328798, 'v_max': 150.0} because of the following error: ValueError("unknown Mario env_make_params keys: ['warp_guard']. Known wrapper keys: ['action_set', 'frame_skip', 'level_sampler', 'max_episode_steps', 'noop_max', 'reward_clip', 'reward_divisor', 'sticky_prob', 'use_gym_make', 'version', 'warp_bonus']; level keys: ['level_set', 'level_split', 'levels']").
+Traceback (most recent call last):
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py", line 310, in <lambda>
+    study.optimize(lambda t: objective(t, a), callbacks=[stop_when_reached], timeout=a.timeout)
+                             ~~~~~~~~~^^^^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py", line 270, in objective
+    agent.train(report_cb=report_cb, record_video=False)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/dqn_agent.py", line 115, in train
+    env = self._make_env()
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/base_agent.py", line 85, in _make_env
+    return make_env(self.env_id, self.env_make_params, render_mode=render_mode,
+                    obs_size=self.obs_size, frame_stack=self.frame_stack,
+                    rgb_wrapper=self.rgb_wrapper, levels=levels)
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/env_factory.py", line 75, in make_env
+    gym_kw, wrapper_kw = split_env_params(env_make_params, kind)
+                         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/env_factory.py", line 61, in split_env_params
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: unknown Mario env_make_params keys: ['warp_guard']. Known wrapper keys: ['action_set', 'frame_skip', 'level_sampler', 'max_episode_steps', 'noop_max', 'reward_clip', 'reward_divisor', 'sticky_prob', 'use_gym_make', 'version', 'warp_bonus']; level keys: ['level_set', 'level_split', 'levels']
+[W 2026-08-22 21:37:25,128] Trial 0 failed with value None.
+Traceback (most recent call last):
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py", line 455, in <module>
+    main()
+    ~~~~^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py", line 451, in main
+    run_worker(a)
+    ~~~~~~~~~~^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py", line 310, in run_worker
+    study.optimize(lambda t: objective(t, a), callbacks=[stop_when_reached], timeout=a.timeout)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/study/study.py", line 516, in optimize
+    _optimize(
+    ~~~~~~~~~^
+        study=self,
+        ^^^^^^^^^^^
+    ...<7 lines>...
+        show_progress_bar=show_progress_bar,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/study/_optimize.py", line 68, in _optimize
+    _optimize_sequential(
+    ~~~~~~~~~~~~~~~~~~~~^
+        study,
+        ^^^^^^
+    ...<8 lines>...
+        progress_bar=progress_bar,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/study/_optimize.py", line 165, in _optimize_sequential
+    frozen_trial_id = _run_trial(study, func, catch)
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/study/_optimize.py", line 263, in _run_trial
+    raise func_err
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py", line 310, in <lambda>
+    study.optimize(lambda t: objective(t, a), callbacks=[stop_when_reached], timeout=a.timeout)
+                             ~~~~~~~~~^^^^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py", line 270, in objective
+    agent.train(report_cb=report_cb, record_video=False)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/dqn_agent.py", line 115, in train
+    env = self._make_env()
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/base_agent.py", line 85, in _make_env
+    return make_env(self.env_id, self.env_make_params, render_mode=render_mode,
+                    obs_size=self.obs_size, frame_stack=self.frame_stack,
+                    rgb_wrapper=self.rgb_wrapper, levels=levels)
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/env_factory.py", line 75, in make_env
+    gym_kw, wrapper_kw = split_env_params(env_make_params, kind)
+                         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/env_factory.py", line 61, in split_env_params
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: unknown Mario env_make_params keys: ['warp_guard']. Known wrapper keys: ['action_set', 'frame_skip', 'level_sampler', 'max_episode_steps', 'noop_max', 'reward_clip', 'reward_divisor', 'sticky_prob', 'use_gym_make', 'version', 'warp_bonus']; level keys: ['level_set', 'level_split', 'levels']
+/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/_experimental.py:33: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+  optuna_warn(
+/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/_experimental.py:33: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+  optuna_warn(
+/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/_experimental.py:33: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+  optuna_warn(
+[I 2026-08-22 21:37:38,469] Using an existing study with name 'mario_rainbow_6448757' instead of creating a new one.
+[I 2026-08-22 21:37:38,480] Using an existing study with name 'mario_rainbow_6448757' instead of creating a new one.
+[I 2026-08-22 21:37:38,491] Using an existing study with name 'mario_rainbow_6448757' instead of creating a new one.
+[W 2026-08-22 21:37:39,201] Trial 2 failed with parameters: {'learning_rate_a': 0.0001636715201533644, 'batch_size': 64, 'network_sync_rate': 1000, 'n_step': 5, 'per_alpha': 0.5901927860092282, 'per_beta_init': 0.3817321935794299, 'sigma_init': 0.5451054785410641, 'v_max': 60.0} because of the following error: ValueError("unknown Mario env_make_params keys: ['warp_guard']. Known wrapper keys: ['action_set', 'frame_skip', 'level_sampler', 'max_episode_steps', 'noop_max', 'reward_clip', 'reward_divisor', 'sticky_prob', 'use_gym_make', 'version', 'warp_bonus']; level keys: ['level_set', 'level_split', 'levels']").
+Traceback (most recent call last):
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py", line 310, in <lambda>
+    study.optimize(lambda t: objective(t, a), callbacks=[stop_when_reached], timeout=a.timeout)
+                             ~~~~~~~~~^^^^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py", line 270, in objective
+    agent.train(report_cb=report_cb, record_video=False)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/dqn_agent.py", line 115, in train
+    env = self._make_env()
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/base_agent.py", line 85, in _make_env
+    return make_env(self.env_id, self.env_make_params, render_mode=render_mode,
+                    obs_size=self.obs_size, frame_stack=self.frame_stack,
+                    rgb_wrapper=self.rgb_wrapper, levels=levels)
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/env_factory.py", line 75, in make_env
+    gym_kw, wrapper_kw = split_env_params(env_make_params, kind)
+                         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/env_factory.py", line 61, in split_env_params
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: unknown Mario env_make_params keys: ['warp_guard']. Known wrapper keys: ['action_set', 'frame_skip', 'level_sampler', 'max_episode_steps', 'noop_max', 'reward_clip', 'reward_divisor', 'sticky_prob', 'use_gym_make', 'version', 'warp_bonus']; level keys: ['level_set', 'level_split', 'levels']
+[W 2026-08-22 21:37:39,203] Trial 2 failed with value None.
+Traceback (most recent call last):
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py", line 455, in <module>
+    main()
+    ~~~~^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py", line 451, in main
+    run_worker(a)
+    ~~~~~~~~~~^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py", line 310, in run_worker
+    study.optimize(lambda t: objective(t, a), callbacks=[stop_when_reached], timeout=a.timeout)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/study/study.py", line 516, in optimize
+    _optimize(
+    ~~~~~~~~~^
+        study=self,
+        ^^^^^^^^^^^
+    ...<7 lines>...
+        show_progress_bar=show_progress_bar,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/study/_optimize.py", line 68, in _optimize
+    _optimize_sequential(
+    ~~~~~~~~~~~~~~~~~~~~^
+        study,
+        ^^^^^^
+    ...<8 lines>...
+        progress_bar=progress_bar,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/study/_optimize.py", line 165, in _optimize_sequential
+    frozen_trial_id = _run_trial(study, func, catch)
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/study/_optimize.py", line 263, in _run_trial
+    raise func_err
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py", line 310, in <lambda>
+    study.optimize(lambda t: objective(t, a), callbacks=[stop_when_reached], timeout=a.timeout)
+                             ~~~~~~~~~^^^^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py", line 270, in objective
+    agent.train(report_cb=report_cb, record_video=False)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/dqn_agent.py", line 115, in train
+    env = self._make_env()
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/base_agent.py", line 85, in _make_env
+    return make_env(self.env_id, self.env_make_params, render_mode=render_mode,
+                    obs_size=self.obs_size, frame_stack=self.frame_stack,
+                    rgb_wrapper=self.rgb_wrapper, levels=levels)
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/env_factory.py", line 75, in make_env
+    gym_kw, wrapper_kw = split_env_params(env_make_params, kind)
+                         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/env_factory.py", line 61, in split_env_params
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: unknown Mario env_make_params keys: ['warp_guard']. Known wrapper keys: ['action_set', 'frame_skip', 'level_sampler', 'max_episode_steps', 'noop_max', 'reward_clip', 'reward_divisor', 'sticky_prob', 'use_gym_make', 'version', 'warp_bonus']; level keys: ['level_set', 'level_split', 'levels']
+[W 2026-08-22 21:37:39,244] Trial 3 failed with parameters: {'learning_rate_a': 0.0001555063234792622, 'batch_size': 128, 'network_sync_rate': 500, 'n_step': 3, 'per_alpha': 0.596719892761474, 'per_beta_init': 0.5372554017625637, 'sigma_init': 0.3536903982163693, 'v_max': 150.0} because of the following error: ValueError("unknown Mario env_make_params keys: ['warp_guard']. Known wrapper keys: ['action_set', 'frame_skip', 'level_sampler', 'max_episode_steps', 'noop_max', 'reward_clip', 'reward_divisor', 'sticky_prob', 'use_gym_make', 'version', 'warp_bonus']; level keys: ['level_set', 'level_split', 'levels']").
+Traceback (most recent call last):
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py", line 310, in <lambda>
+    study.optimize(lambda t: objective(t, a), callbacks=[stop_when_reached], timeout=a.timeout)
+                             ~~~~~~~~~^^^^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py", line 270, in objective
+    agent.train(report_cb=report_cb, record_video=False)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/dqn_agent.py", line 115, in train
+    env = self._make_env()
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/base_agent.py", line 85, in _make_env
+    return make_env(self.env_id, self.env_make_params, render_mode=render_mode,
+                    obs_size=self.obs_size, frame_stack=self.frame_stack,
+                    rgb_wrapper=self.rgb_wrapper, levels=levels)
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/env_factory.py", line 75, in make_env
+    gym_kw, wrapper_kw = split_env_params(env_make_params, kind)
+                         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/env_factory.py", line 61, in split_env_params
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: unknown Mario env_make_params keys: ['warp_guard']. Known wrapper keys: ['action_set', 'frame_skip', 'level_sampler', 'max_episode_steps', 'noop_max', 'reward_clip', 'reward_divisor', 'sticky_prob', 'use_gym_make', 'version', 'warp_bonus']; level keys: ['level_set', 'level_split', 'levels']
+[W 2026-08-22 21:37:39,246] Trial 3 failed with value None.
+Traceback (most recent call last):
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py", line 455, in <module>
+    main()
+    ~~~~^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py", line 451, in main
+    run_worker(a)
+    ~~~~~~~~~~^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py", line 310, in run_worker
+    study.optimize(lambda t: objective(t, a), callbacks=[stop_when_reached], timeout=a.timeout)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/study/study.py", line 516, in optimize
+    _optimize(
+    ~~~~~~~~~^
+        study=self,
+        ^^^^^^^^^^^
+    ...<7 lines>...
+        show_progress_bar=show_progress_bar,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/study/_optimize.py", line 68, in _optimize
+    _optimize_sequential(
+    ~~~~~~~~~~~~~~~~~~~~^
+        study,
+        ^^^^^^
+    ...<8 lines>...
+        progress_bar=progress_bar,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/study/_optimize.py", line 165, in _optimize_sequential
+    frozen_trial_id = _run_trial(study, func, catch)
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/study/_optimize.py", line 263, in _run_trial
+    raise func_err
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py", line 310, in <lambda>
+    study.optimize(lambda t: objective(t, a), callbacks=[stop_when_reached], timeout=a.timeout)
+                             ~~~~~~~~~^^^^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py", line 270, in objective
+    agent.train(report_cb=report_cb, record_video=False)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/dqn_agent.py", line 115, in train
+    env = self._make_env()
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/base_agent.py", line 85, in _make_env
+    return make_env(self.env_id, self.env_make_params, render_mode=render_mode,
+                    obs_size=self.obs_size, frame_stack=self.frame_stack,
+                    rgb_wrapper=self.rgb_wrapper, levels=levels)
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/env_factory.py", line 75, in make_env
+    gym_kw, wrapper_kw = split_env_params(env_make_params, kind)
+                         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/env_factory.py", line 61, in split_env_params
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: unknown Mario env_make_params keys: ['warp_guard']. Known wrapper keys: ['action_set', 'frame_skip', 'level_sampler', 'max_episode_steps', 'noop_max', 'reward_clip', 'reward_divisor', 'sticky_prob', 'use_gym_make', 'version', 'warp_bonus']; level keys: ['level_set', 'level_split', 'levels']
+[W 2026-08-22 21:37:39,319] Trial 1 failed with parameters: {'learning_rate_a': 0.00015959771224948846, 'batch_size': 32, 'network_sync_rate': 8000, 'n_step': 3, 'per_alpha': 0.5530000250169317, 'per_beta_init': 0.40725467032808027, 'sigma_init': 0.6035052798549991, 'v_max': 100.0} because of the following error: ValueError("unknown Mario env_make_params keys: ['warp_guard']. Known wrapper keys: ['action_set', 'frame_skip', 'level_sampler', 'max_episode_steps', 'noop_max', 'reward_clip', 'reward_divisor', 'sticky_prob', 'use_gym_make', 'version', 'warp_bonus']; level keys: ['level_set', 'level_split', 'levels']").
+Traceback (most recent call last):
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py", line 310, in <lambda>
+    study.optimize(lambda t: objective(t, a), callbacks=[stop_when_reached], timeout=a.timeout)
+                             ~~~~~~~~~^^^^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py", line 270, in objective
+    agent.train(report_cb=report_cb, record_video=False)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/dqn_agent.py", line 115, in train
+    env = self._make_env()
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/base_agent.py", line 85, in _make_env
+    return make_env(self.env_id, self.env_make_params, render_mode=render_mode,
+                    obs_size=self.obs_size, frame_stack=self.frame_stack,
+                    rgb_wrapper=self.rgb_wrapper, levels=levels)
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/env_factory.py", line 75, in make_env
+    gym_kw, wrapper_kw = split_env_params(env_make_params, kind)
+                         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/env_factory.py", line 61, in split_env_params
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: unknown Mario env_make_params keys: ['warp_guard']. Known wrapper keys: ['action_set', 'frame_skip', 'level_sampler', 'max_episode_steps', 'noop_max', 'reward_clip', 'reward_divisor', 'sticky_prob', 'use_gym_make', 'version', 'warp_bonus']; level keys: ['level_set', 'level_split', 'levels']
+[W 2026-08-22 21:37:39,322] Trial 1 failed with value None.
+Traceback (most recent call last):
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py", line 455, in <module>
+    main()
+    ~~~~^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py", line 451, in main
+    run_worker(a)
+    ~~~~~~~~~~^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py", line 310, in run_worker
+    study.optimize(lambda t: objective(t, a), callbacks=[stop_when_reached], timeout=a.timeout)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/study/study.py", line 516, in optimize
+    _optimize(
+    ~~~~~~~~~^
+        study=self,
+        ^^^^^^^^^^^
+    ...<7 lines>...
+        show_progress_bar=show_progress_bar,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/study/_optimize.py", line 68, in _optimize
+    _optimize_sequential(
+    ~~~~~~~~~~~~~~~~~~~~^
+        study,
+        ^^^^^^
+    ...<8 lines>...
+        progress_bar=progress_bar,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/study/_optimize.py", line 165, in _optimize_sequential
+    frozen_trial_id = _run_trial(study, func, catch)
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/study/_optimize.py", line 263, in _run_trial
+    raise func_err
+  File "/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/study/_optimize.py", line 206, in _run_trial
+    value_or_values = func(trial)
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py", line 310, in <lambda>
+    study.optimize(lambda t: objective(t, a), callbacks=[stop_when_reached], timeout=a.timeout)
+                             ~~~~~~~~~^^^^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py", line 270, in objective
+    agent.train(report_cb=report_cb, record_video=False)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/dqn_agent.py", line 115, in train
+    env = self._make_env()
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/base_agent.py", line 85, in _make_env
+    return make_env(self.env_id, self.env_make_params, render_mode=render_mode,
+                    obs_size=self.obs_size, frame_stack=self.frame_stack,
+                    rgb_wrapper=self.rgb_wrapper, levels=levels)
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/env_factory.py", line 75, in make_env
+    gym_kw, wrapper_kw = split_env_params(env_make_params, kind)
+                         ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/env_factory.py", line 61, in split_env_params
+    raise ValueError(
+    ...<3 lines>...
+    )
+ValueError: unknown Mario env_make_params keys: ['warp_guard']. Known wrapper keys: ['action_set', 'frame_skip', 'level_sampler', 'max_episode_steps', 'noop_max', 'reward_clip', 'reward_divisor', 'sticky_prob', 'use_gym_make', 'version', 'warp_bonus']; level keys: ['level_set', 'level_split', 'levels']
+/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py:337: ExperimentalWarning: optuna.visualization.matplotlib._optimization_history.plot_optimization_history is experimental (supported from v2.2.0). The interface can change in the future.
+  ax = fn(study)
+[W 2026-08-22 22:38:21,264] There are no complete trials.
+/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/visualization/matplotlib/_optimization_history.py:150: UserWarning: No artists with labels found to put in legend.  Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+  plt.legend(bbox_to_anchor=(1.05, 1.0), loc="upper left")
+/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py:337: ExperimentalWarning: optuna.visualization.matplotlib._param_importances.plot_param_importances is experimental (supported from v2.2.0). The interface can change in the future.
+  ax = fn(study)
+[W 2026-08-22 22:38:21,602] Study instance does not contain completed trials.
+/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/visualization/matplotlib/_param_importances.py:116: UserWarning: No artists with labels found to put in legend.  Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+  ax.legend(loc="best")
+/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py:337: ExperimentalWarning: optuna.visualization.matplotlib._parallel_coordinate.plot_parallel_coordinate is experimental (supported from v2.2.0). The interface can change in the future.
+  ax = fn(study)
+[W 2026-08-22 22:38:21,691] Your study does not have any completed trials.
+/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/tune.py:337: ExperimentalWarning: optuna.visualization.matplotlib._slice.plot_slice is experimental (supported from v2.2.0). The interface can change in the future.
+  ax = fn(study)
+[W 2026-08-22 22:38:21,766] Your study does not have any completed trials.

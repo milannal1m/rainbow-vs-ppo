@@ -1,0 +1,15 @@
+
+============================= JOB FEEDBACK =============================
+
+NodeName=uc2n903
+Job ID: 6446162
+Cluster: uc3
+User/Group: ul_lmm50/ul_student
+State: TIMEOUT (exit code 0)
+Nodes: 1
+Cores per node: 2
+CPU Utilized: 00:00:06
+CPU Efficiency: 0.00% of 4-00:00:52 core-walltime
+Job Wall-clock time: 2-00:00:26
+Memory Utilized: 2.49 GB
+Memory Efficiency: 31.82% of 7.81 GB (7.81 GB/node)

@@ -1,0 +1,52 @@
+HPO: env=mario algorithm=rainbow objective=mean n_trials=200 study=mario_rainbow_6448757 workers=4 gpus=4
+Sat Aug 22 22:37:34 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.71.05              Driver Version: 595.71.05      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A100 80GB PCIe          On  |   00000000:19:00.0 Off |                    0 |
+| N/A   41C    P0             51W /  300W |      27MiB /  81920MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   1  NVIDIA A100 80GB PCIe          On  |   00000000:1A:00.0 Off |                    0 |
+| N/A   40C    P0             55W /  300W |      27MiB /  81920MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   2  NVIDIA A100 80GB PCIe          On  |   00000000:1B:00.0 Off |                    0 |
+| N/A   38C    P0             52W /  300W |      27MiB /  81920MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   3  NVIDIA A100 80GB PCIe          On  |   00000000:1C:00.0 Off |                    0 |
+| N/A   39C    P0             52W /  300W |      27MiB /  81920MiB |      0%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A           11231      G   /usr/libexec/Xorg                        17MiB |
+|    1   N/A  N/A           11231      G   /usr/libexec/Xorg                        17MiB |
+|    2   N/A  N/A           11231      G   /usr/libexec/Xorg                        17MiB |
+|    3   N/A  N/A           11231      G   /usr/libexec/Xorg                        17MiB |
++-----------------------------------------------------------------------------------------+
+[report] no completed trials — nothing to export.
+
+============================= JOB FEEDBACK =============================
+
+NodeName=uc2n913
+Job ID: 6448757
+Cluster: uc3
+User/Group: ul_lmm50/ul_student
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 16
+CPU Utilized: 00:00:26
+CPU Efficiency: 0.04% of 16:25:36 core-walltime
+Job Wall-clock time: 01:01:36
+Memory Utilized: 481.02 MB
+Memory Efficiency: 0.25% of 187.50 GB (187.50 GB/node)

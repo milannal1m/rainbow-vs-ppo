@@ -89,8 +89,15 @@ ENVS = {"flappybird": _ENV_FLAPPYBIRD, "mario": _ENV_MARIO}
 ENV_ALGO_OVERRIDES = {
     # Mario's steady-state discounted value is ~59, so FlappyBird's v_max=20 would clamp
     # essentially every C51 target.
+    # The four knobs below are FIXED for Mario, not searched: the 56-trial FlappyBird Rainbow
+    # study put them last by fANOVA importance (v_max .008, n_step .019, batch_size .044,
+    # network_sync_rate .075 -> 15% of variance combined), and with ~29 affordable Mario trials
+    # the budget is better spent on sigma_init/lr/per_* (85%). Values chosen to match the best
+    # Mario trials so far (t2/t3: batch 32, sync 2000) and the C51 arithmetic (steady-state
+    # discounted value ~59, so v_max 100 leaves headroom without wasting atoms).
     ("mario", "rainbow"): {"n_atoms": 101, "v_min": -15.0, "v_max": 100.0,
-                           "replay_memory_size": 300000, "per_beta_frames": 5000000},
+                           "replay_memory_size": 300000, "per_beta_frames": 5000000,
+                           "batch_size": 32, "n_step": 3, "network_sync_rate": 2000},
     ("mario", "dqn"):     {"replay_memory_size": 300000},
     ("mario", "ppo"):     {"rollout_steps": 4096},
 }
@@ -174,18 +181,22 @@ def suggest_params(trial, algorithm, env="flappybird"):
             "hidden_dim":        trial.suggest_categorical("hidden_dim", [256, 512]),
         }
     if algorithm == "rainbow":
-        return {
+        p = {
             "learning_rate_a":   trial.suggest_float("learning_rate_a", 1e-5, 5e-4, log=True),
-            "batch_size":        trial.suggest_categorical("batch_size", [32, 64, 128]),
-            "network_sync_rate": trial.suggest_categorical("network_sync_rate", [500, 1000, 2000, 8000]),
-            "n_step":            trial.suggest_categorical("n_step", [1, 3, 5]),
             "per_alpha":         trial.suggest_float("per_alpha", 0.3, 0.7),
             "per_beta_init":     trial.suggest_float("per_beta_init", 0.3, 0.6),
             "sigma_init":        trial.suggest_float("sigma_init", 0.3, 0.7),
-            # ~59 on Mario vs ~10 on FlappyBird, so one categorical cannot serve both
-            "v_max":             trial.suggest_categorical(
-                "v_max", [60.0, 100.0, 150.0] if env == "mario" else [15.0, 20.0, 30.0]),
         }
+        if env != "mario":
+            # Mario fixes these in ENV_ALGO_OVERRIDES — see the note there.
+            p.update({
+                "batch_size":        trial.suggest_categorical("batch_size", [32, 64, 128]),
+                "network_sync_rate": trial.suggest_categorical("network_sync_rate", [500, 1000, 2000, 8000]),
+                "n_step":            trial.suggest_categorical("n_step", [1, 3, 5]),
+                # ~59 on Mario vs ~10 on FlappyBird, so one categorical cannot serve both
+                "v_max":             trial.suggest_categorical("v_max", [15.0, 20.0, 30.0]),
+            })
+        return p
     raise ValueError(f"unknown algorithm: {algorithm}")
 
 
@@ -299,7 +310,10 @@ def run_worker(a):
     )
     study = optuna.create_study(
         study_name=a.study, storage=storage,
-        sampler=optuna.samplers.TPESampler(multivariate=True),  # unseeded: workers diverge
+        # unseeded: workers diverge. n_startup_trials is pure random sampling, so on a
+        # ~40-trial Mario study the default 10 would waste a quarter of the budget.
+        sampler=optuna.samplers.TPESampler(multivariate=True,
+                                          n_startup_trials=a.startup_trials),
         pruner=pruner, direction="maximize", load_if_exists=True,
     )
 
@@ -420,6 +434,8 @@ def main():
                    help="max_env_steps written into the exported winner config")
     p.add_argument("--search-seeds", type=int, default=1,
                    help="seeds averaged per trial (pruning only active when 1)")
+    p.add_argument("--startup-trials", type=int, default=None,
+                   help="TPE random-sampling warmup (default: 5 for mario, 10 for flappybird)")
     p.add_argument("--study", default=None, help="study name (default: the algorithm)")
     p.add_argument("--storage", default=None,
                    help="journal path (default: runs/hpo/<study>/<study>.journal)")
@@ -432,13 +448,27 @@ def main():
         if a.env == "mario":
             # Mario needs far more steps before any signal shows, so the proxy-to-full transfer
             # assumption is weaker here than it was for FlappyBird.
-            a.proxy_steps = 3_000_000 if a.algorithm == "ppo" else 1_000_000
+            # Rainbow runs at ~10.6 env steps/s on Mario vs PPO's ~77 (1 gradient step per
+            # env step, and n_atoms=101 doubles the C51 head), so a 1M proxy cost 26h/trial
+            # and the 48h study finished 4 trials. 500k keeps it at ~13h.
+            a.proxy_steps = 3_000_000 if a.algorithm == "ppo" else 500_000
         else:
             a.proxy_steps = 1_000_000 if a.algorithm == "ppo" else 300_000
     if a.eval_episodes is None:
         a.eval_episodes = 300 if a.env == "mario" else 30
+    if a.startup_trials is None:
+        a.startup_trials = 5 if a.env == "mario" else 10
     if a.prune_warmup_steps is None:
-        a.prune_warmup_steps = a.proxy_steps // (3 if a.env == "mario" else 9)
+        # Hyperband only pays off if the FIRST rung is cheap: on FlappyBird a rejected Rainbow
+        # trial cost 0.15h, so 144 of 200 trials were discarded for 34% of the hours. A Mario
+        # rung at proxy//3 costs 8.7h -> 0 of 8 trials pruned, Hyperband inert. Measured
+        # crossovers: PPO's proxy is noise below ~300k and reliable at 400-500k (rho .47/.55/.68
+        # at 300/400/500k, n=28); Rainbow already identifies the weaker half from ~50k (n=4, so
+        # suggestive only, but it is far more sample-efficient: replay + n-step + PER).
+        if a.env == "mario" and a.algorithm == "ppo":
+            a.prune_warmup_steps = a.proxy_steps // 6      # 500k at the 3M proxy
+        else:
+            a.prune_warmup_steps = a.proxy_steps // 9      # 55k at Rainbow's 500k; unchanged for flappybird
     if a.study is None:
         # unchanged for flappybird, so existing journals still resume by name
         a.study = a.algorithm if a.env == "flappybird" else f"{a.env}_{a.algorithm}"

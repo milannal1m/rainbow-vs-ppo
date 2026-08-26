@@ -7,6 +7,8 @@
 #SBATCH --time=48:00:00          # Mario studies need it; override for flappybird (sbatch --time=32:00:00)
 #SBATCH --output=logs/%x_%j.out
 #SBATCH --error=logs/%x_%j.err
+#SBATCH --signal=B:USR1@600      # USR1 to the batch script 10 min before the wall clock, so the
+                                 # report still runs when the study is cut off mid-flight
 
 # Unified Optuna hyperparameter search for one algorithm.
 #
@@ -35,12 +37,16 @@ ALGO=${1:-ppo}
 N_TRIALS=${2:-400}
 TUNE_ENV=${TUNE_ENV:-flappybird}
 OBJECTIVE=${OBJECTIVE:-p25}
-# Per-algorithm packing default: Rainbow is GPU-compute-bound (C51 + noisy + dueling), so it
-# saturates the card and must NOT be overpacked; PPO / vanilla DQN are env-bound and pack well.
+PROXY_STEPS=${PROXY_STEPS:-}     # override the per-env/algo default
+FULL_STEPS=${FULL_STEPS:-}       # max_env_steps written into the exported winner config
+# Per-algorithm packing. Rainbow is GPU-compute-bound (C51 + noisy + dueling) and measured
+# 91-96% util at 4/GPU on FlappyBird, so it must not be overpacked -- but 1/GPU leaves the card
+# ~25% busy (batch 32 vs 128 changes step time by only 3.5%, i.e. the cost is fixed overhead,
+# not batch compute), so 2 is the right compromise. PPO / vanilla DQN are env-bound.
 if [ -n "$3" ]; then
     TRIALS_PER_GPU=$3
 elif [ "$ALGO" = "rainbow" ]; then
-    TRIALS_PER_GPU=1
+    TRIALS_PER_GPU=2
 else
     TRIALS_PER_GPU=3
 fi
@@ -73,15 +79,28 @@ echo "HPO: env=$TUNE_ENV algorithm=$ALGO objective=$OBJECTIVE n_trials=$N_TRIALS
 for (( i=0; i<K; i++ )); do
     CUDA_VISIBLE_DEVICES=$(( i % N_GPUS )) \
         python src/tune.py --env "$TUNE_ENV" --algorithm "$ALGO" --objective "$OBJECTIVE" \
-               --n-trials "$N_TRIALS" --study "$STUDY" &
+               --n-trials "$N_TRIALS" --study "$STUDY" \
+               ${PROXY_STEPS:+--proxy-steps "$PROXY_STEPS"} &
     if [ "$i" -eq 0 ]; then sleep 15; fi
 done
 
-sleep 3600
-nvidia-smi   # 1h-in GPU snapshot (matches train.sh convention)
+# Artifacts are written by the LAST line of this script, so a job killed at the wall clock
+# used to leave nothing but the journal. Run it from a trap instead: on USR1 (600s before the
+# limit) and on EXIT, guarded so it only happens once.
+REPORT_ARGS=(--env "$TUNE_ENV" --algorithm "$ALGO" --objective "$OBJECTIVE" --study "$STUDY")
+[ -n "$FULL_STEPS" ] && REPORT_ARGS+=(--full-steps "$FULL_STEPS")
+REPORTED=0
+write_report() {
+    [ "$REPORTED" = "1" ] && return 0
+    REPORTED=1
+    echo "[report] writing artifacts for $STUDY"
+    python src/tune.py "${REPORT_ARGS[@]}" --report-only || true
+}
+trap 'echo "[signal] USR1 -- wall clock near, reporting early"; write_report; exit 0' USR1
+trap write_report EXIT
 
-wait
+sleep 3600 &
+wait $!        # backgrounded so the USR1 trap can fire during it
+nvidia-smi     # 1h-in GPU snapshot (matches train.sh convention)
 
-# All workers done → export artifacts + best config (single process, no race).
-python src/tune.py --env "$TUNE_ENV" --algorithm "$ALGO" --objective "$OBJECTIVE" \
-       --study "$STUDY" --report-only
+wait           # all workers

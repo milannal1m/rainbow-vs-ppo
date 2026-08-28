@@ -180,9 +180,11 @@ def _rename_latest_video(video_dir, new_filename):
 
 def record_episode(policy_dqn, env_id, env_make_params, video_dir, name_prefix,
                    stop_on_reward, seed, device, obs_size=None, frame_stack=None, rgb_wrapper=False,
-                   record_video=True, levels=None):
+                   record_video=True, levels=None, max_steps=None):
     # record_video=False runs the same greedy episode and returns its reward, but skips the
     # RecordVideo wrapper (and mp4 write) — used by HPO trials where only the reward matters.
+    # max_steps caps the clip: RecordVideo buffers every frame in RAM (~0.44 MB at 288x512), so
+    # a converged FlappyBird agent's 7-hour episode would need ~335 GB.
     # Function-local import: env_factory imports this module at its top level.
     from env_factory import make_env
     env = make_env(env_id, env_make_params, render_mode="rgb_array",
@@ -203,13 +205,17 @@ def record_episode(policy_dqn, env_id, env_make_params, video_dir, name_prefix,
     truncated      = False
     episode_reward = 0.0
 
-    while not (terminated or truncated) and episode_reward < stop_on_reward:
+    steps = 0
+
+    while (not (terminated or truncated) and episode_reward < stop_on_reward
+           and (max_steps is None or steps < max_steps)):
         with torch.no_grad():
             out = policy_dqn(state.unsqueeze(0))
             logits = out[0] if isinstance(out, tuple) else out
             action = logits.squeeze().argmax().item()
         new_state, reward, terminated, truncated, _ = env.step(action)
         episode_reward += reward
+        steps += 1
         state = torch.tensor(new_state, dtype=torch.float32).to(device)
 
     env.close()

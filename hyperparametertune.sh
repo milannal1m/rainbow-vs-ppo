@@ -39,14 +39,16 @@ TUNE_ENV=${TUNE_ENV:-flappybird}
 OBJECTIVE=${OBJECTIVE:-p25}
 PROXY_STEPS=${PROXY_STEPS:-}     # override the per-env/algo default
 FULL_STEPS=${FULL_STEPS:-}       # max_env_steps written into the exported winner config
-# Per-algorithm packing. Rainbow is GPU-compute-bound (C51 + noisy + dueling) and measured
-# 91-96% util at 4/GPU on FlappyBird, so it must not be overpacked -- but 1/GPU leaves the card
-# ~25% busy (batch 32 vs 128 changes step time by only 3.5%, i.e. the cost is fixed overhead,
-# not batch compute), so 2 is the right compromise. PPO / vanilla DQN are env-bound.
+# Per-algorithm packing. Rainbow's binding resource is RAM, not the GPU: each worker holds a
+# replay buffer of ~56KB/transition. On Mario at 2/GPU (8 workers x 300k) that is 136 GB of the
+# 187 GB node, and measured throughput collapses from 10.5 to 2.1 steps/s per worker once the
+# buffers fill -- study 6715345 finished 0 of 18 trials in 48h. PPO / vanilla DQN are env-bound.
 if [ -n "$3" ]; then
     TRIALS_PER_GPU=$3
 elif [ "$ALGO" = "rainbow" ]; then
-    TRIALS_PER_GPU=2
+    # 1, nicht 2: bei 8 Workern belegen die Replay-Buffer 136 GB von 187 GB und der
+    # Durchsatz bricht von 10.5 auf 2.1 steps/s je Worker ein (gemessen, Studie 6715345).
+    TRIALS_PER_GPU=1
 else
     TRIALS_PER_GPU=3
 fi

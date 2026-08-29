@@ -451,7 +451,7 @@ def main():
             # Rainbow runs at ~10.6 env steps/s on Mario vs PPO's ~77 (1 gradient step per
             # env step, and n_atoms=101 doubles the C51 head), so a 1M proxy cost 26h/trial
             # and the 48h study finished 4 trials. 500k keeps it at ~13h.
-            a.proxy_steps = 3_000_000 if a.algorithm == "ppo" else 500_000
+            a.proxy_steps = 3_000_000 if a.algorithm == "ppo" else 300_000
         else:
             a.proxy_steps = 1_000_000 if a.algorithm == "ppo" else 300_000
     if a.eval_episodes is None:
@@ -468,7 +468,7 @@ def main():
         if a.env == "mario" and a.algorithm == "ppo":
             a.prune_warmup_steps = a.proxy_steps // 6      # 500k at the 3M proxy
         else:
-            a.prune_warmup_steps = a.proxy_steps // 9      # 55k at Rainbow's 500k; unchanged for flappybird
+            a.prune_warmup_steps = a.proxy_steps // 9      # 33k at Rainbow's 300k; unchanged for flappybird
     if a.study is None:
         # unchanged for flappybird, so existing journals still resume by name
         a.study = a.algorithm if a.env == "flappybird" else f"{a.env}_{a.algorithm}"

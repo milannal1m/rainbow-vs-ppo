@@ -104,3 +104,4 @@
 [I 2026-08-26 05:43:56,212] Trial 57 finished with value: 78.42911111111133 and parameters: {'learning_rate_a': 0.0004665278963983143, 'ppo_epochs': 3, 'ent_coef': 0.007187548339967469, 'clip_eps': 0.2, 'gae_lambda': 0.9331059248230295, 'vf_coef': 0.5906422707377792, 'rollout_steps': 4096, 'minibatch_size': 128, 'hidden_dim': 256}. Best is trial 40 with value: 127.64577777777804.
 [I 2026-08-26 06:13:57,941] Trial 62 pruned. 
 [I 2026-08-26 06:16:25,225] Trial 74 pruned. 
+[2026-08-26T08:18:11.098] error: *** JOB 6559842 ON uc2n905 CANCELLED AT 2026-08-26T08:18:11 DUE TO TIME LIMIT ***

@@ -4,7 +4,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=4         # 1 for env+policy, ~3 for the x264 encode
 #SBATCH --mem=8000                # streaming is O(1) in frames (~0.4GB); no 128GB needed
-#SBATCH --time=13:00:00           # partition max; a full FlappyBird episode needs ~2h
+#SBATCH --time=10:00:00           # partition max; a full FlappyBird episode needs ~2h
 #SBATCH --signal=B:USR1@300       # USR1 5 min before the limit -> mp4 gets finalised, not truncated
 #SBATCH --output=logs/%x_%j.out
 #SBATCH --error=logs/%x_%j.err

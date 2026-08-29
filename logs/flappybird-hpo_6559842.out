@@ -384,3 +384,18 @@ Device: cuda
 2026-08-26_05-56-06 Episode 8000: New best greedy reward 32.00, model saved.
 2026-08-26_05-59-07 Episode 8089: New best reward 234.00, training model saved.
 [worker] done. total trials in study: 80
+
+============================= JOB FEEDBACK =============================
+
+NodeName=uc2n905
+Job ID: 6559842
+Cluster: uc3
+User/Group: ul_lmm50/ul_student
+State: TIMEOUT (exit code 0)
+Nodes: 1
+Cores per node: 16
+CPU Utilized: 3-19:18:06
+CPU Efficiency: 11.89% of 32-00:06:56 core-walltime
+Job Wall-clock time: 2-00:00:26
+Memory Utilized: 39.08 GB
+Memory Efficiency: 20.84% of 187.50 GB (187.50 GB/node)

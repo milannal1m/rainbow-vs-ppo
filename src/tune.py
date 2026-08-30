@@ -66,13 +66,17 @@ _ENV_FLAPPYBIRD = {
     "rgb_wrapper": True,
 }
 
-# Mario trials use the 4-level smb1_hpo subset. Selection must only ever read training levels —
+# Mario trials use the SAME 20 training levels as the real run. smb1_hpo (4 levels, all
+# ground archetype) was unfaithful: it tuned a homogeneous 4-task problem while the run is a
+# heterogeneous 20-task one, and the winning config lost to a hand-set LR schedule. Measured on
+# two configs over these 20 levels, x_pos_max separates them by 31% at 1M and 52% at 3M, so the
+# thinner 150k/level budget still ranks. Selection must only ever read training levels —
 # scoring on a held-out tier would be test-set selection.
 _ENV_MARIO = {
     "env_id": "SuperMarioBros-v0",
     "env_package": "gym_super_mario_bros",
     "env_make_params": {
-        "level_split": "smb1_hpo", "level_set": "train", "level_sampler": "seed_hash",
+        "level_split": "smb1_stage_holdout", "level_set": "train", "level_sampler": "seed_hash",
         "action_set": "COMPLEX_MOVEMENT", "frame_skip": 4,
         "reward_clip": 15.0, "reward_divisor": 15.0,
         "noop_max": 30, "sticky_prob": 0.25,
@@ -447,11 +451,13 @@ def main():
     if a.proxy_steps is None:
         if a.env == "mario":
             # Mario needs far more steps before any signal shows, so the proxy-to-full transfer
-            # assumption is weaker here than it was for FlappyBird.
-            # Rainbow runs at ~10.6 env steps/s on Mario vs PPO's ~77 (1 gradient step per
-            # env step, and n_atoms=101 doubles the C51 head), so a 1M proxy cost 26h/trial
-            # and the 48h study finished 4 trials. 500k keeps it at ~13h.
-            a.proxy_steps = 3_000_000 if a.algorithm == "ppo" else 300_000
+            # assumption is weaker here than it was for FlappyBird. Since trials now run on all
+            # 20 training levels, the per-level budget is what binds: PPO gets 150k/level at 3M,
+            # Rainbow only 15k at 300k -- and start_learning_after=20000 alone eats 6.7% of that
+            # proxy. 600k doubles it to 30k/level and still yields ~71 trials per 48h study at
+            # 4 workers (~25 env steps/s each; 8 workers thrash the replay buffers, see
+            # hyperparametertune.sh).
+            a.proxy_steps = 3_000_000 if a.algorithm == "ppo" else 600_000
         else:
             a.proxy_steps = 1_000_000 if a.algorithm == "ppo" else 300_000
     if a.eval_episodes is None:
@@ -466,7 +472,9 @@ def main():
         # at 300/400/500k, n=28); Rainbow already identifies the weaker half from ~50k (n=4, so
         # suggestive only, but it is far more sample-efficient: replay + n-step + PER).
         if a.env == "mario" and a.algorithm == "ppo":
-            a.prune_warmup_steps = a.proxy_steps // 6      # 500k at the 3M proxy
+            a.prune_warmup_steps = a.proxy_steps // 3      # 1M at the 3M proxy: on the 20-level
+            # split two configs are only 7% apart at 500k but 31% apart at 1M, so pruning at 500k
+            # would discard good trials. Costs ~96 trials per 48h study instead of ~120.
         else:
             a.prune_warmup_steps = a.proxy_steps // 9      # 33k at Rainbow's 300k; unchanged for flappybird
     if a.study is None:

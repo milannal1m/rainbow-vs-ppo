@@ -19,3 +19,57 @@ Fri Aug 28 14:53:50 2026
 |    0   N/A  N/A           11231      G   /usr/libexec/Xorg                        17MiB |
 |    0   N/A  N/A         3963858      C   python                                 1486MiB |
 +-----------------------------------------------------------------------------------------+
+Using device: cuda
+2026-08-28_13-55-02: Training starting...
+Device: cuda
+2026-08-28_13-55-10 Episode 0: New best reward -2.07, training model saved.
+2026-08-28_13-55-13 Episode 0: New best greedy reward 10.00, model saved.
+2026-08-28_13-55-15 Episode 1: New best reward 23.60, training model saved.
+2026-08-28_13-56-27 Episode 16: New best reward 32.50, training model saved.
+2026-08-28_13-56-50 Episode 21: New best reward 65.80, training model saved.
+2026-08-28_13-57-22 Episode 36: New best reward 65.87, training model saved.
+2026-08-28_13-57-46 Episode 44: New best reward 67.00, training model saved.
+2026-08-28_13-59-18 Episode 72: New best reward 69.80, training model saved.
+2026-08-28_13-59-20 Episode 73: New best reward 78.47, training model saved.
+2026-08-28_13-59-52 Episode 101: New best reward 83.73, training model saved.
+2026-08-28_14-00-57 Episode 128: New best reward 90.13, training model saved.
+2026-08-28_14-04-57 Episode 307: New best reward 145.87, training model saved.
+2026-08-28_14-12-47 Episode 885: New best reward 154.60, training model saved.
+2026-08-28_14-14-06 Episode 1000: New best greedy reward 12.60, model saved.
+2026-08-28_14-20-48 Episode 1511: New best reward 156.07, training model saved.
+2026-08-28_14-26-49 Episode 2000: New best greedy reward 34.40, model saved.
+2026-08-28_14-44-02 Episode 3358: New best reward 190.33, training model saved.
+2026-08-28_15-01-31 Episode 4741: New best reward 194.80, training model saved.
+2026-08-28_15-21-46 Episode 6345: New best reward 201.40, training model saved.
+2026-08-28_15-30-02 Episode 7000: New best greedy reward 114.53, model saved.
+2026-08-28_16-42-14 Episode 11768: New best reward 202.67, training model saved.
+2026-08-28_17-22-34 Episode 14203: LR reached floor 1.00e-05 (step 1507328), holding.
+2026-08-28_17-37-27 Episode 15069: New best reward 232.00, training model saved.
+2026-08-28_18-42-44 Episode 18907: New best reward 232.40, training model saved.
+2026-08-28_19-02-07 Episode 20000: New best greedy reward 126.47, model saved.
+2026-08-28_20-13-07 Episode 23955: New best reward 232.93, training model saved.
+2026-08-28_20-32-17 Episode 24985: New best reward 233.40, training model saved.
+2026-08-28_21-03-39 Episode 26654: New best reward 233.73, training model saved.
+2026-08-28_21-50-19 Episode 29148: New best reward 234.07, training model saved.
+2026-08-28_22-26-06 Episode 31000: New best greedy reward 133.93, model saved.
+2026-08-29_01-19-20 Episode 39649: New best reward 234.13, training model saved.
+2026-08-29_01-48-05 Episode 41042: New best reward 234.13, training model saved.
+2026-08-29_03-32-03 Episode 45866: New best reward 242.00, training model saved.
+2026-08-29_04-58-43 Episode 50000: New best greedy reward 167.87, model saved.
+2026-08-29_06-26-06 Episode 53985: New best reward 244.00, training model saved.
+[checkpoint] final save failed: Parent directory runs/mario_ppo_tuned does not exist.
+
+============================= JOB FEEDBACK =============================
+
+NodeName=uc2n913
+Job ID: 6725413
+Cluster: uc3
+User/Group: ul_lmm50/ul_student
+State: CANCELLED (exit code 0)
+Nodes: 1
+Cores per node: 4
+CPU Utilized: 00:00:06
+CPU Efficiency: 0.00% of 3-09:02:20 core-walltime
+Job Wall-clock time: 20:15:35
+Memory Utilized: 3.94 GB
+Memory Efficiency: 3.16% of 125.00 GB (125.00 GB/node)

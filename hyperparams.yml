@@ -279,4 +279,4 @@ mario_ppo_tuned:
   gae_lambda: 0.9490597723632296
   vf_coef: 0.3801000579735247
   minibatch_size: 64
-  lr_anneal_steps: 1500000
+  lr_anneal_steps: 20000000

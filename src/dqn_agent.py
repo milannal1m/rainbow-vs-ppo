@@ -31,6 +31,16 @@ class DQNAgent(BaseAgent):
         self.network_sync_rate    = hyperparams["network_sync_rate"]
         self.enable_double_dqn    = hyperparams.get("enable_double_dqn", False)
         self.network_type         = hyperparams.get("network_type", "dqn")
+        # One gradient step every `replay_period` env steps. Hessel et al. 2018 use 4; the default
+        # is 1 so every pre-existing config keeps its exact old behaviour. Note that
+        # network_sync_rate stays in ENV steps, so at period 4 the target net updates 4x more
+        # often per GRADIENT step -- the HPO searches network_sync_rate, so it compensates.
+        self.replay_period        = max(1, int(hyperparams.get("replay_period", 1)))
+        # Adam epsilon. Hessel et al. 2018 use 1.5e-4; torch's default is 1e-8, four orders of
+        # magnitude lower, which inflates the effective step for small gradients -- and measured
+        # gradient norms here are ~0.02-0.06 median, exactly that regime. Default stays 1e-8 so
+        # pre-existing configs are bit-identical; RAINBOW_BASE sets the paper value.
+        self.adam_eps             = float(hyperparams.get("adam_eps", 1e-8))
 
         # Rainbow extension flags
         self.use_noisy          = hyperparams.get("use_noisy", False)
@@ -121,7 +131,8 @@ class DQNAgent(BaseAgent):
         target_dqn = self._build_model(num_states, num_actions)
         target_dqn.load_state_dict(policy_dqn.state_dict())
 
-        optimizer = torch.optim.Adam(policy_dqn.parameters(), lr=self.learning_rate_a)
+        optimizer = torch.optim.Adam(policy_dqn.parameters(), lr=self.learning_rate_a,
+                                     eps=self.adam_eps)
         lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
             optimizer, mode='max', factor=0.5, patience=self.lr_decay_patience, min_lr=1e-6
         ) if self.lr_decay_patience else None
@@ -243,7 +254,8 @@ class DQNAgent(BaseAgent):
 
                     if (len(memory) > self.batch_size
                             and total_steps > self.start_learning_after
-                            and total_steps > refill_until):
+                            and total_steps > refill_until
+                            and total_steps % self.replay_period == 0):
                         if self.use_per:
                             beta = min(1.0, self.per_beta_init +
                                        total_steps * (1.0 - self.per_beta_init) / self.per_beta_frames)
@@ -310,11 +322,19 @@ class DQNAgent(BaseAgent):
                     log(f"{datetime.now().strftime(DATE_FORMAT)} Episode {episode}: New best reward {best_reward:.2f}, training model saved.", self.LOG_FILE)
 
                 if episode % CHECKPOINT_EVERY == 0:
-                    greedy_reward = record_episode(policy_dqn, self.env_id, self.env_make_params,
-                                                   self.CHECKPOINT_VIDEO_DIR, f"checkpoint_ep{episode}",
-                                                   self.stop_on_reward, seed=episode + 1, device=device,
-                                                   obs_size=self.obs_size, frame_stack=self.frame_stack,
-                                                   rgb_wrapper=self.rgb_wrapper, record_video=record_video)
+                    # eval() is load-bearing with noisy nets: NoisyLinear.forward only injects
+                    # noise while self.training, so without this the "greedy" probe that drives
+                    # checkpoint selection would measure an exploring policy -- and PPO's model is
+                    # in eval() on the same path, which made the two algorithms asymmetric.
+                    policy_dqn.eval()
+                    try:
+                        greedy_reward = record_episode(policy_dqn, self.env_id, self.env_make_params,
+                                                       self.CHECKPOINT_VIDEO_DIR, f"checkpoint_ep{episode}",
+                                                       self.stop_on_reward, seed=episode + 1, device=device,
+                                                       obs_size=self.obs_size, frame_stack=self.frame_stack,
+                                                       rgb_wrapper=self.rgb_wrapper, record_video=record_video)
+                    finally:
+                        policy_dqn.train()
                     if greedy_reward > best_greedy_reward:
                         best_greedy_reward = greedy_reward
                         torch.save(policy_dqn.state_dict(), self.MODEL_FILE)

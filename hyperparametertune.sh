@@ -19,7 +19,8 @@
 #
 # Env-var overrides (defaults keep every existing FlappyBird invocation identical):
 #   TUNE_ENV   flappybird | mario     which game to tune            (default flappybird)
-#   OBJECTIVE  p25 | median | mean    eval statistic to maximise    (default p25)
+#   OBJECTIVE  p25 | median | mean    eval statistic to maximise    (default: p25 on
+#                                    flappybird, mean on mario -- set per TUNE_ENV below)
 #
 # Mario needs BOTH the python 3.13 conda env and TUNE_ENV -- without TUNE_ENV the workers
 # build a FlappyBird config and die on the missing flappy_bird_gymnasium import:
@@ -36,18 +37,25 @@
 ALGO=${1:-ppo}
 N_TRIALS=${2:-400}
 TUNE_ENV=${TUNE_ENV:-flappybird}
-OBJECTIVE=${OBJECTIVE:-p25}
+# Env-aware default so it cannot be forgotten: p25 on FlappyBird (unbounded eval episodes make
+# reward heavy-tailed, so the mean is outlier-driven), mean on Mario (with 20 levels and mostly
+# zero flag rates, p25 collapses to ~0 and stops discriminating). Override explicitly if needed.
+if [ "$TUNE_ENV" = "mario" ]; then
+    OBJECTIVE=${OBJECTIVE:-mean}
+else
+    OBJECTIVE=${OBJECTIVE:-p25}
+fi
 PROXY_STEPS=${PROXY_STEPS:-}     # override the per-env/algo default
 FULL_STEPS=${FULL_STEPS:-}       # max_env_steps written into the exported winner config
-# Per-algorithm packing. Rainbow's binding resource is RAM, not the GPU: each worker holds a
-# replay buffer of ~56KB/transition. On Mario at 2/GPU (8 workers x 300k) that is 136 GB of the
-# 187 GB node, and measured throughput collapses from 10.5 to 2.1 steps/s per worker once the
-# buffers fill -- study 6715345 finished 0 of 18 trials in 48h. PPO / vanilla DQN are env-bound.
+# Per-algorithm packing. Rainbow is neither GPU- nor RAM-bound now that trials use a
+# proxy-scaled replay buffer (50k on Mario = 2.8 GB/worker, see build_trial_config), so the
+# 16 cores of the node are the limit. Measured: 4 vs 8 workers gave the same aggregate throughput
+# (13.4 vs 13.6 env steps/s), i.e. packing more only makes each trial slower -- study 6715345 ran
+# 8 workers and finished 0 of 18 trials in 48h, while 6736259 ran 4 and completed 36 of 80.
+# PPO / vanilla DQN are env-bound and pack fine.
 if [ -n "$3" ]; then
     TRIALS_PER_GPU=$3
 elif [ "$ALGO" = "rainbow" ]; then
-    # 1, nicht 2: bei 8 Workern belegen die Replay-Buffer 136 GB von 187 GB und der
-    # Durchsatz bricht von 10.5 auf 2.1 steps/s je Worker ein (gemessen, Studie 6715345).
     TRIALS_PER_GPU=1
 else
     TRIALS_PER_GPU=3

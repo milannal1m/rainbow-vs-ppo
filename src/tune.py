@@ -96,7 +96,10 @@ ENV_ALGO_OVERRIDES = {
     # FlappyBird's v_max=20 would clamp essentially every C51 target, and 51 atoms would be too
     # coarse for that range -- hence the value-support triple below.
     ("mario", "rainbow"): {"n_atoms": 101, "v_min": -15.0, "v_max": 100.0,
-                           "replay_memory_size": 300000, "per_beta_frames": 5000000},
+                           # 400000, not 300000: matches the hand-written mario_rainbow config, so
+                           # the project has ONE Mario Rainbow buffer size and the 3.3% retention
+                           # that build_trial_config's proxy buffer is derived from stays valid.
+                           "replay_memory_size": 400000, "per_beta_frames": 5000000},
     ("mario", "dqn"):     {"replay_memory_size": 300000},
     ("mario", "ppo"):     {"rollout_steps": 4096},
 }
@@ -237,7 +240,15 @@ def build_trial_config(algorithm, params, proxy_steps, env="flappybird"):
         # them in the slow full-buffer regime: measured 44 -> 9 env steps/s once 300k is full,
         # which would make a 3M Mario trial cost ~93h. The real run's buffer size stays
         # proxy-blind and is exported unchanged by build_export_config().
-        cfg["replay_memory_size"] = 50_000 if env == "mario" else 100_000
+        # Scale the buffer to the proxy so trials retain the SAME FRACTION of their history as the
+        # full run does. With the absolute buffer of the full run, a proxy retains far too much
+        # (Mario 3M/300k = 10%, FlappyBird 1M/1M = 100%) and spends most of its time in the slow
+        # full-buffer regime -- measured 44 -> 9 env steps/s on Mario, which put a 3M trial at ~93h.
+        # Both games happen to land on the same number:
+        #   FlappyBird  1M buffer / 10M steps = 10.0%  ->  1M proxy x 10.0%  = 100k
+        #   Mario      400k buffer / 12M steps =  3.3%  ->  3M proxy x  3.3%  = 100k
+        # The full run's absolute buffer stays unsearched ("proxy-blind"); only trials use this.
+        cfg["replay_memory_size"] = 100_000
     return cfg
 
 

@@ -465,3 +465,53 @@ flappybird_rainbow_tuned_2:
   learning_rate_a: 0.00013247208585745213
   n_step: 3
   max_env_steps: 10000000
+
+mario_rainbow_tuned:
+  algorithm: dqn
+  network_type: rainbow_cnn_dqn
+  hidden_dim: 512
+  discount_factor_g: 0.99
+  stop_on_reward: 100000
+  seed: 42
+  replay_memory_size: 400000
+  batch_size: 128
+  epsilon_init: 1.0
+  epsilon_decay: 1.0
+  epsilon_min: 0.0
+  network_sync_rate: 2000
+  start_learning_after: 20000
+  enable_double_dqn: true
+  use_dueling: true
+  use_per: true
+  use_nstep: true
+  use_noisy: true
+  use_distributional: true
+  n_atoms: 101
+  v_min: -15.0
+  v_max: 100.0
+  per_alpha: 0.6254595513203001
+  per_beta_init: 0.399771175517114
+  per_beta_frames: 5000000
+  sigma_init: 0.558519790534874
+  replay_period: 4
+  adam_eps: 0.00015
+  env_id: SuperMarioBros-v0
+  env_package: gym_super_mario_bros
+  env_make_params:
+    level_split: smb1_stage_holdout
+    level_set: train
+    level_sampler: seed_hash
+    action_set: COMPLEX_MOVEMENT
+    frame_skip: 4
+    reward_clip: 15.0
+    reward_divisor: 15.0
+    noop_max: 30
+    sticky_prob: 0.25
+    max_episode_steps: 3000
+    warp_bonus: 5.0
+  frame_stack: 4
+  obs_size: 84
+  rgb_wrapper: false
+  learning_rate_a: 0.00029784159300156536
+  n_step: 3
+  max_env_steps: 100000000

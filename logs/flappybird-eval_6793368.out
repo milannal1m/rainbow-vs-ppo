@@ -1,0 +1,19 @@
+Using device: cuda
+Per-level evaluation — split=smb1_stage_holdout tiers=['train', 'tier0', 'tier1', 'tier2'] levels=41 episodes/level=30 policy=argmax
+env: kind=mario levels=smb1_stage_holdout/train (20 levels) action_set=COMPLEX_MOVEMENT frame_skip=4 level_sampler=seed_hash max_episode_steps=3000 noop_max=30 reward_clip=15.0 reward_divisor=15.0 sticky_prob=0.25 warp_bonus=5.0
+NOTE: no frozen route table (mario_levels.json) — reporting `pages` and raw x_pos_max instead of normalised Route Progress. See mario.md 5.3.
+
+============================= JOB FEEDBACK =============================
+
+NodeName=uc2n905
+Job ID: 6793368
+Cluster: uc3
+User/Group: ul_lmm50/ul_student
+State: FAILED (exit code 1)
+Nodes: 1
+Cores per node: 2
+CPU Utilized: 00:00:16
+CPU Efficiency: 9.64% of 00:02:46 core-walltime
+Job Wall-clock time: 00:01:23
+Memory Utilized: 672.09 MB
+Memory Efficiency: 2.10% of 31.25 GB (31.25 GB/node)

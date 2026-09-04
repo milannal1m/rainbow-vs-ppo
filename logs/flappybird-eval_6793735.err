@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/opt/bwhpc/common/devel/miniforge/25.3.1-py3.12/condabin/conda", line 12, in <module>
+    from conda.cli import main
+ModuleNotFoundError: No module named 'conda'
+[2026-09-04T08:28:40.712] error: *** JOB 6793735 ON uc2n905 CANCELLED AT 2026-09-04T08:28:40 DUE to SIGNAL Terminated ***

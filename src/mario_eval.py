@@ -565,9 +565,27 @@ def _write_csv(per_level, path):
             w.writerow(row)
 
 
+def _one_level_per_world(per_level):
+    """The lowest-numbered evaluated stage of each SMB1 world.
+
+    Lowest rather than best-performing: a per-world best would pick different stages for
+    different algorithms, and the clips would no longer be comparable. Lost Levels ids carry no
+    SMB1 world and are skipped — request them explicitly if wanted.
+    """
+    by_world = {}
+    for level in per_level:
+        try:
+            world, stage = ML.parse_level(level)
+        except Exception:                                  # noqa: BLE001 -- non-SMB1 level id
+            continue
+        if world not in by_world or stage < by_world[world][0]:
+            by_world[world] = (stage, level)
+    return tuple(lvl for _, (_, lvl) in sorted(by_world.items()))
+
+
 def run(agent, *, split_name=None, tiers=("train", "tier0", "tier1", "tier2"),
         episodes_per_level=30, policy_mode="argmax", out_dir=None, levels=None,
-        full_game_episodes=10, video_levels=("1-1",), full_game_video=True):
+        full_game_episodes=10, video_levels="per_world", full_game_video=True):
     """Evaluate the requested tiers, write JSON/CSV/figures, return the aggregate.
 
     Also plays full_game_episodes chronological runs of the original game (0 to skip).
@@ -635,6 +653,9 @@ def run(agent, *, split_name=None, tiers=("train", "tier0", "tier1", "tier2"),
     save_tier2_bars(per_level, os.path.join(out_dir, f"tier2_lost_levels{suffix}.png"))
 
     # One mp4 per requested level, replaying its best episode (a seed reproduces a run exactly).
+    if video_levels == "per_world":
+        video_levels = _one_level_per_world(per_level)
+        log(f"videos: one per world -> {list(video_levels)}", log_file)
     for level in (video_levels or ()):
         if level not in per_level:
             continue

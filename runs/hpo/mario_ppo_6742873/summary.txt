@@ -1,0 +1,17 @@
+study: mario_ppo_6742873
+algorithm: ppo
+completed trials: 49 / 95 total
+best value (mean greedy reward): 63.3389
+best trial: #71
+best params:
+  learning_rate_a: 0.000203799653626525
+  ppo_epochs: 4
+  ent_coef: 0.010152604422466502
+  clip_eps: 0.3
+  gae_lambda: 0.9162089035400237
+  vf_coef: 0.6923311717592857
+  rollout_steps: 8192
+  minibatch_size: 64
+  hidden_dim: 512
+exported to hyperparams.yml as: mario_ppo_tuned_2
+run it with: sbatch train.sh mario_ppo_tuned_2

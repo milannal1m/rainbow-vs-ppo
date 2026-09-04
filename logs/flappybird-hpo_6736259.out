@@ -652,3 +652,273 @@ Device: cuda
 2026-08-30_18-00-18 Episode 462: New best reward 121.60, training model saved.
 2026-08-30_18-01-10 Episode 471: New best reward 125.00, training model saved.
 [worker] done. total trials in study: 80
+2026-08-29_22-44-58: Training starting...
+Device: cuda
+2026-08-29_22-45-11 Episode 0: New best reward 8.40, training model saved.
+2026-08-29_22-45-25 Episode 0: New best greedy reward -27.60, model saved.
+2026-08-29_22-46-11 Episode 8: New best reward 12.67, training model saved.
+2026-08-29_22-46-57 Episode 12: New best reward 40.37, training model saved.
+2026-08-29_22-47-52 Episode 17: New best reward 120.50, training model saved.
+2026-08-29_22-56-27 Episode 121: New best reward 129.27, training model saved.
+2026-08-29_23-02-08 Episode 172: New best reward 139.33, training model saved.
+2026-08-29_23-26-32 Episode 510: New best reward 154.53, training model saved.
+2026-08-29_23-46-27 Episode 949: New best reward 156.27, training model saved.
+2026-08-29_23-48-20 Episode 1000: New best greedy reward 55.40, model saved.
+2026-08-29_23-50-45 Episode 1050: New best reward 231.53, training model saved.
+2026-08-30_00-19-36: Training starting...
+Device: cuda
+2026-08-30_00-19-46 Episode 0: New best reward 1.73, training model saved.
+2026-08-30_00-20-01 Episode 0: New best greedy reward -27.60, model saved.
+2026-08-30_00-20-03 Episode 1: New best reward 2.13, training model saved.
+2026-08-30_00-20-08 Episode 2: New best reward 5.53, training model saved.
+2026-08-30_00-20-11 Episode 3: New best reward 6.13, training model saved.
+2026-08-30_00-20-20 Episode 5: New best reward 6.80, training model saved.
+2026-08-30_00-20-37 Episode 6: New best reward 8.47, training model saved.
+2026-08-30_00-21-13 Episode 11: New best reward 11.93, training model saved.
+2026-08-30_00-21-35 Episode 14: New best reward 25.87, training model saved.
+2026-08-30_00-22-55 Episode 19: New best reward 28.73, training model saved.
+2026-08-30_00-25-12 Episode 30: New best reward 62.47, training model saved.
+2026-08-30_00-46-38 Episode 173: New best reward 89.67, training model saved.
+2026-08-30_00-48-57: Training starting...
+Device: cuda
+2026-08-30_00-49-03 Episode 0: New best reward 10.27, training model saved.
+2026-08-30_00-49-18 Episode 0: New best greedy reward -27.60, model saved.
+2026-08-30_00-49-41 Episode 2: New best reward 18.80, training model saved.
+2026-08-30_00-50-56 Episode 16: New best reward 47.53, training model saved.
+2026-08-30_00-53-38 Episode 35: New best reward 80.87, training model saved.
+2026-08-30_01-00-41 Episode 150: New best reward 86.00, training model saved.
+2026-08-30_01-14-39 Episode 469: New best reward 89.87, training model saved.
+2026-08-30_01-15-54 Episode 483: New best reward 94.33, training model saved.
+2026-08-30_01-18-24 Episode 530: New best reward 94.53, training model saved.
+2026-08-30_01-27-17 Episode 633: New best reward 104.20, training model saved.
+2026-08-30_01-29-26 Episode 664: New best reward 105.33, training model saved.
+2026-08-30_01-38-28 Episode 767: New best reward 117.00, training model saved.
+2026-08-30_01-56-48 Episode 1000: New best greedy reward 36.93, model saved.
+2026-08-30_02-01-54 Episode 1050: New best reward 134.93, training model saved.
+2026-08-30_02-29-58: Training starting...
+Device: cuda
+2026-08-30_02-30-02 Episode 0: New best reward 10.87, training model saved.
+2026-08-30_02-30-18 Episode 0: New best greedy reward -27.60, model saved.
+2026-08-30_02-30-46 Episode 5: New best reward 16.00, training model saved.
+2026-08-30_02-31-51 Episode 15: New best reward 16.07, training model saved.
+2026-08-30_02-32-34 Episode 19: New best reward 20.27, training model saved.
+2026-08-30_02-32-36 Episode 20: New best reward 48.20, training model saved.
+2026-08-30_02-34-56 Episode 30: New best reward 55.53, training model saved.
+2026-08-30_02-36-00 Episode 49: New best reward 70.13, training model saved.
+2026-08-30_02-37-58 Episode 93: New best reward 81.53, training model saved.
+2026-08-30_02-39-36 Episode 120: New best reward 89.00, training model saved.
+2026-08-30_02-40-14 Episode 133: New best reward 113.00, training model saved.
+2026-08-30_02-41-37 Episode 165: New best reward 116.07, training model saved.
+2026-08-30_03-01-38 Episode 640: New best reward 136.27, training model saved.
+2026-08-30_03-12-04 Episode 902: New best reward 165.47, training model saved.
+2026-08-30_03-15-40 Episode 1000: New best greedy reward 31.93, model saved.
+2026-08-30_03-16-27 Episode 1016: New best reward 187.20, training model saved.
+2026-08-30_03-54-21 Episode 2000: New best greedy reward 132.53, model saved.
+2026-08-30_04-17-34: Training starting...
+Device: cuda
+2026-08-30_04-17-44 Episode 0: New best reward 2.40, training model saved.
+2026-08-30_04-18-01 Episode 0: New best greedy reward -27.60, model saved.
+2026-08-30_04-18-08 Episode 2: New best reward 4.80, training model saved.
+2026-08-30_04-18-12 Episode 3: New best reward 8.40, training model saved.
+2026-08-30_04-18-40 Episode 6: New best reward 9.33, training model saved.
+2026-08-30_04-19-33 Episode 11: New best reward 19.27, training model saved.
+2026-08-30_04-19-39 Episode 12: New best reward 30.53, training model saved.
+2026-08-30_04-21-19 Episode 19: New best reward 34.47, training model saved.
+2026-08-30_04-24-41 Episode 49: New best reward 42.80, training model saved.
+2026-08-30_04-26-39: Training starting...
+Device: cuda
+2026-08-30_04-26-45 Episode 0: New best reward 8.33, training model saved.
+2026-08-30_04-27-00 Episode 0: New best greedy reward -27.60, model saved.
+2026-08-30_04-27-38 Episode 7: New best reward 9.20, training model saved.
+2026-08-30_04-27-41 Episode 8: New best reward 10.80, training model saved.
+2026-08-30_04-28-37 Episode 17: New best reward 57.03, training model saved.
+2026-08-30_04-30-02 Episode 29: New best reward 132.53, training model saved.
+2026-08-30_04-31-39 Episode 68: New best reward 133.27, training model saved.
+2026-08-30_04-48-52 Episode 300: New best reward 152.87, training model saved.
+2026-08-30_05-04-02 Episode 626: New best reward 172.73, training model saved.
+2026-08-30_05-23-06 Episode 1000: New best greedy reward 37.77, model saved.
+2026-08-30_05-25-11 Episode 1051: New best reward 180.33, training model saved.
+2026-08-30_05-32-16 Episode 1218: New best reward 182.40, training model saved.
+2026-08-30_05-32-58 Episode 1238: New best reward 187.53, training model saved.
+2026-08-30_05-52-34 Episode 1624: New best reward 204.67, training model saved.
+2026-08-30_06-06-22: Training starting...
+Device: cuda
+2026-08-30_06-06-33 Episode 0: New best reward 2.13, training model saved.
+2026-08-30_06-06-48 Episode 0: New best greedy reward -27.60, model saved.
+2026-08-30_06-07-06 Episode 1: New best reward 7.80, training model saved.
+2026-08-30_06-07-15 Episode 3: New best reward 10.07, training model saved.
+2026-08-30_06-07-21 Episode 5: New best reward 10.20, training model saved.
+2026-08-30_06-08-17 Episode 11: New best reward 10.47, training model saved.
+2026-08-30_06-08-20 Episode 12: New best reward 12.27, training model saved.
+2026-08-30_06-08-21 Episode 13: New best reward 18.47, training model saved.
+2026-08-30_06-08-53 Episode 16: New best reward 39.07, training model saved.
+2026-08-30_06-09-48 Episode 25: New best reward 42.20, training model saved.
+2026-08-30_06-09-58 Episode 31: New best reward 42.20, training model saved.
+2026-08-30_06-10-06 Episode 35: New best reward 80.80, training model saved.
+2026-08-30_06-16-15 Episode 79: New best reward 88.93, training model saved.
+2026-08-30_06-16-29 Episode 84: New best reward 111.93, training model saved.
+2026-08-30_06-42-59 Episode 550: New best reward 122.00, training model saved.
+2026-08-30_06-45-20 Episode 582: New best reward 137.93, training model saved.
+2026-08-30_06-53-12 Episode 768: New best reward 155.67, training model saved.
+2026-08-30_07-03-00 Episode 1000: New best greedy reward 55.53, model saved.
+2026-08-30_07-28-19 Episode 1611: New best reward 168.07, training model saved.
+2026-08-30_07-49-34: Training starting...
+Device: cuda
+2026-08-30_07-49-44 Episode 0: New best reward 2.93, training model saved.
+2026-08-30_07-50-00 Episode 0: New best greedy reward -27.60, model saved.
+2026-08-30_07-50-07 Episode 2: New best reward 7.53, training model saved.
+2026-08-30_07-50-29 Episode 5: New best reward 10.20, training model saved.
+2026-08-30_07-51-49 Episode 16: New best reward 20.00, training model saved.
+2026-08-30_07-52-07 Episode 17: New best reward 31.07, training model saved.
+2026-08-30_07-52-10 Episode 18: New best reward 48.40, training model saved.
+2026-08-30_07-57-05 Episode 69: New best reward 53.00, training model saved.
+2026-08-30_07-58-52 Episode 78: New best reward 66.73, training model saved.
+2026-08-30_08-02-50 Episode 102: New best reward 83.20, training model saved.
+2026-08-30_08-21-29 Episode 274: New best reward 89.53, training model saved.
+2026-08-30_08-25-41 Episode 311: New best reward 140.13, training model saved.
+2026-08-30_08-40-49 Episode 577: New best reward 157.20, training model saved.
+2026-08-30_08-45-54 Episode 658: New best reward 174.73, training model saved.
+2026-08-30_09-04-46 Episode 1000: New best greedy reward 42.80, model saved.
+2026-08-30_09-27-49: Training starting...
+Device: cuda
+2026-08-30_09-27-55 Episode 0: New best reward 8.87, training model saved.
+2026-08-30_09-28-11 Episode 0: New best greedy reward -27.60, model saved.
+2026-08-30_09-28-25 Episode 5: New best reward 14.73, training model saved.
+2026-08-30_09-29-54 Episode 22: New best reward 45.87, training model saved.
+2026-08-30_09-31-30 Episode 30: New best reward 47.33, training model saved.
+2026-08-30_09-33-15 Episode 34: New best reward 47.80, training model saved.
+2026-08-30_09-34-48 Episode 44: New best reward 70.20, training model saved.
+2026-08-30_09-37-12: Training starting...
+Device: cuda
+2026-08-30_09-37-18 Episode 0: New best reward 8.73, training model saved.
+2026-08-30_09-37-34 Episode 0: New best greedy reward -27.60, model saved.
+2026-08-30_09-37-44 Episode 3: New best reward 10.00, training model saved.
+2026-08-30_09-38-05 Episode 8: New best reward 13.27, training model saved.
+2026-08-30_09-38-22 Episode 12: New best reward 26.73, training model saved.
+2026-08-30_09-39-31 Episode 27: New best reward 46.13, training model saved.
+2026-08-30_09-42-18 Episode 53: New best reward 46.80, training model saved.
+2026-08-30_09-44-56 Episode 68: New best reward 81.13, training model saved.
+2026-08-30_09-59-13 Episode 208: New best reward 81.60, training model saved.
+2026-08-30_10-05-44 Episode 270: New best reward 88.00, training model saved.
+2026-08-30_10-15-16 Episode 375: New best reward 118.33, training model saved.
+2026-08-30_10-23-04 Episode 518: New best reward 118.67, training model saved.
+2026-08-30_10-25-43 Episode 575: New best reward 131.00, training model saved.
+2026-08-30_10-27-13 Episode 608: New best reward 153.47, training model saved.
+2026-08-30_10-49-04 Episode 1000: New best greedy reward 37.27, model saved.
+2026-08-30_10-55-25 Episode 1098: New best reward 203.27, training model saved.
+2026-08-30_11-13-27: Training starting...
+Device: cuda
+2026-08-30_11-13-44 Episode 0: New best reward -8.47, training model saved.
+2026-08-30_11-13-59 Episode 0: New best greedy reward -27.60, model saved.
+2026-08-30_11-14-05 Episode 1: New best reward -2.53, training model saved.
+2026-08-30_11-14-26 Episode 3: New best reward 7.40, training model saved.
+2026-08-30_11-15-29 Episode 8: New best reward 12.73, training model saved.
+2026-08-30_11-15-44 Episode 10: New best reward 19.73, training model saved.
+2026-08-30_11-15-45 Episode 11: New best reward 21.33, training model saved.
+2026-08-30_11-16-24 Episode 16: New best reward 77.67, training model saved.
+2026-08-30_11-23-35 Episode 92: New best reward 82.13, training model saved.
+2026-08-30_11-26-52 Episode 129: New best reward 89.60, training model saved.
+2026-08-30_11-29-09 Episode 157: New best reward 133.13, training model saved.
+2026-08-30_11-46-41 Episode 376: New best reward 133.80, training model saved.
+2026-08-30_11-53-09 Episode 472: New best reward 166.67, training model saved.
+2026-08-30_11-59-37 Episode 560: New best reward 182.60, training model saved.
+2026-08-30_12-22-52 Episode 1000: New best greedy reward 38.07, model saved.
+2026-08-30_12-26-59 Episode 1095: New best reward 187.67, training model saved.
+2026-08-30_12-27-31 Episode 1097: New best reward 187.87, training model saved.
+2026-08-30_12-36-29 Episode 1286: New best reward 190.13, training model saved.
+2026-08-30_12-53-35: Training starting...
+Device: cuda
+2026-08-30_12-53-40 Episode 0: New best reward 11.80, training model saved.
+2026-08-30_12-53-55 Episode 0: New best greedy reward -27.60, model saved.
+2026-08-30_12-54-22 Episode 5: New best reward 17.40, training model saved.
+2026-08-30_12-54-54 Episode 11: New best reward 17.73, training model saved.
+2026-08-30_12-55-21 Episode 21: New best reward 18.20, training model saved.
+2026-08-30_12-55-25 Episode 23: New best reward 29.87, training model saved.
+2026-08-30_12-55-46 Episode 25: New best reward 58.67, training model saved.
+2026-08-30_12-57-45 Episode 51: New best reward 80.53, training model saved.
+2026-08-30_12-57-56 Episode 57: New best reward 89.40, training model saved.
+2026-08-30_12-58-41 Episode 75: New best reward 119.67, training model saved.
+2026-08-30_13-16-44 Episode 311: New best reward 127.53, training model saved.
+2026-08-30_13-27-54 Episode 598: New best reward 195.73, training model saved.
+2026-08-30_13-44-49 Episode 1000: New best greedy reward 24.47, model saved.
+2026-08-30_13-55-05 Episode 1260: New best reward 203.80, training model saved.
+2026-08-30_14-36-14: Training starting...
+Device: cuda
+2026-08-30_14-36-18 Episode 0: New best reward 10.87, training model saved.
+2026-08-30_14-36-33 Episode 0: New best greedy reward -27.60, model saved.
+2026-08-30_14-36-46 Episode 5: New best reward 13.07, training model saved.
+2026-08-30_14-37-08 Episode 11: New best reward 16.87, training model saved.
+2026-08-30_14-37-21 Episode 14: New best reward 22.27, training model saved.
+2026-08-30_14-38-02 Episode 21: New best reward 23.87, training model saved.
+2026-08-30_14-39-10 Episode 25: New best reward 37.07, training model saved.
+2026-08-30_14-40-28 Episode 43: New best reward 39.80, training model saved.
+2026-08-30_14-54-33 Episode 165: New best reward 80.27, training model saved.
+2026-08-30_15-14-51 Episode 294: New best reward 81.93, training model saved.
+2026-08-30_15-39-28 Episode 576: New best reward 88.33, training model saved.
+2026-08-30_15-39-59 Episode 592: New best reward 117.07, training model saved.
+2026-08-30_15-40-36 Episode 608: New best reward 134.13, training model saved.
+2026-08-30_17-09-14: Training starting...
+Device: cuda
+2026-08-30_17-09-24 Episode 0: New best reward 0.60, training model saved.
+2026-08-30_17-09-27 Episode 0: New best greedy reward 14.93, model saved.
+2026-08-30_17-09-36 Episode 2: New best reward 1.07, training model saved.
+2026-08-30_17-09-40 Episode 3: New best reward 4.07, training model saved.
+2026-08-30_17-09-49 Episode 5: New best reward 5.87, training model saved.
+2026-08-30_17-10-00 Episode 7: New best reward 6.47, training model saved.
+2026-08-30_17-10-02 Episode 8: New best reward 8.93, training model saved.
+2026-08-30_17-10-50 Episode 15: New best reward 40.20, training model saved.
+2026-08-30_17-10-54 Episode 16: New best reward 53.53, training model saved.
+2026-08-30_17-12-14 Episode 29: New best reward 81.80, training model saved.
+2026-08-30_17-15-37 Episode 51: New best reward 134.27, training model saved.
+2026-08-30_17-20-25 Episode 99: New best reward 135.00, training model saved.
+2026-08-30_17-36-40: Training starting...
+Device: cuda
+2026-08-30_17-36-56 Episode 0: New best reward -9.80, training model saved.
+2026-08-30_17-37-11 Episode 0: New best greedy reward -27.60, model saved.
+2026-08-30_17-37-17 Episode 1: New best reward -2.40, training model saved.
+2026-08-30_17-37-31 Episode 3: New best reward 8.87, training model saved.
+2026-08-30_17-38-30 Episode 10: New best reward 18.00, training model saved.
+2026-08-30_17-39-17 Episode 12: New best reward 18.53, training model saved.
+2026-08-30_17-39-19 Episode 13: New best reward 20.73, training model saved.
+2026-08-30_17-39-26 Episode 19: New best reward 33.87, training model saved.
+2026-08-30_17-40-45 Episode 27: New best reward 47.07, training model saved.
+2026-08-30_17-42-09 Episode 35: New best reward 83.53, training model saved.
+2026-08-30_17-52-54 Episode 117: New best reward 96.13, training model saved.
+2026-08-30_18-04-49: Training starting...
+Device: cuda
+2026-08-30_18-04-54 Episode 0: New best reward 11.20, training model saved.
+2026-08-30_18-05-09 Episode 0: New best greedy reward -27.60, model saved.
+2026-08-30_18-05-32 Episode 3: New best reward 13.27, training model saved.
+2026-08-30_18-06-04 Episode 9: New best reward 13.40, training model saved.
+2026-08-30_18-06-14 Episode 12: New best reward 16.07, training model saved.
+2026-08-30_18-06-40 Episode 17: New best reward 41.07, training model saved.
+2026-08-30_18-07-06 Episode 27: New best reward 78.87, training model saved.
+2026-08-30_18-07-16 Episode 35: New best reward 81.47, training model saved.
+2026-08-30_18-08-02 Episode 47: New best reward 115.53, training model saved.
+2026-08-30_18-10-26 Episode 90: New best reward 116.87, training model saved.
+2026-08-30_18-20-58 Episode 200: New best reward 117.87, training model saved.
+2026-08-30_18-36-11 Episode 467: New best reward 122.40, training model saved.
+2026-08-30_18-38-23 Episode 492: New best reward 155.07, training model saved.
+2026-08-30_18-43-41 Episode 601: New best reward 155.60, training model saved.
+2026-08-30_18-53-52 Episode 806: New best reward 168.07, training model saved.
+2026-08-30_18-58-35 Episode 933: New best reward 174.53, training model saved.
+2026-08-30_19-01-43 Episode 1000: New best greedy reward 31.73, model saved.
+2026-08-30_19-02-29 Episode 1016: New best reward 186.60, training model saved.
+2026-08-30_19-17-11 Episode 1361: New best reward 201.13, training model saved.
+[worker] done. total trials in study: 80
+[report] writing artifacts for mario_rainbow_6736259
+
+============================= JOB FEEDBACK =============================
+
+NodeName=uc2n909
+Job ID: 6736259
+Cluster: uc3
+User/Group: ul_lmm50/ul_student
+State: CANCELLED (exit code 0)
+Nodes: 1
+Cores per node: 16
+CPU Utilized: 2-13:01:01
+CPU Efficiency: 18.05% of 14-02:04:00 core-walltime
+Job Wall-clock time: 21:07:45
+Memory Utilized: 91.33 GB
+Memory Efficiency: 48.71% of 187.50 GB (187.50 GB/node)

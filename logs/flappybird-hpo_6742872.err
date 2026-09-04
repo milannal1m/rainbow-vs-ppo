@@ -1,0 +1,39 @@
+/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/_experimental.py:33: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+  optuna_warn(
+/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/_experimental.py:33: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+  optuna_warn(
+/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/_experimental.py:33: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+  optuna_warn(
+/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/optuna/_experimental.py:33: ExperimentalWarning: Argument ``multivariate`` is an experimental feature. The interface can change in the future.
+  optuna_warn(
+[I 2026-08-31 05:25:04,352] A new study created in Journal with name: mario_rainbow_6742872
+[I 2026-08-31 05:25:04,358] Using an existing study with name 'mario_rainbow_6742872' instead of creating a new one.
+[I 2026-08-31 05:25:04,375] Using an existing study with name 'mario_rainbow_6742872' instead of creating a new one.
+[I 2026-08-31 05:25:04,398] Using an existing study with name 'mario_rainbow_6742872' instead of creating a new one.
+[I 2026-08-31 08:23:17,581] Trial 1 finished with value: 41.201999999999984 and parameters: {'learning_rate_a': 3.585084505494476e-05, 'per_alpha': 0.6074839547916485, 'per_beta_init': 0.5553897281203051, 'sigma_init': 0.6058746262452657}. Best is trial 1 with value: 41.201999999999984.
+[I 2026-08-31 08:25:32,117] Trial 0 finished with value: 42.95711111111109 and parameters: {'learning_rate_a': 3.253205606852208e-05, 'per_alpha': 0.4752156329472999, 'per_beta_init': 0.36753619106840585, 'sigma_init': 0.6906415364807628}. Best is trial 0 with value: 42.95711111111109.
+[I 2026-08-31 08:26:10,791] Trial 2 finished with value: 36.66466666666667 and parameters: {'learning_rate_a': 6.317277596048025e-05, 'per_alpha': 0.6306994508062301, 'per_beta_init': 0.45603788103119863, 'sigma_init': 0.3869249173723139}. Best is trial 0 with value: 42.95711111111109.
+[I 2026-08-31 08:27:56,767] Trial 3 finished with value: 43.503111111111096 and parameters: {'learning_rate_a': 3.1148200012187694e-05, 'per_alpha': 0.6747283279397412, 'per_beta_init': 0.3587966626197252, 'sigma_init': 0.41673389112966835}. Best is trial 3 with value: 43.503111111111096.
+[I 2026-08-31 08:43:07,153] Trial 5 pruned. 
+[I 2026-08-31 08:44:46,401] Trial 6 pruned. 
+[I 2026-08-31 08:46:13,625] Trial 7 pruned. 
+[I 2026-08-31 09:03:14,676] Trial 10 pruned. 
+[I 2026-08-31 11:26:15,692] Trial 4 finished with value: 42.69088888888886 and parameters: {'learning_rate_a': 0.00015004298806474108, 'per_alpha': 0.39445016795762355, 'per_beta_init': 0.3547020789101153, 'sigma_init': 0.3285814317237007}. Best is trial 3 with value: 43.503111111111096.
+[I 2026-08-31 11:37:20,987] Trial 8 finished with value: 41.398888888888884 and parameters: {'learning_rate_a': 6.917965772790436e-05, 'per_alpha': 0.608612050818059, 'per_beta_init': 0.31577030482837726, 'sigma_init': 0.48099498706389765}. Best is trial 3 with value: 43.503111111111096.
+[I 2026-08-31 11:43:13,820] Trial 9 finished with value: 27.217333333333325 and parameters: {'learning_rate_a': 1.3997566557777486e-05, 'per_alpha': 0.6775792352818917, 'per_beta_init': 0.3406811979124922, 'sigma_init': 0.3953582052811145}. Best is trial 3 with value: 43.503111111111096.
+[I 2026-08-31 11:43:33,161] Trial 12 pruned. 
+[I 2026-08-31 12:00:39,723] Trial 15 pruned. 
+[I 2026-08-31 12:04:20,228] Trial 11 finished with value: 44.4671111111111 and parameters: {'learning_rate_a': 9.955892371405055e-05, 'per_alpha': 0.6457319186048444, 'per_beta_init': 0.3008154945040731, 'sigma_init': 0.5536820739362478}. Best is trial 11 with value: 44.4671111111111.
+[I 2026-08-31 12:17:55,326] Trial 16 pruned. 
+[I 2026-08-31 13:04:18,400] Trial 17 pruned. 
+[I 2026-08-31 13:12:12,359] Trial 18 pruned. 
+[I 2026-08-31 14:00:23,157] Trial 19 pruned. 
+[I 2026-08-31 14:18:46,273] Trial 21 pruned. 
+[I 2026-08-31 14:33:06,257] Trial 13 finished with value: 34.81844444444443 and parameters: {'learning_rate_a': 1.3525317312312764e-05, 'per_alpha': 0.6768083285547759, 'per_beta_init': 0.42687559828391536, 'sigma_init': 0.4145702131237112}. Best is trial 11 with value: 44.4671111111111.
+[I 2026-08-31 14:41:27,491] Trial 14 finished with value: 30.963111111111104 and parameters: {'learning_rate_a': 1.1959981580022367e-05, 'per_alpha': 0.48363010692041675, 'per_beta_init': 0.3751007874130145, 'sigma_init': 0.6408994649455021}. Best is trial 11 with value: 44.4671111111111.
+[I 2026-08-31 14:50:43,230] Trial 23 pruned. 
+[I 2026-08-31 15:36:04,105] Trial 24 pruned. 
+[I 2026-08-31 15:52:50,355] Trial 26 pruned. 
+[I 2026-08-31 16:09:18,561] Trial 27 pruned. 
+[I 2026-08-31 16:14:30,324] Trial 20 finished with value: 39.85288888888887 and parameters: {'learning_rate_a': 2.982927204674652e-05, 'per_alpha': 0.3824044821816777, 'per_beta_init': 0.3915676849939639, 'sigma_init': 0.46465649830801903}. Best is trial 11 with value: 44.4671111111111.
+[2026-08-31T17:12:12.435] error: *** JOB 6742872 ON uc2n905 CANCELLED AT 2026-08-31T17:12:12 DUE to SIGNAL Terminated ***

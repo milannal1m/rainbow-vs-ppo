@@ -1,0 +1,82 @@
+HPO: env=mario algorithm=ppo objective=mean n_trials=100 study=mario_ppo_6742873 workers=12 gpus=4
+Mon Aug 31 07:01:34 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.71.05              Driver Version: 595.71.05      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A100 80GB PCIe          On  |   00000000:19:00.0 Off |                    0 |
+| N/A   41C    P0             78W /  300W |    3355MiB /  81920MiB |     22%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   1  NVIDIA A100 80GB PCIe          On  |   00000000:1A:00.0 Off |                    0 |
+| N/A   51C    P0             89W /  300W |    5003MiB /  81920MiB |     25%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   2  NVIDIA A100 80GB PCIe          On  |   00000000:1B:00.0 Off |                    0 |
+| N/A   42C    P0             79W /  300W |    4247MiB /  81920MiB |     23%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   3  NVIDIA A100 80GB PCIe          On  |   00000000:1C:00.0 Off |                    0 |
+| N/A   43C    P0             79W /  300W |    3945MiB /  81920MiB |     26%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A            9023      G   /usr/libexec/Xorg                        17MiB |
+|    0   N/A  N/A         2912955      C   python                                 1062MiB |
+|    0   N/A  N/A         2912987      C   python                                 1212MiB |
+|    0   N/A  N/A         2912991      C   python                                 1034MiB |
+|    1   N/A  N/A            9023      G   /usr/libexec/Xorg                        17MiB |
+|    1   N/A  N/A         2912984      C   python                                 1652MiB |
+|    1   N/A  N/A         2912988      C   python                                 1652MiB |
+|    1   N/A  N/A         2912992      C   python                                 1652MiB |
+|    2   N/A  N/A            9023      G   /usr/libexec/Xorg                        17MiB |
+|    2   N/A  N/A         2912985      C   python                                 1652MiB |
+|    2   N/A  N/A         2912989      C   python                                 1502MiB |
+|    2   N/A  N/A         2912993      C   python                                 1046MiB |
+|    3   N/A  N/A            9023      G   /usr/libexec/Xorg                        17MiB |
+|    3   N/A  N/A         2912986      C   python                                 1652MiB |
+|    3   N/A  N/A         2912990      C   python                                 1034MiB |
+|    3   N/A  N/A         2912994      C   python                                 1212MiB |
++-----------------------------------------------------------------------------------------+
+[signal] USR1 -- wall clock near, reporting early
+[report] writing artifacts for mario_ppo_6742873
+study: mario_ppo_6742873
+algorithm: ppo
+completed trials: 49 / 95 total
+best value (mean greedy reward): 63.3389
+best trial: #71
+best params:
+  learning_rate_a: 0.000203799653626525
+  ppo_epochs: 4
+  ent_coef: 0.010152604422466502
+  clip_eps: 0.3
+  gae_lambda: 0.9162089035400237
+  vf_coef: 0.6923311717592857
+  rollout_steps: 8192
+  minibatch_size: 64
+  hidden_dim: 512
+exported to hyperparams.yml as: mario_ppo_tuned_2
+run it with: sbatch train.sh mario_ppo_tuned_2
+
+============================= JOB FEEDBACK =============================
+
+NodeName=uc2n903
+Job ID: 6742873
+Cluster: uc3
+User/Group: ul_lmm50/ul_student
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 24
+CPU Utilized: 00:00:18
+CPU Efficiency: 0.00% of 47-20:13:12 core-walltime
+Job Wall-clock time: 1-23:50:33
+Memory Utilized: 39.15 GB
+Memory Efficiency: 62.64% of 62.50 GB (62.50 GB/node)

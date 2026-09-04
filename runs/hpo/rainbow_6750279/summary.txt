@@ -1,0 +1,16 @@
+study: rainbow_6750279
+algorithm: rainbow
+completed trials: 55 / 175 total
+best value (p25 greedy reward): 139.6000
+best trial: #123
+best params:
+  learning_rate_a: 0.00013247208585745213
+  per_alpha: 0.6197103666673888
+  per_beta_init: 0.3006949409302934
+  sigma_init: 0.4245894672922966
+  batch_size: 128
+  network_sync_rate: 8000
+  n_step: 3
+  hidden_dim: 256
+exported to hyperparams.yml as: flappybird_rainbow_tuned_2
+run it with: sbatch train.sh flappybird_rainbow_tuned_2

@@ -92,3 +92,5 @@ ModuleNotFoundError: No module named 'conda'
 [I 2026-08-30 18:33:00,736] Trial 76 pruned. 
 [I 2026-08-30 19:00:11,350] Trial 79 pruned. 
 [I 2026-08-30 19:29:08,537] Trial 69 finished with value: -27.645111111111035 and parameters: {'learning_rate_a': 1.7156087478500714e-05, 'per_alpha': 0.5106366814235498, 'per_beta_init': 0.45165443575413416, 'sigma_init': 0.5355184182204509}. Best is trial 46 with value: 63.58044444444442.
+[I 2026-08-30 19:36:44,922] Trial 75 finished with value: 49.482222222222205 and parameters: {'learning_rate_a': 0.0001985752363801779, 'per_alpha': 0.4542793114314746, 'per_beta_init': 0.3150684385332676, 'sigma_init': 0.5652283387890934}. Best is trial 46 with value: 63.58044444444442.
+[2026-08-30T19:51:02.196] error: *** JOB 6736259 ON uc2n909 CANCELLED AT 2026-08-30T19:51:02 DUE to SIGNAL Terminated ***

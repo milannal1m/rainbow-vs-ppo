@@ -1,0 +1,81 @@
+HPO: env=flappybird algorithm=rainbow objective=p25 n_trials=200 study=rainbow_6750279 workers=12 gpus=4
+Wed Sep  2 06:52:16 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 595.71.05              Driver Version: 595.71.05      CUDA Version: 13.2     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA A100 80GB PCIe          On  |   00000000:19:00.0 Off |                    0 |
+| N/A   50C    P0             96W /  300W |    2033MiB /  81920MiB |     60%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   1  NVIDIA A100 80GB PCIe          On  |   00000000:1A:00.0 Off |                    0 |
+| N/A   61C    P0            108W /  300W |    1863MiB /  81920MiB |     37%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   2  NVIDIA A100 80GB PCIe          On  |   00000000:1B:00.0 Off |                    0 |
+| N/A   50C    P0            102W /  300W |    2021MiB /  81920MiB |     59%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+|   3  NVIDIA A100 80GB PCIe          On  |   00000000:1C:00.0 Off |                    0 |
+| N/A   50C    P0             90W /  300W |    1927MiB /  81920MiB |     37%      Default |
+|                                         |                        |             Disabled |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|    0   N/A  N/A            9023      G   /usr/libexec/Xorg                        17MiB |
+|    0   N/A  N/A         3061826      C   python                                  662MiB |
+|    0   N/A  N/A         3061838      C   python                                  704MiB |
+|    0   N/A  N/A         3061842      C   python                                  620MiB |
+|    1   N/A  N/A            9023      G   /usr/libexec/Xorg                        17MiB |
+|    1   N/A  N/A         3061835      C   python                                  608MiB |
+|    1   N/A  N/A         3061839      C   python                                  588MiB |
+|    1   N/A  N/A         3061843      C   python                                  620MiB |
+|    2   N/A  N/A            9023      G   /usr/libexec/Xorg                        17MiB |
+|    2   N/A  N/A         3061836      C   python                                  608MiB |
+|    2   N/A  N/A         3061840      C   python                                  652MiB |
+|    2   N/A  N/A         3061844      C   python                                  714MiB |
+|    3   N/A  N/A            9023      G   /usr/libexec/Xorg                        17MiB |
+|    3   N/A  N/A         3061837      C   python                                  662MiB |
+|    3   N/A  N/A         3061841      C   python                                  588MiB |
+|    3   N/A  N/A         3061845      C   python                                  630MiB |
++-----------------------------------------------------------------------------------------+
+[signal] USR1 -- wall clock near, reporting early
+[report] writing artifacts for rainbow_6750279
+study: rainbow_6750279
+algorithm: rainbow
+completed trials: 55 / 175 total
+best value (p25 greedy reward): 139.6000
+best trial: #123
+best params:
+  learning_rate_a: 0.00013247208585745213
+  per_alpha: 0.6197103666673888
+  per_beta_init: 0.3006949409302934
+  sigma_init: 0.4245894672922966
+  batch_size: 128
+  network_sync_rate: 8000
+  n_step: 3
+  hidden_dim: 256
+exported to hyperparams.yml as: flappybird_rainbow_tuned_2
+run it with: sbatch train.sh flappybird_rainbow_tuned_2
+
+============================= JOB FEEDBACK =============================
+
+NodeName=uc2n903
+Job ID: 6750279
+Cluster: uc3
+User/Group: ul_lmm50/ul_student
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 32
+CPU Utilized: 00:00:17
+CPU Efficiency: 0.00% of 31-18:59:44 core-walltime
+Job Wall-clock time: 23:50:37
+Memory Utilized: 91.29 GB
+Memory Efficiency: 73.03% of 125.00 GB (125.00 GB/node)

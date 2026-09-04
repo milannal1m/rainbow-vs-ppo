@@ -19,7 +19,7 @@ GENERIC    = "generic"
 MARIO_WRAPPER_KEYS = frozenset({
     "action_set", "version", "frame_skip", "reward_clip", "reward_divisor",
     "noop_max", "sticky_prob", "max_episode_steps", "warp_bonus",
-    "level_sampler", "use_gym_make",
+    "level_sampler", "use_gym_make", "completion_unclipped",
 })
 # Consumed by mario_levels.levels_from_config, not passed to the builder.
 MARIO_LEVEL_KEYS = frozenset({"levels", "level_split", "level_set"})

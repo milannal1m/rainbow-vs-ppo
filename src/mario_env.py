@@ -272,23 +272,47 @@ class StickyActionWrapper(gym.Wrapper):
         return self.env.step(action)
 
 
-class ClipScaleReward(gym.RewardWrapper):
-    """reward -> clip(reward, -clip, +clip) / divisor.
+class ClipScaleReward(gym.Wrapper):
+    """reward -> clip(reward, -clip, +clip) / divisor, on the summed agent-step reward.
 
-    Sits above the frame-skip wrapper so it acts on the summed agent-step reward — the env
-    clips per frame, so 4 frames can otherwise carry ±60. clip == divisor == 15 bounds the
-    learning signal to [-1, 1]. MarioEpisodeInfo records the unscaled return for reporting.
+    Sits above the frame-skip wrapper, so it acts on the sum of the 4 skipped frames. That sum is
+    what needs bounding: the env returns its reward UNCLIPPED (smb_env._get_reward returns
+    _last_reward_unclipped; reward_range and reward_total_clipped are diagnostics only), so one
+    agent step can otherwise carry ~±100. clip == divisor == 15 bounds the signal to [-1, +1],
+    which is what makes Rainbow's fixed C51 support viable. MarioEpisodeInfo records the unscaled
+    return for reporting.
+
+    completion_unclipped exempts the env's one-off +50 completion bonus from the clip. Without it
+    that bonus (which lifts an agent step to ~+66) is reduced to the same +1 that sustained forward
+    motion already earns, so finishing a level carries no distinctive weight in the learning signal
+    and the agent is effectively optimised for distance rather than completion. Exempting only that
+    component leaves every ordinary step untouched, so tuned learning rates and the C51 support stay
+    valid: the discounted value gains one ~+3.3 spike per episode instead of being rescaled.
+    Default False so pre-existing configs stay bit-identical.
     """
 
-    def __init__(self, env, clip=15.0, divisor=15.0):
+    def __init__(self, env, clip=15.0, divisor=15.0, completion_unclipped=False):
         super().__init__(env)
         self.clip = float(clip)
         self.divisor = float(divisor)
+        self.completion_unclipped = bool(completion_unclipped)
 
-    def reward(self, reward):
+    def _scale(self, reward):
         if self.clip is not None:
             reward = max(-self.clip, min(self.clip, reward))
         return reward / self.divisor
+
+    def step(self, action):
+        obs, reward, terminated, truncated, info = self.env.step(action)
+        if not self.completion_unclipped:
+            return obs, self._scale(reward), terminated, truncated, info
+        # info is the last inner frame's, which on a completion step IS the flag frame: the
+        # single-stage env terminates there and MaxAndSkipObservation breaks out early.
+        bonus = float((info.get("reward_components") or {}).get("completion", 0.0))
+        scaled = self._scale(reward - bonus)
+        if bonus:
+            scaled += bonus / self.divisor
+        return obs, scaled, terminated, truncated, info
 
 
 # ── Episode bookkeeping ──────────────────────────────────────────────────────────────
@@ -527,7 +551,8 @@ class MultiLevelMarioEnv(gym.Env):
 def make_mario_env(*, levels, render_mode=None, action_set="COMPLEX_MOVEMENT", version="v0",
                    frame_skip=4, reward_clip=15.0, reward_divisor=15.0, noop_max=30,
                    sticky_prob=0.25, max_episode_steps=3000, warp_bonus=0.0,
-                   level_sampler="seed_hash", use_gym_make=True):
+                   level_sampler="seed_hash", use_gym_make=True,
+                   completion_unclipped=False):
     """Assemble the Mario env, up to but not including the observation pipeline.
 
     env_factory adds preprocess_env on top, so observation handling stays shared with
@@ -548,7 +573,8 @@ def make_mario_env(*, levels, render_mode=None, action_set="COMPLEX_MOVEMENT", v
         env = StickyActionWrapper(env, sticky_prob=sticky_prob)
     if frame_skip and frame_skip > 1:
         env = MaxAndSkipObservation(env, skip=frame_skip)
-    env = ClipScaleReward(env, clip=reward_clip, divisor=reward_divisor)
+    env = ClipScaleReward(env, clip=reward_clip, divisor=reward_divisor,
+                          completion_unclipped=completion_unclipped)
     if max_episode_steps:
         env = TimeLimit(env, max_episode_steps=max_episode_steps)
     return env

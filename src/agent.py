@@ -32,9 +32,14 @@ if __name__ == "__main__":
     parser.add_argument('--policy', default='argmax',
                        choices=('argmax', 'stochastic', 'topk3'),
                        help='action selection at eval time (topk3 = the paper k=3 variant, PPO)')
+    parser.add_argument('--levels', default=None,
+                       help='Mario: evaluate only these levels (comma-separated), ignoring the '
+                            'tier selection. Use to re-record a few levels without a full pass.')
     parser.add_argument('--videos', default='per_world',
-                       help="Mario level clips: 'per_world' (default, one per world), 'none', "
-                            "or a comma-separated level list e.g. 1-1,4-2")
+                       help="Mario level clips: 'per_world' (default, one per world), 'all' "
+                            "(every evaluated level), 'none', or a comma-separated list e.g. 1-1,4-2")
+    parser.add_argument('--videos-per-level', type=int, default=1,
+                       help='clips per level, best episodes first (default 1)')
     args = parser.parse_args()
 
     with open("hyperparams.yml", "r") as f:
@@ -56,15 +61,17 @@ if __name__ == "__main__":
         tiers = tuple(t.strip() for t in args.evaluate_levels.split(',') if t.strip())
         if args.videos == 'none':
             vids = ()
-        elif args.videos == 'per_world':
-            vids = 'per_world'                 # resolved after evaluation, see mario_eval.run
+        elif args.videos in ('per_world', 'all'):
+            vids = args.videos                 # resolved after evaluation, see mario_eval.run
         else:
             vids = tuple(v.strip() for v in args.videos.split(',') if v.strip())
-        summary = mario_eval.run(agent, tiers=tiers,
+        only = tuple(l.strip() for l in args.levels.split(',') if l.strip()) if args.levels else None
+        summary = mario_eval.run(agent, tiers=tiers, levels=only,
                                  episodes_per_level=args.episodes_per_level,
                                  policy_mode=args.policy,
                                  full_game_episodes=args.full_game_runs,
-                                 video_levels=vids)
+                                 video_levels=vids,
+                                 videos_per_level=args.videos_per_level)
         for tier, t in summary["tiers"].items():
             pages = t["pages_macro"]
             print(f"{tier:9s} n={t['n_levels']:2d}  flag={t['flag_rate_macro']:.3f}  "

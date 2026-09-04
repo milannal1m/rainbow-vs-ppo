@@ -166,6 +166,9 @@ def _summarise_level(level, rows):
         "x_pos_max_best": int(np.max(terminal_x)),
         # the seed of the furthest episode, so it can be replayed for video
         "best_seed": int(max(rows, key=lambda r: (r["flag_get"], r["x_pos_max"]))["seed"]),
+        # Ranked so N clips per level can be replayed: completions first, then by distance.
+        "best_seeds": [int(r["seed"]) for r in sorted(
+            rows, key=lambda r: (r["flag_get"], r["x_pos_max"]), reverse=True)][:10],
         "return_mean":    float(np.mean([r["return_scaled"] for r in rows])),
         "return_raw_mean": float(np.mean([r["return_raw"] for r in rows
                                           if r["return_raw"] is not None] or [0.0])),
@@ -205,15 +208,20 @@ class GameProgressTracker:
     def update(self, info):
         label = f"{info['world']}-{info['stage']}"
         self.visited.add(label)
+        prev_best, prev_warps = self.best_index, self.warps
         idx = self._index(info["world"], info["stage"])
         if idx > self.best_index:
             self.best_index, self.best_stage = idx, label
         self.warps = max(self.warps, int(info.get("warps", 0)))
         self.stages_skipped = max(self.stages_skipped, int(info.get("stages_skipped", 0)))
-        flag = bool(info.get("flag_get"))
-        if flag and not self._prev_flag:
+        # Count a clear on a forward stage transition without a warp, not on flag_get:
+        # _is_stage_over needs player_float_state == 3 (the flagpole slide), a window of a few
+        # NES frames that frame_skip=4 can miss entirely. Castle stages are unaffected (they
+        # report via _is_world_over), which is why only flagpole levels under-counted.
+        warps_now = int(info.get("warps", 0))
+        if idx > prev_best and warps_now == prev_warps:
             self.cleared += 1
-        self._prev_flag = flag
+        self._prev_flag = bool(info.get("flag_get"))
 
 
 def run_full_game(agent, *, episodes=10, seed_base=888_000, policy_mode="argmax",
@@ -585,7 +593,8 @@ def _one_level_per_world(per_level):
 
 def run(agent, *, split_name=None, tiers=("train", "tier0", "tier1", "tier2"),
         episodes_per_level=30, policy_mode="argmax", out_dir=None, levels=None,
-        full_game_episodes=10, video_levels="per_world", full_game_video=True):
+        full_game_episodes=10, video_levels="per_world", videos_per_level=1,
+        full_game_video=True):
     """Evaluate the requested tiers, write JSON/CSV/figures, return the aggregate.
 
     Also plays full_game_episodes chronological runs of the original game (0 to skip).
@@ -652,19 +661,28 @@ def run(agent, *, split_name=None, tiers=("train", "tier0", "tier1", "tier2"),
     save_tier_bars(agg, os.path.join(out_dir, f"tier_summary{suffix}.png"))
     save_tier2_bars(per_level, os.path.join(out_dir, f"tier2_lost_levels{suffix}.png"))
 
-    # One mp4 per requested level, replaying its best episode (a seed reproduces a run exactly).
+    # mp4s per requested level, replaying its best episodes (a seed reproduces a run exactly).
     if video_levels == "per_world":
         video_levels = _one_level_per_world(per_level)
         log(f"videos: one per world -> {list(video_levels)}", log_file)
+    elif video_levels == "all":
+        video_levels = tuple(todo)
+    n_clips = max(1, int(videos_per_level))
+    if video_levels:
+        log(f"videos: {len(video_levels)} levels x up to {n_clips} clips", log_file)
     for level in (video_levels or ()):
         if level not in per_level:
             continue
-        try:
-            best_seed = per_level[level]["best_seed"]
-            record_run(agent, level=level, seed=best_seed, out_dir=video_dir,
-                       name=f"level_{level}", policy_mode=policy_mode)
-        except Exception as exc:                           # noqa: BLE001 -- video is optional
-            print(f"[video] level {level} failed: {exc}")
+        seeds = per_level[level].get("best_seeds") or [per_level[level]["best_seed"]]
+        for rank, seed in enumerate(seeds[:n_clips], start=1):
+            # Rank 1 is the best episode; the tag makes a completion identifiable in the filename.
+            tag = "flag" if per_level[level]["flag_rate"] > 0 and rank == 1 else str(rank)
+            try:
+                record_run(agent, level=level, seed=seed, out_dir=video_dir,
+                           name=f"level_{level}_{tag}" if n_clips > 1 else f"level_{level}",
+                           policy_mode=policy_mode)
+            except Exception as exc:                       # noqa: BLE001 -- video is optional
+                print(f"[video] level {level} rank {rank} failed: {exc}")
 
     log("", log_file)
     for tier, t in agg["tiers"].items():

@@ -8,5 +8,4 @@ runs/hpo/*/trials
 PPO.md
 mario.md
 paper/
-
-runs/**/videos/
+runs/flappybird_ppo_tuned_3/videos/

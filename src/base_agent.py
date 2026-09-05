@@ -212,7 +212,7 @@ class BaseAgent:
                 w.writerow({**{k: r[k] for k in ("seed", "reward", "secondary", "length", "aux")},
                             "extras": json.dumps(r["extras"], default=str)})
 
-    def evaluate(self, num_episodes=100, record_artifacts=True, resume=False):
+    def evaluate(self, num_episodes=25, record_artifacts=True, resume=False):
         # record_artifacts=False is the lightweight HPO path: compute the objective
         # metrics and dump metrics.json, but skip Grad-CAM, video and chart writes.
         # resume=True appends num_episodes MORE episodes to the ones already in

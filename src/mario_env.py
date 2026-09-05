@@ -275,19 +275,20 @@ class StickyActionWrapper(gym.Wrapper):
 class ClipScaleReward(gym.Wrapper):
     """reward -> clip(reward, -clip, +clip) / divisor, on the summed agent-step reward.
 
-    Sits above the frame-skip wrapper, so it acts on the sum of the 4 skipped frames. That sum is
-    what needs bounding: the env returns its reward UNCLIPPED (smb_env._get_reward returns
-    _last_reward_unclipped; reward_range and reward_total_clipped are diagnostics only), so one
-    agent step can otherwise carry ~±100. clip == divisor == 15 bounds the signal to [-1, +1],
+    Sits above the frame-skip wrapper, so it acts on the sum of the 4 skipped frames. nes_env
+    already clamps each FRAME to reward_range = (-15, +15) (nes_env.step, after _get_reward), so
+    4 frames can still carry +-60. clip == divisor == 15 bounds the agent-step signal to [-1, +1],
     which is what makes Rainbow's fixed C51 support viable. MarioEpisodeInfo records the unscaled
     return for reporting.
 
-    completion_unclipped exempts the env's one-off +50 completion bonus from the clip. Without it
-    that bonus (which lifts an agent step to ~+66) is reduced to the same +1 that sustained forward
-    motion already earns, so finishing a level carries no distinctive weight in the learning signal
-    and the agent is effectively optimised for distance rather than completion. Exempting only that
-    component leaves every ordinary step untouched, so tuned learning rates and the C51 support stay
-    valid: the discounted value gains one ~+3.3 spike per episode instead of being rescaled.
+    completion_unclipped re-adds the env's one-off +50 completion bonus, read from
+    info["reward_components"]["completion"]. That component is raw, while the frame it arrived on
+    was already clamped to +15 by nes_env -- so no clip setting on this wrapper can recover the
+    bonus, and re-adding it from the components dict is the only route. Without it a completion
+    step scores the same +1 as sustained forward motion, so finishing a level carries no
+    distinctive weight and the agent is effectively optimised for distance rather than completion.
+    Ordinary steps are untouched, so tuned learning rates and the C51 support stay valid: the
+    discounted value gains one ~+3.3 spike per episode instead of being rescaled.
     Default False so pre-existing configs stay bit-identical.
     """
 
@@ -308,8 +309,11 @@ class ClipScaleReward(gym.Wrapper):
             return obs, self._scale(reward), terminated, truncated, info
         # info is the last inner frame's, which on a completion step IS the flag frame: the
         # single-stage env terminates there and MaxAndSkipObservation breaks out early.
+        # reward_components carries the RAW component; nes_env has already clipped the frame it
+        # came in on, so the bonus is added on top rather than subtracted out -- there is no
+        # unclipped copy of it left in `reward` to remove.
         bonus = float((info.get("reward_components") or {}).get("completion", 0.0))
-        scaled = self._scale(reward - bonus)
+        scaled = self._scale(reward)
         if bonus:
             scaled += bonus / self.divisor
         return obs, scaled, terminated, truncated, info

@@ -18,7 +18,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Train or test model.')
     parser.add_argument('hyperparameters', help='')
     parser.add_argument('--train',    help='Training mode', action='store_true')
-    parser.add_argument('--evaluate', help='Evaluate saved model over 100 greedy episodes', action='store_true')
+    parser.add_argument('--evaluate', help='Evaluate saved model over --episodes greedy episodes', action='store_true')
+    parser.add_argument('--episodes', type=int, default=100,
+                       help='episodes for --evaluate; with --resume these are ADDED to the ones '
+                            'already in evaluation/episodes_eval.csv')
     parser.add_argument('--resume',   help='Continue training from <run>_state.pt (Mario runs '
                                            'exceed the 24h SLURM wall clock)',
                         action='store_true')
@@ -82,6 +85,6 @@ if __name__ == "__main__":
                   f"mean {g['furthest_index_mean']:.2f} (~{g['furthest_stage_mean_equiv']}), "
                   f"max {g['furthest_stage_max']}")
     elif args.evaluate:
-        agent.evaluate()
+        agent.evaluate(num_episodes=args.episodes, resume=args.resume)
     else:
         agent.test()

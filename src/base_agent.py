@@ -2,6 +2,7 @@ import gymnasium as gym
 import random
 import torch
 import yaml
+import csv
 import json
 import itertools
 import importlib
@@ -110,7 +111,7 @@ class BaseAgent:
             return str(action)
         return labels[action] if 0 <= action < len(labels) else str(action)
 
-    def explain(self, num_frames=10):
+    def explain(self, num_frames=10, frame_stride=50):
         from pytorch_grad_cam import GradCAM
         from pytorch_grad_cam.utils.image import show_cam_on_image
         from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
@@ -130,12 +131,17 @@ class BaseAgent:
             env.close()
             return
 
-        _, _, _, _, all_states = self._run_episode_greedy(env, policy, seed=42, collect_states=True)
+        # Collect exactly num_frames states, one every frame_stride steps, then stop the episode.
+        # Collecting the whole episode is what OOM-killed job 6709373: a converged FlappyBird
+        # policy runs ~757k steps, i.e. ~77 GB of stacked frames for a 10-frame figure.
+        _, _, _, _, sampled = self._run_episode_greedy(
+            env, policy, seed=42, collect_states=num_frames, collect_stride=frame_stride)
         env.close()
 
-        n = min(num_frames, len(all_states))
-        indices = np.linspace(0, len(all_states) - 1, n, dtype=int)
-        sampled = [all_states[i] for i in indices]
+        if not sampled:
+            print("explain(): no frames collected.")
+            return
+        n = len(sampled)
 
         explain_dir = os.path.join(self.RUN_DIR, "grad_cam")
         os.makedirs(explain_dir, exist_ok=True)
@@ -175,35 +181,81 @@ class BaseAgent:
                 plt.close(fig)
                 print(f"Grad-CAM saved to {explain_dir}/grad_cam_{layer_name}.png")
 
-    def evaluate(self, num_episodes=100, record_artifacts=True):
+    EVAL_ROWS = "episodes_eval.csv"
+
+    def _eval_rows_path(self):
+        return os.path.join(self.RUN_DIR, "evaluation", self.EVAL_ROWS)
+
+    def _load_eval_rows(self):
+        """Per-episode evaluation rows from a previous call, or []."""
+        path = self._eval_rows_path()
+        if not os.path.exists(path):
+            return []
+        with open(path, newline="") as f:
+            rows = []
+            for r in csv.DictReader(f):
+                rows.append({
+                    "seed": int(r["seed"]), "reward": float(r["reward"]),
+                    "secondary": float(r["secondary"]), "length": int(r["length"]),
+                    "aux": float(r["aux"]), "extras": json.loads(r["extras"] or "{}"),
+                })
+        return rows
+
+    def _save_eval_rows(self, rows):
+        path = self._eval_rows_path()
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w", newline="") as f:
+            w = csv.DictWriter(f, fieldnames=["seed", "reward", "secondary", "length", "aux",
+                                              "extras"])
+            w.writeheader()
+            for r in rows:
+                w.writerow({**{k: r[k] for k in ("seed", "reward", "secondary", "length", "aux")},
+                            "extras": json.dumps(r["extras"], default=str)})
+
+    def evaluate(self, num_episodes=100, record_artifacts=True, resume=False):
         # record_artifacts=False is the lightweight HPO path: compute the objective
         # metrics and dump metrics.json, but skip Grad-CAM, video and chart writes.
+        # resume=True appends num_episodes MORE episodes to the ones already in
+        # evaluation/episodes_eval.csv and re-aggregates over the union, so a run can be
+        # topped up later instead of restarted.
         if record_artifacts and self.frame_stack:
             self.explain()
 
+        prior = self._load_eval_rows() if (resume and record_artifacts) else []
+        if prior:
+            print(f"resuming evaluation: {len(prior)} episodes already recorded, "
+                  f"adding {num_episodes}")
+
         env = self._make_env()
         policy = self._load_policy(env)
-
-        all_rewards, all_pipes, all_lengths, all_aux = [], [], [], []
-        all_extras = []
-        best_reward, best_seed = float("-inf"), 1
+        rows = list(prior)
 
         try:
-            for episode in range(num_episodes):
+            for i in range(num_episodes):
+                episode = len(prior) + i
                 seed = episode + 1
                 metric = self.metric_spec.new()
                 reward, secondary, length, aux_vals, _ = self._run_episode_greedy(
                     env, policy, seed=seed, metric=metric)
-                all_rewards.append(reward)
-                all_pipes.append(secondary)
-                all_lengths.append(length)
-                all_aux.append(np.mean(aux_vals) if aux_vals else 0.0)
-                all_extras.append(metric.extras())
-                if reward > best_reward:
-                    best_reward = reward
-                    best_seed   = seed
+                rows.append({
+                    "seed": seed, "reward": float(reward), "secondary": float(secondary),
+                    "length": int(length),
+                    "aux": float(np.mean(aux_vals)) if aux_vals else 0.0,
+                    "extras": metric.extras() or {},
+                })
+                # written every episode, so an OOM or wall-clock kill keeps what was measured
+                if record_artifacts:
+                    self._save_eval_rows(rows)
         finally:
             env.close()
+
+        all_rewards = [r["reward"] for r in rows]
+        all_pipes   = [r["secondary"] for r in rows]
+        all_lengths = [r["length"] for r in rows]
+        all_aux     = [r["aux"] for r in rows]
+        all_extras  = [r["extras"] for r in rows]
+        best_seed   = max(rows, key=lambda r: r["reward"])["seed"]
+        n_total     = len(rows)
 
         lengths_s = [l / self.metric_spec.fps for l in all_lengths]
         metrics = {
@@ -214,7 +266,7 @@ class BaseAgent:
             # eval_pipes_mean for FlappyBird, eval_pages_mean for Mario
             f"eval_{self.metric_spec.key}_mean": float(np.mean(all_pipes)),
             "eval_length_s_mean": float(np.mean(lengths_s)),
-            "n_episodes":         int(num_episodes),
+            "n_episodes":         int(n_total),
         }
         # per-env extras (flag rate, death-cause mix); empty for FlappyBird
         metrics.update(self.metric_spec.aggregate(all_extras))
@@ -222,7 +274,7 @@ class BaseAgent:
             json.dump(metrics, f, indent=2)
 
         lines = [
-            f"Evaluation over {num_episodes} greedy episodes",
+            f"Evaluation over {n_total} greedy episodes",
             f"Reward:               mean={np.mean(all_rewards):.2f}  std={np.std(all_rewards):.2f}",
             f"{self.metric_spec.label + ':':22s}mean={np.mean(all_pipes):.2f}  std={np.std(all_pipes):.2f}",
             f"Episode length (s):   mean={np.mean(lengths_s):.2f}  std={np.std(lengths_s):.2f}",

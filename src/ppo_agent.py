@@ -51,7 +51,8 @@ class PPOAgent(BaseAgent):
         actor_critic.eval()
         return actor_critic
 
-    def _run_episode_greedy(self, env, actor_critic, seed, collect_states=False, metric=None):
+    def _run_episode_greedy(self, env, actor_critic, seed, collect_states=False, metric=None,
+                            collect_stride=1):
         state, _ = env.reset(seed=seed)
         state = torch.tensor(state, dtype=torch.float32).to(device)
         terminated = False
@@ -62,9 +63,17 @@ class PPOAgent(BaseAgent):
         value_estimates = []
         states = []
 
+        # collect_states: False = none, True = every frame (unbounded), int n = at most n frames
+        # taken every collect_stride steps, then stop. The int form exists because Grad-CAM needs
+        # ~10 frames while a converged FlappyBird episode is ~757k steps -- collecting all of them
+        # is ~77 GB and was what OOM-killed job 6709373.
+        want = None if collect_states is True else (int(collect_states) if collect_states else 0)
+
         while not (terminated or truncated) and episode_reward < self.stop_on_reward:
-            if collect_states:
+            if collect_states and (want is None or episode_length % collect_stride == 0):
                 states.append(state.clone())
+                if want is not None and len(states) >= want:
+                    break
             with torch.no_grad():
                 action, _, _, value = actor_critic.get_action(state.unsqueeze(0), deterministic=True)
             value_estimates.append(value.item())

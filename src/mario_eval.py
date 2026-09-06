@@ -591,10 +591,56 @@ def _one_level_per_world(per_level):
     return tuple(lvl for _, (_, lvl) in sorted(by_world.items()))
 
 
+def _grad_cam_levels(per_level, spec):
+    """Resolve a grad-cam spec to level ids: "best", "all", or a comma-separated list.
+
+    "best" ranks by flag rate then pages, since an attention map only says something on a level
+    the policy actually plays.
+    """
+    if spec == "best":
+        ranked = sorted(per_level.items(),
+                        key=lambda kv: ((kv[1].get("flag_rate") or 0.0),
+                                        (kv[1].get("pages_mean") or 0.0)),
+                        reverse=True)
+        return (ranked[0][0],) if ranked else ()
+    if spec == "all":
+        return tuple(per_level)
+    return tuple(l for l in (x.strip() for x in spec.split(",")) if l in per_level)
+
+
+def run_grad_cam(agent, per_level, spec, out_dir, log_file, *, num_frames=10, frame_stride=25):
+    """Grad-CAM figures per selected level, one set of three conv layers each.
+
+    Bounded exactly as the FlappyBird path in base_agent.explain(): the episode stops once
+    num_frames states are collected, so at most num_frames*frame_stride agent steps are
+    simulated however long the policy would otherwise survive. Replays each level's best
+    evaluation seed, so the figure shows the episode the per-level table already reports.
+    """
+    picked = _grad_cam_levels(per_level, spec)
+    if not picked:
+        log(f"grad-cam: nothing selected (spec={spec!r})", log_file)
+        return []
+    log(f"grad-cam: {len(picked)} level(s), <= {num_frames * frame_stride} agent steps each",
+        log_file)
+    written = []
+    for level in picked:
+        seed = int((per_level.get(level) or {}).get("best_seed") or EVAL_SEED_BASE)
+        dest = os.path.join(out_dir, "grad_cam", level)
+        try:
+            agent.explain(num_frames=num_frames, frame_stride=frame_stride,
+                          levels=(level,), seed=seed, out_dir=dest,
+                          subtitle=f"{level}, seed {seed}")
+            written.append(level)
+            log(f"grad-cam: {level} (seed {seed}) -> {dest}", log_file)
+        except Exception as exc:                    # noqa: BLE001 -- figures are optional
+            log(f"grad-cam: {level} failed: {exc}", log_file)
+    return written
+
+
 def run(agent, *, split_name=None, tiers=("train", "tier0", "tier1", "tier2"),
         episodes_per_level=30, policy_mode="argmax", out_dir=None, levels=None,
         full_game_episodes=10, video_levels="per_world", videos_per_level=1,
-        full_game_video=True):
+        full_game_video=True, grad_cam="best", grad_cam_frames=10, grad_cam_stride=25):
     """Evaluate the requested tiers, write JSON/CSV/figures, return the aggregate.
 
     Also plays full_game_episodes chronological runs of the original game (0 to skip).
@@ -644,6 +690,11 @@ def run(agent, *, split_name=None, tiers=("train", "tier0", "tier1", "tier2"),
     agg["env"] = describe_env_params(emp, env_id=agent.env_id)
     agg["checkpoint"] = agent.MODEL_FILE
     agg["seed"] = agent.seed
+
+    if grad_cam and grad_cam != "none":
+        agg["grad_cam_levels"] = run_grad_cam(agent, per_level, grad_cam, out_dir, log_file,
+                                              num_frames=grad_cam_frames,
+                                              frame_stride=grad_cam_stride)
 
     suffix = "" if policy_mode == "argmax" else f"_{policy_mode}"
     with open(os.path.join(out_dir, f"per_level{suffix}.json"), "w") as f:

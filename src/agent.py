@@ -43,6 +43,17 @@ if __name__ == "__main__":
                             "(every evaluated level), 'none', or a comma-separated list e.g. 1-1,4-2")
     parser.add_argument('--videos-per-level', type=int, default=1,
                        help='clips per level, best episodes first (default 1)')
+    parser.add_argument('--grad-cam', default='best',
+                       help="Mario Grad-CAM after the per-level eval: 'best' (default, the "
+                            "level the policy plays best), 'all', 'none', or a comma-separated "
+                            "list e.g. 1-1,5-3")
+    parser.add_argument('--grad-cam-frames', type=int, default=10,
+                       help='rows per Grad-CAM figure; the episode stops once these are '
+                            'collected (default 10)')
+    parser.add_argument('--grad-cam-stride', type=int, default=25,
+                       help='agent steps between collected frames, so at most '
+                            '--grad-cam-frames x --grad-cam-stride steps are simulated '
+                            '(default 25)')
     args = parser.parse_args()
 
     with open("hyperparams.yml", "r") as f:
@@ -74,7 +85,10 @@ if __name__ == "__main__":
                                  policy_mode=args.policy,
                                  full_game_episodes=args.full_game_runs,
                                  video_levels=vids,
-                                 videos_per_level=args.videos_per_level)
+                                 videos_per_level=args.videos_per_level,
+                                 grad_cam=args.grad_cam,
+                                 grad_cam_frames=args.grad_cam_frames,
+                                 grad_cam_stride=args.grad_cam_stride)
         for tier, t in summary["tiers"].items():
             pages = t["pages_macro"]
             print(f"{tier:9s} n={t['n_levels']:2d}  flag={t['flag_rate_macro']:.3f}  "

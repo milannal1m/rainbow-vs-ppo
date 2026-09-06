@@ -111,7 +111,14 @@ class BaseAgent:
             return str(action)
         return labels[action] if 0 <= action < len(labels) else str(action)
 
-    def explain(self, num_frames=10, frame_stride=50):
+    def explain(self, num_frames=10, frame_stride=50, levels=None, out_dir=None,
+                seed=42, subtitle=None):
+        """Grad-CAM figures, one per conv layer, from a single greedy episode.
+
+        levels pins the Mario level (None = the configured set, which is what FlappyBird uses);
+        out_dir/subtitle let a caller write several sets side by side without overwriting.
+        (Not named `label`: the per-frame action label below would shadow it.)
+        """
         from pytorch_grad_cam import GradCAM
         from pytorch_grad_cam.utils.image import show_cam_on_image
         from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
@@ -121,7 +128,7 @@ class BaseAgent:
             print("explain() only supported for CNN models.")
             return
 
-        env = self._make_env()
+        env = self._make_env(levels=levels)
         policy = self._load_policy(env)
         # 'flap'/'no-flap' would be silently wrong on all 12 Mario actions.
         self._action_labels = action_labels_for(self.hyperparams, env.action_space.n)
@@ -135,7 +142,7 @@ class BaseAgent:
         # Collecting the whole episode is what OOM-killed job 6709373: a converged FlappyBird
         # policy runs ~757k steps, i.e. ~77 GB of stacked frames for a 10-frame figure.
         _, _, _, _, sampled = self._run_episode_greedy(
-            env, policy, seed=42, collect_states=num_frames, collect_stride=frame_stride)
+            env, policy, seed=seed, collect_states=num_frames, collect_stride=frame_stride)
         env.close()
 
         if not sampled:
@@ -143,7 +150,7 @@ class BaseAgent:
             return
         n = len(sampled)
 
-        explain_dir = os.path.join(self.RUN_DIR, "grad_cam")
+        explain_dir = out_dir or os.path.join(self.RUN_DIR, "grad_cam")
         os.makedirs(explain_dir, exist_ok=True)
 
         conv_layers = [("conv1", policy.conv1), ("conv2", policy.conv2), ("conv3", policy.conv3)]
@@ -153,7 +160,8 @@ class BaseAgent:
                 fig, axes = plt.subplots(n, 5, figsize=(15, n * 3))
                 if n == 1:
                     axes = axes[np.newaxis, :]
-                fig.suptitle(f"Grad-CAM — {layer_name}")
+                fig.suptitle(f"Grad-CAM — {layer_name}"
+                             + (f"  ({subtitle})" if subtitle else ""))
 
                 for i, s in enumerate(sampled):
                     inp = s.unsqueeze(0)

@@ -5,6 +5,9 @@
 #SBATCH --cpus-per-task=3
 #SBATCH --mem=84000
 #SBATCH --time=24:00:00
+# USR1 to the job step 600 s before the wall clock, so the agent can stop cleanly and write
+# its replay buffer (~1 min) instead of being killed mid-episode.
+#SBATCH --signal=USR1@600
 #SBATCH --output=logs/%x_%j.out
 #SBATCH --error=logs/%x_%j.err
 

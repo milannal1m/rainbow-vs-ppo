@@ -15,6 +15,16 @@ class ReplayMemory:
     def sample(self, batch_size):
         return self._rng.sample(self.memory, batch_size)
 
+    def state_dict(self):
+        return {"kind": "uniform", "memory": list(self.memory), "rng": self._rng.getstate()}
+
+    def load_state_dict(self, sd):
+        if sd.get("kind") != "uniform":
+            raise ValueError(f"buffer checkpoint is {sd.get('kind')!r}, not uniform")
+        self.memory.clear()
+        self.memory.extend(sd["memory"])
+        self._rng.setstate(sd["rng"])
+
     def __len__(self):
         return len(self.memory)
 
@@ -94,6 +104,32 @@ class PrioritizedReplayMemory:
             self.tree.update(idx, float(p))
         self.max_priority = max(self.max_priority, float(priorities.max()))
 
+    def state_dict(self):
+        """Everything needed to resume sampling identically.
+
+        The priorities in `tree` cannot be recomputed from the transitions alone -- they come
+        from TD errors the network has since moved past -- so they are stored too. `data` goes
+        out as a plain list rather than the numpy object-array.
+        """
+        t = self.tree
+        return {"kind": "per", "capacity": t.capacity, "data": list(t.data[:t.n_entries]),
+                "tree": t.tree.copy(), "n_entries": t.n_entries, "ptr": t.ptr,
+                "max_priority": self.max_priority}
+
+    def load_state_dict(self, sd):
+        if sd.get("kind") != "per":
+            raise ValueError(f"buffer checkpoint is {sd.get('kind')!r}, not per")
+        t = self.tree
+        if sd["capacity"] != t.capacity:
+            raise ValueError(f"buffer capacity {sd['capacity']} != configured {t.capacity}")
+        t.data = np.empty(t.capacity, dtype=object)
+        for i, item in enumerate(sd["data"]):
+            t.data[i] = item
+        t.tree = np.asarray(sd["tree"], dtype=np.float64).copy()
+        t.n_entries = int(sd["n_entries"])
+        t.ptr = int(sd["ptr"])
+        self.max_priority = float(sd["max_priority"])
+
     def __len__(self):
         return self.tree.n_entries
 
@@ -115,6 +151,13 @@ class NStepBuffer:
         """Push all remaining transitions at episode end (with shorter horizons)."""
         while self.buffer:
             self._commit_oldest()
+
+    def state_dict(self):
+        return {"buffer": list(self.buffer)}
+
+    def load_state_dict(self, sd):
+        self.buffer.clear()
+        self.buffer.extend(sd.get("buffer", []))
 
     def _commit_oldest(self):
         state_0, action_0 = self.buffer[0][0], self.buffer[0][1]

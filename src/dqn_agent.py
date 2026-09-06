@@ -1,4 +1,5 @@
 import random
+import signal
 import torch
 import itertools
 import os
@@ -10,7 +11,8 @@ from base_agent import BaseAgent, device
 from experience_replay import ReplayMemory, PrioritizedReplayMemory, NStepBuffer
 from dqn import NETWORK_REGISTRY, optimize, mean_sigma
 from utils import log, save_graph, record_episode, save_preprocessed_sanity_check
-from checkpointing import (EpisodeCSVLogger, episode_row, load_run_state, metric_stride,
+from checkpointing import (EpisodeCSVLogger, episode_row, load_replay_buffer,
+                           load_run_state, metric_stride, save_replay_buffer,
                            save_run_state, CHECKPOINT_STATE_SECONDS)
 from config import DATE_FORMAT, CHECKPOINT_EVERY, REPLAY_MEMORY_SEED, GRAPH_UPDATE_SECONDS
 
@@ -188,8 +190,16 @@ class DQNAgent(BaseAgent):
             rewards_per_episode = restored.get("rewards_per_episode", [])
             pipes_per_episode   = restored.get("pipes_per_episode", [])
             lengths_per_episode = restored.get("lengths_per_episode", [])
-            # buffer is not checkpointed (~17 GB), so gate learning while it refills
-            refill_until = total_steps + self.resume_refill_steps
+            n_restored = load_replay_buffer(self.BUFFER_FILE, memory, nstep_buf,
+                                            map_location="cpu")
+            if n_restored:
+                buffer_note = f"Replay buffer restored: {n_restored:,} transitions."
+            else:
+                # No buffer checkpoint (or it failed to load): gate learning while it refills.
+                refill_until = total_steps + self.resume_refill_steps
+                buffer_note = (f"Replay buffer NOT restored: learning is gated until step "
+                               f"{refill_until} while it refills -- expect a brief off-policy "
+                               f"discontinuity here.")
 
         start_time = datetime.now()
         last_graph_update_time = start_time
@@ -199,9 +209,8 @@ class DQNAgent(BaseAgent):
             f"{'RESUMING' if restored else 'starting'}...", self.LOG_FILE, mode=log_mode)
         log(f"Device: {device}", self.LOG_FILE)
         if restored:
-            log(f"Resumed at step {total_steps}, episode {start_episode}. Replay buffer was NOT "
-                f"checkpointed: learning is gated until step {refill_until} while it refills — "
-                f"expect a brief off-policy discontinuity here.", self.LOG_FILE)
+            log(f"Resumed at step {total_steps}, episode {start_episode}. {buffer_note}",
+                self.LOG_FILE)
         csv_logger = EpisodeCSVLogger(self.EPISODES_CSV, resume=bool(restored))
 
         if self.frame_stack and record_video:
@@ -209,9 +218,25 @@ class DQNAgent(BaseAgent):
                                            self.obs_size, self.frame_stack, self.RUN_DIR,
                                            rgb_wrapper=self.rgb_wrapper)
 
+        # SLURM's --signal=USR1@N fires N seconds before the wall clock. Flag rather than raise,
+        # so the loop leaves through its own `finally` and the one-off buffer save can run.
+        stop_soon = {"now": False}
+
+        def _on_wallclock(signum, _frame):
+            stop_soon["now"] = True
+            print(f"[signal {signum}] wall clock near -- stopping after this episode.", flush=True)
+
+        try:
+            for sig in (signal.SIGUSR1, signal.SIGTERM):
+                signal.signal(sig, _on_wallclock)
+        except ValueError:
+            pass          # not the main thread (HPO worker); the periodic save still applies
+
         try:
             for episode in itertools.count(start_episode):
                 if self.max_env_steps and total_steps >= self.max_env_steps:
+                    break
+                if stop_soon["now"]:
                     break
                 # seed=episode+1 also picks the Mario level, so resuming at the right index
                 # keeps the level sequence continuous.
@@ -384,5 +409,14 @@ class DQNAgent(BaseAgent):
                                })
             except Exception as exc:  # noqa: BLE001
                 print(f"[checkpoint] final save failed: {exc}")
+            if stop_soon["now"] or self.max_env_steps:
+                # Only on a planned exit. ~23 GB for a 400k Mario buffer, ~1 min to write; the
+                # point is that a --resume continues with a full buffer instead of an empty one.
+                n_bytes = save_replay_buffer(self.BUFFER_FILE, memory, nstep_buf)
+                if n_bytes:
+                    size = (f"{n_bytes / 1e9:.1f} GB" if n_bytes >= 1e9
+                            else f"{n_bytes / 1e6:.0f} MB")
+                    log(f"Replay buffer saved: {len(memory):,} transitions, {size} -> "
+                        f"{self.BUFFER_FILE}", self.LOG_FILE)
             csv_logger.close()
             env.close()

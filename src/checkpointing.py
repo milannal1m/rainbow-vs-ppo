@@ -88,6 +88,49 @@ def load_run_state(path, *, model, optimizer, map_location=None):
     return counters
 
 
+
+# ── replay buffer ────────────────────────────────────────────────────────────────────
+# Written ONCE, when the wall clock is about to end the job -- never on the periodic cadence.
+# 400k Mario transitions are ~23 GB (1M FlappyBird ones ~51 GB): far too much every 15 minutes,
+# but ~1 min as a one-off, against the 600 s warning SLURM's --signal gives. Without it a resumed
+# Rainbow run starts from an empty buffer and spends ~1.4 h refilling it.
+
+def save_replay_buffer(path, memory, nstep_buf=None):
+    """Write the buffer beside the run state. Returns bytes written, or 0 on failure."""
+    if not hasattr(memory, "state_dict"):
+        return 0
+    tmp = f"{path}.tmp"
+    try:
+        torch.save({"version": 1, "memory": memory.state_dict(),
+                    "nstep": nstep_buf.state_dict() if nstep_buf is not None else None}, tmp)
+        os.replace(tmp, path)
+        return os.path.getsize(path)
+    except Exception as exc:  # noqa: BLE001 -- a failed buffer save must not lose the run
+        print(f"[checkpoint] replay buffer save failed: {exc}")
+        if os.path.exists(tmp):
+            os.remove(tmp)
+        return 0
+
+
+def load_replay_buffer(path, memory, nstep_buf=None, map_location=None):
+    """Restore the buffer in place. Returns the transition count, or 0 if unavailable.
+
+    A missing or unreadable file is not fatal: the run then refills from scratch, which is the
+    behaviour that existed before this.
+    """
+    if not os.path.exists(path) or not hasattr(memory, "load_state_dict"):
+        return 0
+    try:
+        payload = torch.load(path, map_location=map_location, weights_only=False)
+        memory.load_state_dict(payload["memory"])
+        if nstep_buf is not None and payload.get("nstep"):
+            nstep_buf.load_state_dict(payload["nstep"])
+        return len(memory)
+    except Exception as exc:  # noqa: BLE001
+        print(f"[resume] replay buffer restore failed ({exc}); refilling from scratch")
+        return 0
+
+
 # ── per-episode CSV ──────────────────────────────────────────────────────────────────
 class EpisodeCSVLogger:
     """Append-only per-episode log, flushed every row so a kill -9 loses at most one episode."""

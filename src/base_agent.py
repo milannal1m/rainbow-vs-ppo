@@ -74,6 +74,8 @@ class BaseAgent:
         os.makedirs(self.CHECKPOINT_VIDEO_DIR, exist_ok=True)
         # Resume state and the per-episode metric log — Mario runs exceed the 24 h wall clock.
         self.STATE_FILE   = os.path.join(self.RUN_DIR, f"{base}_state.pt")
+        # Written once at the wall clock, not on the periodic cadence -- see checkpointing.
+        self.BUFFER_FILE  = os.path.join(self.RUN_DIR, f"{base}_buffer.pt")
         self.EPISODES_CSV = os.path.join(self.RUN_DIR, "episodes.csv")
         # The replay buffer is too large to checkpoint, so after a resume learning is gated for
         # this many steps while it refills. Unused by PPO.

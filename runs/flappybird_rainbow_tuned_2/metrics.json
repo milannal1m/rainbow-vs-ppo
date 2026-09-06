@@ -1,9 +1,9 @@
 {
-  "eval_reward_mean": 997.6659999998534,
-  "eval_reward_median": 760.6000000000822,
-  "eval_reward_p25": 321.8000000000039,
-  "eval_reward_std": 914.259627700719,
-  "eval_pipes_mean": 212.87,
-  "eval_length_s_mean": 269.061,
-  "n_episodes": 100
+  "eval_reward_mean": 2052.9479999996825,
+  "eval_reward_median": 1254.3999999999633,
+  "eval_reward_p25": 484.4000000000329,
+  "eval_reward_std": 1853.0908796108367,
+  "eval_pipes_mean": 439.2,
+  "eval_length_s_mean": 552.9226666666667,
+  "n_episodes": 25
 }

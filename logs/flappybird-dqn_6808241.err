@@ -1,0 +1,5 @@
+/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/gymnasium/wrappers/rendering.py:292: UserWarning: [33mWARN: Overwriting existing videos at /pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/runs/mario_ppo_tuned/checkpoint_videos folder (try specifying a different `video_folder` for the `RecordVideo` wrapper if this is not desired)[0m
+  logger.warn(
+/home/ul/ul_student/ul_lmm50/.conda/envs/mario-rl-cuda/lib/python3.13/site-packages/gymnasium/wrappers/rendering.py:292: UserWarning: [33mWARN: Overwriting existing videos at /pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/runs/mario_ppo_tuned/checkpoint_videos folder (try specifying a different `video_folder` for the `RecordVideo` wrapper if this is not desired)[0m
+  logger.warn(
+[2026-09-06T16:07:00.030] error: *** JOB 6808241 ON uc2n912 CANCELLED AT 2026-09-06T16:07:00 DUE TO TIME LIMIT ***

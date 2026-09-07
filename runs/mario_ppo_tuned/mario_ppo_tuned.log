@@ -1,0 +1,33 @@
+2026-09-06_19-34-49: Training starting...
+Device: cuda
+2026-09-06_19-34-57 Episode 0: New best reward -2.07, training model saved.
+2026-09-06_19-35-00 Episode 0: New best greedy reward 10.00, model saved.
+2026-09-06_19-35-02 Episode 1: New best reward 23.60, training model saved.
+2026-09-06_19-36-18 Episode 16: New best reward 32.50, training model saved.
+2026-09-06_19-36-40 Episode 21: New best reward 63.80, training model saved.
+2026-09-06_19-37-33 Episode 48: New best reward 74.53, training model saved.
+2026-09-06_19-37-57 Episode 54: New best reward 82.07, training model saved.
+2026-09-06_19-39-54 Episode 114: New best reward 98.67, training model saved.
+2026-09-06_19-40-56 Episode 156: New best reward 110.40, training model saved.
+2026-09-06_19-45-36 Episode 363: New best reward 122.20, training model saved.
+2026-09-06_19-50-33 Episode 676: New best reward 126.87, training model saved.
+2026-09-06_19-52-26 Episode 821: New best reward 138.33, training model saved.
+2026-09-06_19-54-38 Episode 1000: New best greedy reward 19.60, model saved.
+2026-09-06_19-59-15 Episode 1367: New best reward 154.53, training model saved.
+2026-09-06_20-06-35 Episode 1950: New best reward 184.27, training model saved.
+2026-09-06_20-33-12 Episode 4000: New best greedy reward 23.07, model saved.
+2026-09-06_20-47-39 Episode 5000: New best greedy reward 23.80, model saved.
+2026-09-06_21-05-23 Episode 6000: New best greedy reward 29.80, model saved.
+2026-09-06_21-21-35 Episode 7000: New best greedy reward 56.67, model saved.
+2026-09-06_21-54-18 Episode 9000: New best greedy reward 60.87, model saved.
+2026-09-06_22-00-12 Episode 9361: New best reward 198.40, training model saved.
+2026-09-06_22-10-51 Episode 10000: New best greedy reward 68.67, model saved.
+2026-09-06_23-12-59 Episode 13374: New best reward 202.93, training model saved.
+2026-09-06_23-22-02 Episode 13844: New best reward 204.27, training model saved.
+2026-09-06_23-42-49 Episode 15000: New best greedy reward 90.00, model saved.
+2026-09-07_00-09-41 Episode 16575: New best reward 235.13, training model saved.
+2026-09-07_00-17-24 Episode 17000: New best greedy reward 117.73, model saved.
+2026-09-07_01-15-28 Episode 20000: New best greedy reward 130.60, model saved.
+2026-09-07_01-34-27 Episode 20984: New best reward 237.93, training model saved.
+2026-09-07_02-36-45 Episode 24000: New best greedy reward 134.67, model saved.
+2026-09-07_04-48-11 Episode 30000: New best greedy reward 189.13, model saved.

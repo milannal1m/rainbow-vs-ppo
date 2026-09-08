@@ -31,3 +31,17 @@ Device: cuda
 2026-09-07_01-34-27 Episode 20984: New best reward 237.93, training model saved.
 2026-09-07_02-36-45 Episode 24000: New best greedy reward 134.67, model saved.
 2026-09-07_04-48-11 Episode 30000: New best greedy reward 189.13, model saved.
+2026-09-07_10-52-52: Training RESUMING...
+Device: cuda
+Resumed at step 5021696, episode 37511. PPO is on-policy, so there is no replay buffer to refill — the resume is exact apart from the in-flight rollout.
+2026-09-07_14-43-42 Episode 47329: New best reward 238.13, training model saved.
+2026-09-07_15-17-19 Episode 48764: New best reward 238.80, training model saved.
+2026-09-07_15-45-14 Episode 49925: New best reward 239.87, training model saved.
+2026-09-07_16-35-17 Episode 51992: New best reward 242.07, training model saved.
+2026-09-07_17-43-16 Episode 54832: New best reward 242.13, training model saved.
+2026-09-07_22-35-27 Episode 65445: LR reached floor 1.00e-05 (step 10002432), holding.
+2026-09-07_23-26-58: Training RESUMING...
+Device: cuda
+Resumed at step 10043392, episode 65646. PPO is on-policy, so there is no replay buffer to refill — the resume is exact apart from the in-flight rollout.
+2026-09-07_23-26-59 Episode 65646: LR reached floor 1.00e-05 (step 10043392), holding.
+2026-09-08_04-32-32 Episode 76000: New best greedy reward 218.47, model saved.

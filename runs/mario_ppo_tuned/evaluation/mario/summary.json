@@ -1,0 +1,250 @@
+{
+  "split": "smb1_stage_holdout",
+  "tiers": {
+    "tier0": {
+      "n_levels": 2,
+      "flag_rate_macro": 0.0,
+      "flag_rate_ci": [
+        0.0,
+        0.0
+      ],
+      "pages_macro": 2.05,
+      "pages_ci": [
+        1.9333333333333333,
+        2.1666666666666665
+      ],
+      "route_progress_macro": null,
+      "x_pos_max_macro": 745.8333333333333,
+      "warp_rate_macro": 0.0,
+      "levels_excluded_from_progress": [],
+      "degenerate_levels": []
+    },
+    "tier1": {
+      "n_levels": 7,
+      "flag_rate_macro": 0.0,
+      "flag_rate_ci": [
+        0.0,
+        0.0
+      ],
+      "pages_macro": 1.5523809523809524,
+      "pages_ci": [
+        0.6714285714285715,
+        2.5571428571428574
+      ],
+      "route_progress_macro": null,
+      "x_pos_max_macro": 576.7476190476191,
+      "warp_rate_macro": 0.0,
+      "levels_excluded_from_progress": [],
+      "degenerate_levels": []
+    },
+    "tier2": {
+      "n_levels": 12,
+      "flag_rate_macro": 0.0,
+      "flag_rate_ci": [
+        0.0,
+        0.0
+      ],
+      "pages_macro": 1.0083333333333333,
+      "pages_ci": [
+        0.7777777777777777,
+        1.1916666666666667
+      ],
+      "route_progress_macro": null,
+      "x_pos_max_macro": 401.4194444444444,
+      "warp_rate_macro": 0.0,
+      "levels_excluded_from_progress": [],
+      "degenerate_levels": []
+    },
+    "train": {
+      "n_levels": 20,
+      "flag_rate_macro": 0.11833333333333333,
+      "flag_rate_ci": [
+        0.006666666666666666,
+        0.24500000000000002
+      ],
+      "pages_macro": 6.236666666666666,
+      "pages_ci": [
+        5.159958333333333,
+        7.344999999999999
+      ],
+      "route_progress_macro": null,
+      "x_pos_max_macro": 1760.8566666666661,
+      "warp_rate_macro": 0.0,
+      "levels_excluded_from_progress": [],
+      "degenerate_levels": []
+    }
+  },
+  "generalisation_gap_flag": 0.11833333333333333,
+  "generalisation_gap_pages": 4.684285714285714,
+  "transfer_ratio_pages": 0.24891196457203943,
+  "jackknife_tier1_pages": {
+    "key": "pages_mean",
+    "full": 1.5523809523809524,
+    "min": 1.1722222222222223,
+    "max": 1.8111111111111111,
+    "range": 0.6388888888888888,
+    "leave_one_out": [
+      {
+        "dropped": "2-4",
+        "macro": 1.1722222222222223
+      },
+      {
+        "dropped": "3-2",
+        "macro": 1.3166666666666667
+      },
+      {
+        "dropped": "4-2",
+        "macro": 1.8111111111111111
+      },
+      {
+        "dropped": "4-3",
+        "macro": 1.6444444444444446
+      },
+      {
+        "dropped": "5-2",
+        "macro": 1.7166666666666668
+      },
+      {
+        "dropped": "6-3",
+        "macro": 1.6333333333333335
+      },
+      {
+        "dropped": "8-2",
+        "macro": 1.5722222222222222
+      }
+    ]
+  },
+  "full_game": {
+    "episodes": 10,
+    "policy_mode": "argmax",
+    "furthest_index_mean": 1.0,
+    "furthest_index_std": 0.0,
+    "furthest_index_max": 1,
+    "furthest_stage_mean_equiv": "1-1",
+    "furthest_stage_max": "1-1",
+    "stages_cleared_mean": 0.0,
+    "stages_cleared_max": 0,
+    "warp_runs": 0,
+    "stages_skipped_mean": 0.0,
+    "runs": [
+      {
+        "seed": 888000,
+        "furthest_index": 1,
+        "furthest_stage": "1-1",
+        "stages_cleared": 0,
+        "stages_visited": 1,
+        "warps": 0,
+        "stages_skipped": 0,
+        "return_scaled": 125.60000000000133,
+        "steps": 2030
+      },
+      {
+        "seed": 888001,
+        "furthest_index": 1,
+        "furthest_stage": "1-1",
+        "stages_cleared": 0,
+        "stages_visited": 1,
+        "warps": 0,
+        "stages_skipped": 0,
+        "return_scaled": 125.466666666668,
+        "steps": 2034
+      },
+      {
+        "seed": 888002,
+        "furthest_index": 1,
+        "furthest_stage": "1-1",
+        "stages_cleared": 0,
+        "stages_visited": 1,
+        "warps": 0,
+        "stages_skipped": 0,
+        "return_scaled": 125.5333333333347,
+        "steps": 2035
+      },
+      {
+        "seed": 888003,
+        "furthest_index": 1,
+        "furthest_stage": "1-1",
+        "stages_cleared": 0,
+        "stages_visited": 1,
+        "warps": 0,
+        "stages_skipped": 0,
+        "return_scaled": 125.60000000000133,
+        "steps": 2034
+      },
+      {
+        "seed": 888004,
+        "furthest_index": 1,
+        "furthest_stage": "1-1",
+        "stages_cleared": 0,
+        "stages_visited": 1,
+        "warps": 0,
+        "stages_skipped": 0,
+        "return_scaled": 124.53333333333467,
+        "steps": 2033
+      },
+      {
+        "seed": 888005,
+        "furthest_index": 1,
+        "furthest_stage": "1-1",
+        "stages_cleared": 0,
+        "stages_visited": 1,
+        "warps": 0,
+        "stages_skipped": 0,
+        "return_scaled": 125.60000000000139,
+        "steps": 2030
+      },
+      {
+        "seed": 888006,
+        "furthest_index": 1,
+        "furthest_stage": "1-1",
+        "stages_cleared": 0,
+        "stages_visited": 1,
+        "warps": 0,
+        "stages_skipped": 0,
+        "return_scaled": 125.46666666666803,
+        "steps": 2035
+      },
+      {
+        "seed": 888007,
+        "furthest_index": 1,
+        "furthest_stage": "1-1",
+        "stages_cleared": 0,
+        "stages_visited": 1,
+        "warps": 0,
+        "stages_skipped": 0,
+        "return_scaled": 125.60000000000133,
+        "steps": 2032
+      },
+      {
+        "seed": 888008,
+        "furthest_index": 1,
+        "furthest_stage": "1-1",
+        "stages_cleared": 0,
+        "stages_visited": 1,
+        "warps": 0,
+        "stages_skipped": 0,
+        "return_scaled": 125.60000000000136,
+        "steps": 2031
+      },
+      {
+        "seed": 888009,
+        "furthest_index": 1,
+        "furthest_stage": "1-1",
+        "stages_cleared": 0,
+        "stages_visited": 1,
+        "warps": 0,
+        "stages_skipped": 0,
+        "return_scaled": 115.93333333333459,
+        "steps": 2032
+      }
+    ]
+  },
+  "policy_mode": "argmax",
+  "episodes_per_level": 30,
+  "env": "kind=mario levels=smb1_stage_holdout/train (20 levels) action_set=COMPLEX_MOVEMENT completion_unclipped=True frame_skip=4 level_sampler=seed_hash max_episode_steps=3000 noop_max=30 reward_clip=15.0 reward_divisor=15.0 sticky_prob=0.25 warp_bonus=5.0",
+  "checkpoint": "runs/mario_ppo_tuned/mario_ppo_tuned.pt",
+  "seed": 42,
+  "grad_cam_levels": [
+    "1-4"
+  ]
+}

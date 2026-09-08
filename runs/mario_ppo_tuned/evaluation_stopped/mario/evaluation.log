@@ -1,0 +1,40 @@
+Per-level evaluation — split=smb1_stage_holdout tiers=['train', 'tier0', 'tier1', 'tier2'] levels=41 episodes/level=30 policy=argmax
+env: kind=mario levels=smb1_stage_holdout/train (20 levels) action_set=COMPLEX_MOVEMENT completion_unclipped=True frame_skip=4 level_sampler=seed_hash max_episode_steps=3000 noop_max=30 reward_clip=15.0 reward_divisor=15.0 sticky_prob=0.25 warp_bonus=5.0
+NOTE: no frozen route table (mario_levels.json) — reporting `pages` and raw x_pos_max instead of normalised Route Progress. See mario.md 5.3.
+  1-1                    flag=0.00 pages=8.93 x_max=2361 distinct_x=5/30 deaths={'timeout': 30}
+  1-2                    flag=0.07 pages=4.97 x_max=1402 distinct_x=20/30 deaths={'enemy': 16, 'timeout': 12, 'flag': 2}
+  1-3                    flag=0.00 pages=2.00 x_max=779 distinct_x=9/30 deaths={'pit': 30}
+  1-4                    flag=0.83 pages=8.00 x_max=2245 distinct_x=17/30 deaths={'flag': 25, 'enemy': 5}
+  2-1                    flag=0.00 pages=3.10 x_max=990 distinct_x=22/30 deaths={'enemy': 20, 'timeout': 8, 'pit': 2}
+  2-2                    flag=0.00 pages=3.30 x_max=1017 distinct_x=25/30 deaths={'enemy': 23, 'pit': 7}
+  2-3                    flag=0.00 pages=10.83 x_max=2913 distinct_x=19/30 deaths={'timeout': 20, 'pit': 1, 'enemy': 9}
+  3-1                    flag=0.00 pages=6.33 x_max=1763 distinct_x=27/30 deaths={'enemy': 18, 'pit': 6, 'timeout': 6}
+  3-3                    flag=0.00 pages=7.30 x_max=2045 distinct_x=17/30 deaths={'pit': 25, 'enemy': 5}
+  3-4                    flag=0.67 pages=7.80 x_max=2173 distinct_x=20/30 deaths={'enemy': 10, 'flag': 20}
+  4-1                    flag=0.03 pages=9.53 x_max=2535 distinct_x=18/30 deaths={'enemy': 20, 'pit': 1, 'timeout': 8, 'flag': 1}
+  5-1                    flag=0.00 pages=2.73 x_max=874 distinct_x=13/30 deaths={'enemy': 22, 'timeout': 5, 'pit': 3}
+  5-4                    flag=0.00 pages=6.07 x_max=1760 distinct_x=22/30 deaths={'enemy': 12, 'pit': 18}
+  6-1                    flag=0.77 pages=10.73 x_max=2907 distinct_x=7/30 deaths={'flag': 23, 'pit': 6, 'enemy': 1}
+  6-2                    flag=0.00 pages=5.60 x_max=1598 distinct_x=28/30 deaths={'enemy': 18, 'pit': 6, 'timeout': 6}
+  6-4                    flag=0.00 pages=6.37 x_max=1788 distinct_x=26/30 deaths={'enemy': 29, 'timeout': 1}
+  7-1                    flag=0.00 pages=4.97 x_max=1408 distinct_x=21/30 deaths={'enemy': 20, 'timeout': 10}
+  7-3                    flag=0.00 pages=6.80 x_max=1906 distinct_x=25/30 deaths={'pit': 21, 'enemy': 9}
+  8-1                    flag=0.00 pages=5.60 x_max=1631 distinct_x=15/30 deaths={'enemy': 17, 'timeout': 13}
+  8-3                    flag=0.00 pages=3.77 x_max=1121 distinct_x=14/30 deaths={'timeout': 3, 'enemy': 27}
+  5-3                    flag=0.00 pages=1.93 x_max=735 distinct_x=13/30 deaths={'pit': 25, 'enemy': 5}
+  7-2                    flag=0.00 pages=2.17 x_max=756 distinct_x=26/30 deaths={'enemy': 30}
+  2-4                    flag=0.00 pages=3.83 x_max=1117 distinct_x=18/30 deaths={'enemy': 10, 'pit': 20}
+  3-2                    flag=0.00 pages=2.97 x_max=1000 distinct_x=14/30 deaths={'enemy': 29, 'pit': 1}
+  4-2                    flag=0.00 pages=0.00 x_max=240 distinct_x=13/30 deaths={'pit': 30}
+  4-3                    flag=0.00 pages=1.00 x_max=439 distinct_x=11/30 deaths={'enemy': 13, 'pit': 17}
+  5-2                    flag=0.00 pages=0.57 x_max=345 distinct_x=18/30 deaths={'timeout': 5, 'enemy': 21, 'pit': 4}
+  6-3                    flag=0.00 pages=1.07 x_max=405 distinct_x=13/30 deaths={'pit': 29, 'timeout': 1}
+  8-2                    flag=0.00 pages=1.43 x_max=491 distinct_x=18/30 deaths={'enemy': 10, 'pit': 20}
+  SuperMarioBros2-1-1-v0 flag=0.00 pages=0.60 x_max=321 distinct_x=17/30 deaths={'enemy': 29, 'timeout': 1}
+  SuperMarioBros2-1-3-v0 flag=0.00 pages=1.00 x_max=338 distinct_x=7/30 deaths={'pit': 30}
+  SuperMarioBros2-2-1-v0 flag=0.00 pages=1.00 x_max=521 distinct_x=12/30 deaths={'enemy': 30}
+  SuperMarioBros2-3-1-v0 flag=0.00 pages=1.53 x_max=484 distinct_x=15/30 deaths={'pit': 16, 'enemy': 14}
+  SuperMarioBros2-4-1-v0 flag=0.00 pages=1.10 x_max=432 distinct_x=4/30 deaths={'enemy': 26, 'timeout': 3, 'pit': 1}
+  SuperMarioBros2-4-3-v0 flag=0.00 pages=1.00 x_max=382 distinct_x=5/30 deaths={'pit': 30}
+  SuperMarioBros2-5-1-v0 flag=0.00 pages=1.13 x_max=444 distinct_x=14/30 deaths={'pit': 28, 'enemy': 2}
+  SuperMarioBros2-6-1-v0 flag=0.00 pages=1.10 x_max=458 distinct_x=16/30 deaths={'pit': 26, 'enemy': 4}

@@ -31,3 +31,13 @@ Device: cuda
 2026-09-07_06-53-45 Episode 15348: New best reward 237.00, training model saved.
 2026-09-07_08-06-02 Episode 17000: New best greedy reward 166.73, model saved.
 2026-09-07_08-49-33 Episode 18000: New best greedy reward 171.60, model saved.
+2026-09-07_10-52-52: Training RESUMING...
+Device: cuda
+Resumed at step 3568388, episode 18317. Replay buffer NOT restored: learning is gated until step 3588388 while it refills -- expect a brief off-policy discontinuity here.
+2026-09-07_11-13-25 Episode 18737: New best reward 238.13, training model saved.
+2026-09-07_15-30-08 Episode 24000: New best greedy reward 195.33, model saved.
+2026-09-07_17-16-32 Episode 26125: New best reward 239.33, training model saved.
+2026-09-07_21-27-12 Episode 31000: New best greedy reward 236.00, model saved.
+2026-09-07_23-27-51: Training RESUMING...
+Device: cuda
+Resumed at step 7103092, episode 32404. Replay buffer NOT restored: learning is gated until step 7123092 while it refills -- expect a brief off-policy discontinuity here.

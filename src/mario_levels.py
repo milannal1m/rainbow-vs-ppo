@@ -3,6 +3,7 @@
 Stdlib only: imported from env_factory under both conda envs, and gym_super_mario_bros only
 exists in the Mario one. The split is hardcoded rather than seeded — see SPLITS.
 """
+import os
 from dataclasses import dataclass
 
 # ── Archetypes ───────────────────────────────────────────────────────────────────────
@@ -282,7 +283,10 @@ def levels_from_config(env_make_params):
 # progress_max is raw pixels and x_pos is per-area, so a normalised progress metric would need a
 # per-stage reference route. Not measured (see mario.md); mario_eval reads this file if it appears,
 # and reports pages otherwise. It must not be derived from agent runs — that would be circular.
-ROUTE_TABLE_PATH = "mario_levels.json"
+# Anchored to this file rather than the cwd, so the table is found whatever directory
+# python was invoked from.
+ROUTE_TABLE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                               "mario_levels.json")
 PAGE_WIDTH = 256  # one NES screen; `pages_cleared` is the normalisation-free fallback metric
 
 

@@ -1,0 +1,621 @@
+{
+  "1-1": {
+    "enemy_pointer": "$9F01",
+    "n_completions": 160,
+    "object_pointer": "$A690",
+    "rom_delta_px": -23,
+    "rom_length_px": 3138,
+    "route": [
+      {
+        "area": 1,
+        "x_max": 3161,
+        "x_min": 40
+      }
+    ],
+    "source": "flag_get episodes in runs/*/episodes.csv",
+    "warp_tail": false,
+    "x_spread": 0
+  },
+  "1-2": {
+    "enemy_pointer": "$A0D8",
+    "n_completions": 24,
+    "object_pointer": "$AC37",
+    "rom_delta_px": 400,
+    "rom_length_px": 3074,
+    "route": [
+      {
+        "area": 3,
+        "x_max": 2674,
+        "x_min": 40
+      }
+    ],
+    "source": "flag_get episodes in runs/*/episodes.csv",
+    "warp_tail": true,
+    "x_spread": 33
+  },
+  "1-3": {
+    "enemy_pointer": "$9F1F",
+    "object_pointer": "$A6F5",
+    "route": [
+      {
+        "area": 4,
+        "x_max": 2418,
+        "x_min": 40
+      }
+    ],
+    "source": "rom object list (src/mario_rom.py)",
+    "warp_tail": false
+  },
+  "1-4": {
+    "enemy_pointer": "$9D70",
+    "n_completions": 1800,
+    "object_pointer": "$A1B1",
+    "rom_delta_px": 46,
+    "rom_length_px": 2290,
+    "route": [
+      {
+        "area": 5,
+        "x_max": 2244,
+        "x_min": 40
+      }
+    ],
+    "source": "flag_get episodes in runs/*/episodes.csv",
+    "warp_tail": false,
+    "x_spread": 26
+  },
+  "2-1": {
+    "enemy_pointer": "$9F51",
+    "object_pointer": "$A7CF",
+    "route": [
+      {
+        "area": 1,
+        "x_max": 3170,
+        "x_min": 40
+      }
+    ],
+    "source": "rom object list (src/mario_rom.py)",
+    "warp_tail": false
+  },
+  "2-2": {
+    "enemy_pointer": "$A171",
+    "n_completions": 21,
+    "object_pointer": "$AE47",
+    "rom_delta_px": -71,
+    "rom_length_px": 3090,
+    "route": [
+      {
+        "area": 3,
+        "x_max": 3161,
+        "x_min": 40
+      }
+    ],
+    "source": "flag_get episodes in runs/*/episodes.csv",
+    "warp_tail": false,
+    "x_spread": 0
+  },
+  "2-3": {
+    "enemy_pointer": "$9F3C",
+    "n_completions": 64,
+    "object_pointer": "$A74A",
+    "rom_delta_px": -7,
+    "rom_length_px": 3586,
+    "route": [
+      {
+        "area": 4,
+        "x_max": 3593,
+        "x_min": 40
+      }
+    ],
+    "source": "flag_get episodes in runs/*/episodes.csv",
+    "warp_tail": false,
+    "x_spread": 0
+  },
+  "2-4": {
+    "enemy_pointer": "$9DB0",
+    "object_pointer": "$A291",
+    "rom_delta_px": 43,
+    "rom_length_px": 2290,
+    "route": [
+      {
+        "area": 5,
+        "x_max": 2247,
+        "x_min": 40
+      }
+    ],
+    "source": "flag_get via ROM-identical twin (5-4)",
+    "warp_tail": false
+  },
+  "3-1": {
+    "enemy_pointer": "$9ED0",
+    "object_pointer": "$A61B",
+    "route": [
+      {
+        "area": 1,
+        "x_max": 3170,
+        "x_min": 40
+      }
+    ],
+    "source": "rom object list (src/mario_rom.py)",
+    "warp_tail": false
+  },
+  "3-2": {
+    "enemy_pointer": "$A0B3",
+    "object_pointer": "$AC04",
+    "route": [
+      {
+        "area": 2,
+        "x_max": 3314,
+        "x_min": 40
+      }
+    ],
+    "source": "rom object list (src/mario_rom.py)",
+    "warp_tail": false
+  },
+  "3-3": {
+    "enemy_pointer": "$9E59",
+    "n_completions": 1,
+    "object_pointer": "$A46D",
+    "rom_delta_px": -7,
+    "rom_length_px": 2402,
+    "route": [
+      {
+        "area": 3,
+        "x_max": 2409,
+        "x_min": 40
+      }
+    ],
+    "source": "flag_get episodes in runs/*/episodes.csv",
+    "warp_tail": false,
+    "x_spread": 0
+  },
+  "3-4": {
+    "enemy_pointer": "$9DDF",
+    "n_completions": 637,
+    "object_pointer": "$A304",
+    "rom_delta_px": 46,
+    "rom_length_px": 2290,
+    "route": [
+      {
+        "area": 4,
+        "x_max": 2244,
+        "x_min": 40
+      }
+    ],
+    "source": "flag_get episodes in runs/*/episodes.csv",
+    "warp_tail": false,
+    "x_spread": 26
+  },
+  "4-1": {
+    "enemy_pointer": "$9E9B",
+    "n_completions": 705,
+    "object_pointer": "$A539",
+    "rom_delta_px": -23,
+    "rom_length_px": 3570,
+    "route": [
+      {
+        "area": 1,
+        "x_max": 3593,
+        "x_min": 40
+      }
+    ],
+    "source": "flag_get episodes in runs/*/episodes.csv",
+    "warp_tail": false,
+    "x_spread": 0
+  },
+  "4-2": {
+    "enemy_pointer": "$A105",
+    "object_pointer": "$ACDA",
+    "route": [
+      {
+        "area": 3,
+        "x_max": 3586,
+        "x_min": 40
+      }
+    ],
+    "source": "rom object list (src/mario_rom.py)",
+    "warp_tail": true
+  },
+  "4-3": {
+    "enemy_pointer": "$9FA9",
+    "object_pointer": "$A891",
+    "route": [
+      {
+        "area": 4,
+        "x_max": 2338,
+        "x_min": 40
+      }
+    ],
+    "source": "rom object list (src/mario_rom.py)",
+    "warp_tail": false
+  },
+  "4-4": {
+    "enemy_pointer": "$9D97",
+    "object_pointer": "$A212",
+    "route": [
+      {
+        "area": 5,
+        "x_max": 2802,
+        "x_min": 40
+      }
+    ],
+    "source": "rom object list (src/mario_rom.py)",
+    "warp_tail": false
+  },
+  "5-1": {
+    "enemy_pointer": "$9F7C",
+    "n_completions": 3,
+    "object_pointer": "$A83D",
+    "rom_delta_px": -23,
+    "rom_length_px": 3154,
+    "route": [
+      {
+        "area": 1,
+        "x_max": 3177,
+        "x_min": 40
+      }
+    ],
+    "source": "flag_get episodes in runs/*/episodes.csv",
+    "warp_tail": false,
+    "x_spread": 0
+  },
+  "5-2": {
+    "enemy_pointer": "$A035",
+    "object_pointer": "$AA94",
+    "route": [
+      {
+        "area": 2,
+        "x_max": 3170,
+        "x_min": 40
+      }
+    ],
+    "source": "rom object list (src/mario_rom.py)",
+    "warp_tail": false
+  },
+  "5-3": {
+    "enemy_pointer": "$9F1F",
+    "object_pointer": "$A6F5",
+    "route": [
+      {
+        "area": 3,
+        "x_max": 2418,
+        "x_min": 40
+      }
+    ],
+    "source": "rom object list (src/mario_rom.py)",
+    "warp_tail": false
+  },
+  "5-4": {
+    "enemy_pointer": "$9DB0",
+    "n_completions": 11,
+    "object_pointer": "$A291",
+    "rom_delta_px": 43,
+    "rom_length_px": 2290,
+    "route": [
+      {
+        "area": 4,
+        "x_max": 2247,
+        "x_min": 40
+      }
+    ],
+    "source": "flag_get episodes in runs/*/episodes.csv",
+    "warp_tail": false,
+    "x_spread": 17
+  },
+  "6-1": {
+    "enemy_pointer": "$9FF1",
+    "n_completions": 68,
+    "object_pointer": "$A95D",
+    "rom_delta_px": 9,
+    "rom_length_px": 2978,
+    "route": [
+      {
+        "area": 1,
+        "x_max": 2969,
+        "x_min": 40
+      }
+    ],
+    "source": "flag_get episodes in runs/*/episodes.csv",
+    "warp_tail": false,
+    "x_spread": 0
+  },
+  "6-2": {
+    "enemy_pointer": "$9EA9",
+    "object_pointer": "$A58C",
+    "route": [
+      {
+        "area": 2,
+        "x_max": 3426,
+        "x_min": 40
+      }
+    ],
+    "source": "rom object list (src/mario_rom.py)",
+    "warp_tail": false
+  },
+  "6-3": {
+    "enemy_pointer": "$9FCE",
+    "object_pointer": "$A8F8",
+    "route": [
+      {
+        "area": 3,
+        "x_max": 2658,
+        "x_min": 40
+      }
+    ],
+    "source": "rom object list (src/mario_rom.py)",
+    "warp_tail": false
+  },
+  "6-4": {
+    "enemy_pointer": "$9D70",
+    "n_completions": 126,
+    "object_pointer": "$A1B1",
+    "rom_delta_px": 46,
+    "rom_length_px": 2290,
+    "route": [
+      {
+        "area": 4,
+        "x_max": 2244,
+        "x_min": 40
+      }
+    ],
+    "source": "flag_get episodes in runs/*/episodes.csv",
+    "warp_tail": false,
+    "x_spread": 26
+  },
+  "7-1": {
+    "enemy_pointer": "$A08E",
+    "n_completions": 2,
+    "object_pointer": "$AB80",
+    "rom_delta_px": -23,
+    "rom_length_px": 2834,
+    "route": [
+      {
+        "area": 1,
+        "x_max": 2857,
+        "x_min": 40
+      }
+    ],
+    "source": "flag_get episodes in runs/*/episodes.csv",
+    "warp_tail": false,
+    "x_spread": 0
+  },
+  "7-2": {
+    "enemy_pointer": "$A171",
+    "object_pointer": "$AE47",
+    "rom_delta_px": -71,
+    "rom_length_px": 3090,
+    "route": [
+      {
+        "area": 3,
+        "x_max": 3161,
+        "x_min": 40
+      }
+    ],
+    "source": "flag_get via ROM-identical twin (2-2)",
+    "warp_tail": false
+  },
+  "7-3": {
+    "enemy_pointer": "$9F3C",
+    "n_completions": 5,
+    "object_pointer": "$A74A",
+    "rom_delta_px": -7,
+    "rom_length_px": 3586,
+    "route": [
+      {
+        "area": 4,
+        "x_max": 3593,
+        "x_min": 40
+      }
+    ],
+    "source": "flag_get episodes in runs/*/episodes.csv",
+    "warp_tail": false,
+    "x_spread": 0
+  },
+  "7-4": {
+    "enemy_pointer": "$9E0A",
+    "object_pointer": "$A371",
+    "route": [
+      {
+        "area": 5,
+        "x_max": 3314,
+        "x_min": 40
+      }
+    ],
+    "source": "rom object list (src/mario_rom.py)",
+    "warp_tail": false
+  },
+  "8-1": {
+    "enemy_pointer": "$9FFB",
+    "object_pointer": "$AA01",
+    "route": [
+      {
+        "area": 1,
+        "x_max": 5986,
+        "x_min": 40
+      }
+    ],
+    "source": "rom object list (src/mario_rom.py)",
+    "warp_tail": false
+  },
+  "8-2": {
+    "enemy_pointer": "$A060",
+    "object_pointer": "$AB07",
+    "route": [
+      {
+        "area": 2,
+        "x_max": 3426,
+        "x_min": 40
+      }
+    ],
+    "source": "rom object list (src/mario_rom.py)",
+    "warp_tail": false
+  },
+  "8-3": {
+    "enemy_pointer": "$9E7E",
+    "object_pointer": "$A4D0",
+    "route": [
+      {
+        "area": 3,
+        "x_max": 3458,
+        "x_min": 40
+      }
+    ],
+    "source": "rom object list (src/mario_rom.py)",
+    "warp_tail": false
+  },
+  "8-4": {
+    "enemy_pointer": "$9E1F",
+    "object_pointer": "$A3FC",
+    "route": [
+      {
+        "area": 4,
+        "x_max": 4850,
+        "x_min": 40
+      }
+    ],
+    "source": "rom object list (src/mario_rom.py)",
+    "warp_tail": false
+  },
+  "SuperMarioBros2-1-1-v0": {
+    "enemy_pointer": "$A78E",
+    "object_pointer": "$9F68",
+    "route": [
+      {
+        "area": 1,
+        "x_max": 3202,
+        "x_min": 40
+      }
+    ],
+    "source": "rom object list (src/mario_rom.py)",
+    "warp_tail": false
+  },
+  "SuperMarioBros2-1-3-v0": {
+    "enemy_pointer": "$A7B4",
+    "object_pointer": "$9FC3",
+    "route": [
+      {
+        "area": 4,
+        "x_max": 2914,
+        "x_min": 40
+      }
+    ],
+    "source": "rom object list (src/mario_rom.py)",
+    "warp_tail": false
+  },
+  "SuperMarioBros2-2-1-v0": {
+    "enemy_pointer": "$A7D7",
+    "object_pointer": "$A012",
+    "route": [
+      {
+        "area": 1,
+        "x_max": 3906,
+        "x_min": 40
+      }
+    ],
+    "source": "rom object list (src/mario_rom.py)",
+    "warp_tail": false
+  },
+  "SuperMarioBros2-3-1-v0": {
+    "enemy_pointer": "$A84D",
+    "object_pointer": "$A167",
+    "route": [
+      {
+        "area": 1,
+        "x_max": 4098,
+        "x_min": 40
+      }
+    ],
+    "source": "rom object list (src/mario_rom.py)",
+    "warp_tail": false
+  },
+  "SuperMarioBros2-4-1-v0": {
+    "enemy_pointer": "$A89C",
+    "object_pointer": "$A245",
+    "route": [
+      {
+        "area": 1,
+        "x_max": 3378,
+        "x_min": 40
+      }
+    ],
+    "source": "rom object list (src/mario_rom.py)",
+    "warp_tail": false
+  },
+  "SuperMarioBros2-4-3-v0": {
+    "enemy_pointer": "$A8D5",
+    "object_pointer": "$A31D",
+    "route": [
+      {
+        "area": 3,
+        "x_max": 3170,
+        "x_min": 40
+      }
+    ],
+    "source": "rom object list (src/mario_rom.py)",
+    "warp_tail": false
+  },
+  "SuperMarioBros2-5-1-v0": {
+    "enemy_pointer": "$A94E",
+    "object_pointer": "$A4C6",
+    "route": [
+      {
+        "area": 1,
+        "x_max": 3090,
+        "x_min": 40
+      }
+    ],
+    "source": "rom object list (src/mario_rom.py)",
+    "warp_tail": false
+  },
+  "SuperMarioBros2-6-1-v0": {
+    "enemy_pointer": "$A94E",
+    "object_pointer": "$A4C6",
+    "route": [
+      {
+        "area": 1,
+        "x_max": 3090,
+        "x_min": 40
+      }
+    ],
+    "source": "rom object list (src/mario_rom.py)",
+    "warp_tail": false
+  },
+  "SuperMarioBros2-7-1-v0": {
+    "enemy_pointer": "$A94E",
+    "object_pointer": "$A4C6",
+    "route": [
+      {
+        "area": 1,
+        "x_max": 3090,
+        "x_min": 40
+      }
+    ],
+    "source": "rom object list (src/mario_rom.py)",
+    "warp_tail": false
+  },
+  "SuperMarioBros2-8-1-v0": {
+    "enemy_pointer": "$A94E",
+    "object_pointer": "$A4C6",
+    "route": [
+      {
+        "area": 1,
+        "x_max": 3090,
+        "x_min": 40
+      }
+    ],
+    "source": "rom object list (src/mario_rom.py)",
+    "warp_tail": false
+  },
+  "SuperMarioBros2-C-3-v0": {
+    "enemy_pointer": "$A94E",
+    "object_pointer": "$A4C6",
+    "route": [
+      {
+        "area": 3,
+        "x_max": 3090,
+        "x_min": 40
+      }
+    ],
+    "source": "rom object list (src/mario_rom.py)",
+    "warp_tail": false
+  }
+}

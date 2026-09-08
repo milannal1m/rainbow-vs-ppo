@@ -9,3 +9,7 @@ PPO.md
 mario.md
 paper/
 runs/flappybird_ppo_tuned_3/videos/
+
+# Editor / OS cruft
+.vscode/
+.DS_Store

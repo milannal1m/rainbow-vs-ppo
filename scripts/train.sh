@@ -32,8 +32,9 @@ TRAIN_PID=$!
 
 trap 'echo "[signal] USR1 -- forwarding to agent $TRAIN_PID"; kill -USR1 "$TRAIN_PID" 2>/dev/null' USR1
 
-sleep 3600      # GPU snapshot an hour in, for the record
-nvidia-smi
+# Backgrounded: bash defers a trap until the running foreground command returns, so a
+# foreground sleep here would swallow USR1 for up to an hour.
+( sleep 3600; nvidia-smi ) &   # GPU snapshot an hour in, for the record
 
 # `wait` returns as soon as a trap runs, so repeat until the child is really gone.
 while kill -0 "$TRAIN_PID" 2>/dev/null; do

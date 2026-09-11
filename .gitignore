@@ -2,14 +2,17 @@ __pycache__/
 *.pyc
 *.pyo
 
-runs/hpo/*/trials
-
-# Personal notes / reference (not part of the deliverable)
-PPO.md
-mario.md
-paper/
-runs/flappybird_ppo_tuned_3/videos/
-
 # Editor / OS cruft
 .vscode/
 .DS_Store
+
+# Internal notes, not part of the deliverable
+paper/
+
+# Operational bulk: HPO trial dirs, resume state, replay buffers, per-checkpoint clips
+runs/hpo/*/trials
+runs/*/*_state.pt
+runs/*/*_buffer.pt
+runs/*/checkpoint_videos/
+runs/*/videos/
+logs/

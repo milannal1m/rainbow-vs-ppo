@@ -1,12 +1,10 @@
 """Per-level Mario evaluation: the four tiers, aggregates and figures.
 
-BaseAgent.evaluate() pools everything into one number, which cannot answer the question this
-study is about, so each level is evaluated separately (mario_levels.SPLITS defines the tiers).
-
-Also plays chronological runs of the original game with warps allowed — the "how far did it get"
-number the per-level tiers cannot show.
-
-Eval seeds start at 777_000, disjoint from the training seeds (episode + 1).
+BaseAgent.evaluate() pools everything into one number, which cannot answer the generalisation
+question, so each level is evaluated separately against the tiers in mario_levels.SPLITS. Also
+plays chronological runs of the original game with warps allowed, for the "how far did it get"
+number the per-level tiers cannot show. Eval seeds start at 777_000, disjoint from the training
+seeds (episode + 1).
 """
 import csv
 import json
@@ -20,37 +18,13 @@ import torch
 
 import mario_levels as ML
 from env_factory import describe_env_params
-from utils import log
+from utils import log, select_action
 
 EVAL_SEED_BASE = 777_000
 POLICY_MODES = ("argmax", "stochastic", "topk3")
 
 
 # ── one episode ──────────────────────────────────────────────────────────────────────
-def _select_action(model, state, mode, device):
-    """Action selection for either algorithm. PPO exposes get_action(); DQN returns Q-values.
-    stochastic/topk3 are PPO-only (topk3 is the paper's k=3 variant) and fall back to argmax on a
-    value net, where the logits are Q-values rather than a policy."""
-    is_ppo = hasattr(model, "get_action")
-    with torch.no_grad():
-        if is_ppo:
-            if mode == "argmax":
-                action, _, _, value = model.get_action(state.unsqueeze(0), deterministic=True)
-                return int(action.item()), float(value.item())
-            logits, value = model(state.unsqueeze(0))
-            logits = logits.squeeze(0)
-            if mode == "topk3":
-                k = min(3, logits.numel())
-                top_vals, top_idx = torch.topk(logits, k)
-                pick = torch.distributions.Categorical(logits=top_vals).sample()
-                return int(top_idx[pick].item()), float(value.item())
-            pick = torch.distributions.Categorical(logits=logits).sample()
-            return int(pick.item()), float(value.item())
-
-        q = model(state.unsqueeze(0)).squeeze(0)
-        return int(q.argmax().item()), float(q.max().item())
-
-
 def _run_episode(agent, env, model, seed, metric, mode, device):
     state, _ = env.reset(seed=seed)
     state = torch.tensor(state, dtype=torch.float32).to(device)
@@ -58,7 +32,7 @@ def _run_episode(agent, env, model, seed, metric, mode, device):
     total, length, aux = 0.0, 0, []
 
     while not (terminated or truncated) and total < agent.stop_on_reward:
-        action, aux_val = _select_action(model, state, mode, device)
+        action, aux_val = select_action(model, state, mode)
         aux.append(aux_val)
         new_state, reward, terminated, truncated, info = env.step(action)
         total += reward
@@ -190,7 +164,6 @@ class GameProgressTracker:
 
     Separate from run_full_game so it can be unit-tested: no scripted policy clears 1-1, so
     driving this directly is the only way to check cross-stage tracking without a trained agent.
-    flag_get stays true for several frames, so clears are counted on the rising edge.
     """
 
     def __init__(self, info):
@@ -203,7 +176,6 @@ class GameProgressTracker:
         self.cleared = 0
         self.warps = 0
         self.stages_skipped = 0
-        self._prev_flag = False
 
     def update(self, info):
         label = f"{info['world']}-{info['stage']}"
@@ -214,23 +186,22 @@ class GameProgressTracker:
             self.best_index, self.best_stage = idx, label
         self.warps = max(self.warps, int(info.get("warps", 0)))
         self.stages_skipped = max(self.stages_skipped, int(info.get("stages_skipped", 0)))
-        # Count a clear on a forward stage transition without a warp, not on flag_get:
-        # _is_stage_over needs player_float_state == 3 (the flagpole slide), a window of a few
-        # NES frames that frame_skip=4 can miss entirely. Castle stages are unaffected (they
-        # report via _is_world_over), which is why only flagpole levels under-counted.
+        # A forward stage transition without a warp, not flag_get: _is_stage_over needs
+        # player_float_state == 3 (the flagpole slide), a few-frame window that frame_skip=4 can
+        # miss entirely. Castles report via _is_world_over instead, which is why only flagpole
+        # levels under-counted.
         warps_now = int(info.get("warps", 0))
         if idx > prev_best and warps_now == prev_warps:
             self.cleared += 1
-        self._prev_flag = bool(info.get("flag_get"))
 
 
 def run_full_game(agent, *, episodes=10, seed_base=888_000, policy_mode="argmax",
                   max_steps=20_000, log_file=None, device=None, video_dir=None):
     """Play the original game from 1-1, warps allowed, and report how far it got.
 
-    Uses the full-game env, so clearing a stage advances to the next and a warp really skips
-    ahead. One episode runs until game over, i.e. one playthrough attempt. "How far" is the
-    chronological stage index (1-1 -> 1, 8-4 -> 32), which counts a warp as real progress.
+    The full-game env, so clearing a stage advances and a warp really skips ahead. One episode is
+    one playthrough attempt. "How far" is the chronological stage index (1-1 -> 1, 8-4 -> 32),
+    which counts a warp as real progress.
     """
     from base_agent import device as default_device
     device = device or default_device
@@ -246,7 +217,7 @@ def run_full_game(agent, *, episodes=10, seed_base=888_000, policy_mode="argmax"
             total_ret, steps = 0.0, 0
 
             for steps in range(1, max_steps + 1):
-                action, _ = _select_action(model, state, policy_mode, device)
+                action, _ = select_action(model, state, policy_mode)
                 new_state, reward, terminated, truncated, info = env.step(action)
                 total_ret += reward
                 track.update(info)
@@ -308,9 +279,9 @@ def record_run(agent, *, level, seed, out_dir, name, policy_mode="argmax",
                max_steps=20_000, device=None):
     """Replay one episode with RecordVideo attached and write an mp4.
 
-    Cheap because a seed reproduces a run exactly: the emulator is deterministic and the no-op
-    and sticky draws are pure functions of the seed, so we can pick the run we want from the
-    summary and re-play precisely that one instead of recording all of them.
+    Cheap because a seed reproduces a run exactly -- the emulator is deterministic and the no-op
+    and sticky draws are pure functions of the seed -- so the wanted run can be picked from the
+    summary and replayed instead of recording all of them.
     """
     from gymnasium.wrappers import RecordVideo
     from base_agent import device as default_device
@@ -325,7 +296,7 @@ def record_run(agent, *, level, seed, out_dir, name, policy_mode="argmax",
         state, _ = env.reset(seed=seed)
         state = torch.tensor(state, dtype=torch.float32).to(device)
         for _ in range(max_steps):
-            action, _ = _select_action(model, state, policy_mode, device)
+            action, _ = select_action(model, state, policy_mode)
             state_np, _, terminated, truncated, info = env.step(action)
             state = torch.tensor(state_np, dtype=torch.float32).to(device)
             if terminated or truncated:
@@ -387,9 +358,9 @@ def _bootstrap_ci(values, n_boot=10_000, seed=0):
 def aggregate(per_level, split_name=ML.DEFAULT_SPLIT):
     """Macro-average over levels per tier, with bootstrap CIs.
 
-    Macro (each level equal) rather than pooling episodes: pooling ignores level clustering,
-    understates uncertainty and lets one high-variance level dominate. Non-monotone-x levels are
-    excluded from progress means but keep their flag rate.
+    Macro rather than pooling episodes: pooling ignores level clustering, understates uncertainty
+    and lets one high-variance level dominate. Non-monotone-x levels are excluded from progress
+    means but keep their flag rate.
     """
     out = {"split": split_name, "tiers": {}}
     by_tier = {}
@@ -576,9 +547,8 @@ def _write_csv(per_level, path):
 def _one_level_per_world(per_level):
     """The lowest-numbered evaluated stage of each SMB1 world.
 
-    Lowest rather than best-performing: a per-world best would pick different stages for
-    different algorithms, and the clips would no longer be comparable. Lost Levels ids carry no
-    SMB1 world and are skipped — request them explicitly if wanted.
+    Lowest rather than best-performing: a per-world best would pick different stages per algorithm
+    and the clips would stop being comparable. Lost Levels ids carry no SMB1 world and are skipped.
     """
     by_world = {}
     for level in per_level:

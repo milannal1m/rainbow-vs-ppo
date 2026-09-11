@@ -1,9 +1,8 @@
 """Mario env construction: the game-specific wrappers plus the multi-level env.
 
-Imports gym_super_mario_bros at module scope, so it must only be imported lazily (from the
-mario branch of env_factory.make_env) — it does not exist in the FlappyBird env.
-
-Most wrappers here work around upstream quirks; mario.md has the details.
+Imports gym_super_mario_bros at module scope, so env_factory.make_env imports this lazily from
+its Mario branch only -- the package does not exist in the FlappyBird environment. Most wrappers
+here work around one specific upstream quirk, named in each class docstring.
 """
 import numpy as np
 import gymnasium as gym
@@ -13,7 +12,7 @@ import gym_super_mario_bros  # noqa: F401  -- registers the SuperMarioBros* env 
 from gym_super_mario_bros.actions import RIGHT_ONLY, SIMPLE_MOVEMENT, COMPLEX_MOVEMENT
 from nes_py.wrappers import JoypadSpace
 
-from mario_levels import env_id_for, is_lost_levels, parse_level
+from mario_levels import env_id_for
 
 ACTION_SETS = {
     "RIGHT_ONLY": RIGHT_ONLY,              # 5
@@ -23,9 +22,9 @@ ACTION_SETS = {
 
 NES_FPS = 60
 
-# Salts keep the derived streams independent of each other and of the global torch/numpy seeds.
-# Every stochastic element is a pure function of the reset seed, so the same seed gives the same
-# episode for either algorithm.
+# Salts keep the derived streams independent of each other and of the global RNGs, so every
+# stochastic element is a pure function of the reset seed and both algorithms see the same
+# episode for a given seed.
 _NOOP_SALT   = 0x4E4F4F50  # "NOOP"
 _STICKY_SALT = 0x53544B59  # "STKY"
 _LEVEL_SALT  = 0x4C564C53  # "LVLS"
@@ -36,10 +35,7 @@ _PLAYER_STATE_DYING = 0x0b
 
 
 def action_labels(action_set="COMPLEX_MOVEMENT"):
-    """Human-readable action names, e.g. ['NOOP', 'right', 'right A', ...].
-
-    Used for the Grad-CAM panel labels, which are otherwise hardcoded to flap/no-flap.
-    """
+    """Action names for the Grad-CAM panels, which are otherwise hardcoded to flap/no-flap."""
     return [" ".join(buttons) for buttons in ACTION_SETS[action_set]]
 
 
@@ -48,12 +44,11 @@ def _rng(salt, seed):
     return np.random.default_rng([salt, int(seed) & 0x7FFFFFFF])
 
 
-# The x counter is a 16-bit page value (ram[0x6d]*256 + ram[0x86]). No SMB1 or Lost Levels stage
-# is longer than ~5000 px, so anything past this is an underflow wrap, not a position.
+# No SMB1 or Lost Levels stage is longer than ~5000 px, so anything past this is an underflow
+# wrap of the 16-bit x counter, not a position.
 MAX_PLAUSIBLE_X = 8192
-# Mario runs at under 4 px/frame, so a bigger single-frame jump is spurious. Needed as well as
-# the absolute bound: the underflow also emits 255 (only the low byte wrapped), which passes any
-# absolute check. Area transitions jump legitimately and are exempt.
+# Mario runs at under 4 px/frame. Needed as well as the absolute bound: the underflow also emits
+# 255 when only the low byte wrapped, which passes any absolute check. Area transitions are exempt.
 MAX_X_JUMP = 32
 
 
@@ -61,9 +56,9 @@ MAX_X_JUMP = 32
 class MarioSanitizeX(gym.Wrapper):
     """Repair `x_pos` when holding LEFT drives it below 0 and the RAM bytes wrap to 65535.
 
-    Not just a metrics problem: `_progress_reward` latches `_x_position_max` before its cap
-    check, so one wrap kills the dense progress reward for the rest of the episode. Must wrap
-    the ROM env directly so `self.env.unwrapped` is the SuperMarioBrosEnv.
+    Not just a metrics problem: `_progress_reward` latches `_x_position_max` before its cap check,
+    so one wrap kills the dense progress reward for the rest of the episode. Must wrap the ROM env
+    directly, so `self.env.unwrapped` is the SuperMarioBrosEnv.
     """
 
     def __init__(self, env):
@@ -116,24 +111,22 @@ class MarioSanitizeX(gym.Wrapper):
 class MarioAreaRebase(gym.Wrapper):
     """Rebase the env's max-x high-water mark when Mario changes area.
 
-    `x_pos` is a per-area counter that restarts after a pipe, but `_x_position_max` is not
-    reset, so the dense reward dies until x re-exceeds the old area's max. We keep a per-area
-    high-water mark instead of just resetting, so returning from a bonus room does not re-pay
-    reward already earned. Must sit below the frame-skip wrapper to see every frame.
+    `x_pos` restarts per area after a pipe but `_x_position_max` does not, so the dense reward
+    dies until x re-exceeds the old area's max. Marks are kept per area rather than reset, so
+    returning from a bonus room does not re-pay earned reward. Must sit below the frame-skip
+    wrapper to see every frame.
     """
 
     def __init__(self, env):
         super().__init__(env)
         self._area_max = {}
         self._prev_area = None
-        self.rebases = 0
 
     def reset(self, **kwargs):
         obs, info = self.env.reset(**kwargs)
         self._area_max = {}
         self._prev_area = info.get("area")
         self._area_max[self._prev_area] = info.get("x_pos_max", 0)
-        self.rebases = 0
         info["area_max"] = dict(self._area_max)
         return obs, info
 
@@ -149,7 +142,6 @@ class MarioAreaRebase(gym.Wrapper):
             self.env.unwrapped._x_position_max = restored
             info["x_pos_max"] = restored
             info["progress_max"] = restored
-            self.rebases += 1
 
         self._prev_area = area
         self._area_max[area] = max(self._area_max.get(area, 0), info.get("x_pos_max", 0))
@@ -211,27 +203,24 @@ class MarioWarpTracker(gym.Wrapper):
 class NoopResetWrapper(gym.Wrapper):
     """Take a seed-derived number of NOOP frames after reset, to decorrelate episodes.
 
-    The emulator restores a backup on reset, so identical seeds give identical rollouts. On
-    Mario this only decorrelates weakly (Mario stands still, so nothing scrolls) — sticky
-    actions do the real work. Kept because it is free and adds a little. k is a pure function
-    of the seed, so eval episodes stay paired across algorithms and checkpoints.
+    The emulator restores a backup on reset, so identical seeds would otherwise give identical
+    rollouts. On Mario this decorrelates only weakly -- standing still scrolls nothing, and sticky
+    actions do the real work -- but it is free. k is a pure function of the seed, so eval episodes
+    stay paired across algorithms.
     """
 
     def __init__(self, env, noop_max=30, noop_action=0):
         super().__init__(env)
         self.noop_max = int(noop_max)
         self.noop_action = noop_action
-        self.last_noops = 0
 
     def reset(self, *, seed=None, options=None):
         obs, info = self.env.reset(seed=seed, options=options)
         if self.noop_max <= 0:
-            self.last_noops = 0
             return obs, info
 
         gen = _rng(_NOOP_SALT, seed) if seed is not None else self.np_random
         k = int(gen.integers(0, self.noop_max + 1))
-        self.last_noops = k
 
         for _ in range(k):
             obs, _, terminated, truncated, info = self.env.step(self.noop_action)
@@ -273,23 +262,19 @@ class StickyActionWrapper(gym.Wrapper):
 
 
 class ClipScaleReward(gym.Wrapper):
-    """reward -> clip(reward, -clip, +clip) / divisor, on the summed agent-step reward.
+    """reward -> clip(reward, -clip, +clip) / divisor on the summed agent-step reward.
 
-    Sits above the frame-skip wrapper, so it acts on the sum of the 4 skipped frames. nes_env
-    already clamps each FRAME to reward_range = (-15, +15) (nes_env.step, after _get_reward), so
-    4 frames can still carry +-60. clip == divisor == 15 bounds the agent-step signal to [-1, +1],
-    which is what makes Rainbow's fixed C51 support viable. MarioEpisodeInfo records the unscaled
-    return for reporting.
+    Sits above the frame-skip wrapper, so it acts on the sum of the 4 skipped frames. The env has
+    already clamped each FRAME to its declared reward_range (-15, +15), so a sum can still carry
+    +-60; clip == divisor == 15 bounds an ordinary agent step to [-1, +1], which is what makes
+    Rainbow's fixed C51 support viable. MarioEpisodeInfo records the unscaled return.
 
-    completion_unclipped re-adds the env's one-off +50 completion bonus, read from
-    info["reward_components"]["completion"]. That component is raw, while the frame it arrived on
-    was already clamped to +15 by nes_env -- so no clip setting on this wrapper can recover the
-    bonus, and re-adding it from the components dict is the only route. Without it a completion
-    step scores the same +1 as sustained forward motion, so finishing a level carries no
-    distinctive weight and the agent is effectively optimised for distance rather than completion.
-    Ordinary steps are untouched, so tuned learning rates and the C51 support stay valid: the
+    completion_unclipped re-adds the one-off +50 flag bonus from
+    info["reward_components"]["completion"]. That component is raw while the frame it arrived on
+    was already clamped to +15, so no clip setting here can recover it -- the components dict is
+    the only route. Without it a completion scores the same +1 as sustained running, which asks
+    the agent to travel right rather than to finish. Ordinary steps are untouched, so the
     discounted value gains one ~+3.3 spike per episode instead of being rescaled.
-    Default False so pre-existing configs stay bit-identical.
     """
 
     def __init__(self, env, clip=15.0, divisor=15.0, completion_unclipped=False):
@@ -308,10 +293,8 @@ class ClipScaleReward(gym.Wrapper):
         if not self.completion_unclipped:
             return obs, self._scale(reward), terminated, truncated, info
         # info is the last inner frame's, which on a completion step IS the flag frame: the
-        # single-stage env terminates there and MaxAndSkipObservation breaks out early.
-        # reward_components carries the RAW component; nes_env has already clipped the frame it
-        # came in on, so the bonus is added on top rather than subtracted out -- there is no
-        # unclipped copy of it left in `reward` to remove.
+        # single-stage env terminates there. The bonus is ADDED, not subtracted out -- `reward`
+        # never contained the raw 50, only the +15 the env clamped that frame to.
         bonus = float((info.get("reward_components") or {}).get("completion", 0.0))
         scaled = self._scale(reward)
         if bonus:
@@ -323,9 +306,9 @@ class ClipScaleReward(gym.Wrapper):
 class MarioEpisodeInfo(gym.Wrapper):
     """Accumulate per-episode stats and emit them as info["episode"] on termination.
 
-    Sits below the frame-skip wrapper (sees every frame) and below the reward scaling, so
-    `return_raw` is the true unscaled return. `covered_px` sums per-area spans traversed, which
-    stays meaningful across area transitions where x_pos_max does not; pages = covered_px // 256.
+    Sits below the frame-skip wrapper and below the reward scaling, so it sees every frame and
+    `return_raw` is the true unscaled return. `covered_px` sums the per-area spans traversed,
+    which stays meaningful across the area transitions where x_pos_max does not.
     """
 
     def __init__(self, env, level=None):
@@ -430,7 +413,7 @@ class MultiLevelMarioEnv(gym.Env):
     """
 
     def __init__(self, levels, *, render_mode=None, action_set="COMPLEX_MOVEMENT",
-                 version="v0", sampler="seed_hash", frame_skip=4, use_gym_make=True,
+                 version="v0", sampler="seed_hash", frame_skip=4,
                  warp_bonus=0.0):
         if not levels:
             raise ValueError("MultiLevelMarioEnv needs at least one level")
@@ -439,7 +422,6 @@ class MultiLevelMarioEnv(gym.Env):
         self.action_set = action_set
         self.version = version
         self.sampler = sampler
-        self.use_gym_make = use_gym_make
         self.warp_bonus = warp_bonus
         self.metadata = {
             "render_modes": ["rgb_array", "human"],
@@ -448,7 +430,6 @@ class MultiLevelMarioEnv(gym.Env):
         }
 
         self._children = {}
-        self._forced_level = None
         self._current_level = self.levels[0]
         self._episodes = 0
 
@@ -467,15 +448,7 @@ class MultiLevelMarioEnv(gym.Env):
         env_id = (level if level.startswith("SuperMarioBros")
                   else env_id_for(level, version=self.version))
 
-        if self.use_gym_make:
-            env = gym.make(env_id, render_mode="rgb_array")
-        else:
-            # Fallback that skips gym.make's TimeLimit(OrderEnforcing(...)) stack entirely.
-            from gym_super_mario_bros import SuperMarioBrosEnv
-            target = parse_level("-".join(env_id.split("-")[1:-1]))
-            env = SuperMarioBrosEnv(lost_levels=is_lost_levels(env_id), target=target,
-                                    render_mode="rgb_array")
-
+        env = gym.make(env_id, render_mode="rgb_array")
         env = JoypadSpace(env, ACTION_SETS[self.action_set])
         env = MarioSanitizeX(env)      # must precede everything that reads x_pos
         env = MarioAreaRebase(env)
@@ -490,25 +463,17 @@ class MultiLevelMarioEnv(gym.Env):
 
     # -- level selection -----------------------------------------------------------
     def _pick_level(self, seed):
-        if self._forced_level is not None:
-            return self._forced_level
         if len(self.levels) == 1:
             return self.levels[0]
         if self.sampler == "round_robin":
             return self.levels[self._episodes % len(self.levels)]
         if self.sampler == "seed_hash" and seed is not None:
-            # Level is a pure function of the reset seed. Both train loops reset with
-            # seed=episode+1, so Rainbow and PPO see the same level sequence — and it stays
-            # independent of the global RNGs, which the two algorithms consume at different rates.
+            # Pure function of the reset seed. Both train loops reset with seed=episode+1, so
+            # the two algorithms see the same level sequence despite consuming the global RNGs
+            # at different rates.
             idx = int(_rng(_LEVEL_SALT, seed).integers(0, len(self.levels)))
             return self.levels[idx]
         return self.levels[int(self.np_random.integers(0, len(self.levels)))]
-
-    def set_level(self, level):
-        """Pin every subsequent reset to `level`; pass None to resume sampling."""
-        if level is not None and level not in self.levels:
-            raise ValueError(f"{level!r} is not in this env's level pool: {self.levels}")
-        self._forced_level = level
 
     @property
     def current_level(self):
@@ -517,10 +482,7 @@ class MultiLevelMarioEnv(gym.Env):
     # -- gym API -------------------------------------------------------------------
     def reset(self, *, seed=None, options=None):
         super().reset(seed=seed)
-        level = (options or {}).get("level") or self._pick_level(seed)
-        if level not in self.levels:
-            raise ValueError(f"{level!r} is not in this env's level pool: {self.levels}")
-
+        level = self._pick_level(seed)
         self._current_level = level
         self._episodes += 1
         obs, info = self._child(level).reset(seed=seed, options=None)
@@ -535,9 +497,8 @@ class MultiLevelMarioEnv(gym.Env):
         return obs, reward, terminated, truncated, info
 
     def render(self):
-        # .copy() is load-bearing: nes-py returns a zero-copy view of the emulator's screen
-        # buffer, so RecordVideo's frame list would otherwise hold N aliases of one buffer and
-        # every frame of the mp4 would show the final state.
+        # .copy() is load-bearing: nes-py returns a zero-copy view of the screen buffer, so
+        # RecordVideo would hold N aliases of it and every mp4 frame would show the final state.
         frame = self._child(self._current_level).render()
         return None if frame is None else frame.copy()
 
@@ -555,7 +516,7 @@ class MultiLevelMarioEnv(gym.Env):
 def make_mario_env(*, levels, render_mode=None, action_set="COMPLEX_MOVEMENT", version="v0",
                    frame_skip=4, reward_clip=15.0, reward_divisor=15.0, noop_max=30,
                    sticky_prob=0.25, max_episode_steps=3000, warp_bonus=0.0,
-                   level_sampler="seed_hash", use_gym_make=True,
+                   level_sampler="seed_hash",
                    completion_unclipped=False):
     """Assemble the Mario env, up to but not including the observation pipeline.
 
@@ -569,7 +530,6 @@ def make_mario_env(*, levels, render_mode=None, action_set="COMPLEX_MOVEMENT", v
         version=version,
         sampler=level_sampler,
         frame_skip=frame_skip,
-        use_gym_make=use_gym_make,
         warp_bonus=warp_bonus,
     )
     env = NoopResetWrapper(env, noop_max=noop_max)

@@ -1,4 +1,3 @@
-import gymnasium as gym
 import random
 import torch
 import yaml
@@ -11,10 +10,12 @@ import numpy as np
 
 from datetime import datetime
 
-from utils import log, save_eval_chart, record_episode
+from utils import (log, record_episode, save_eval_chart, save_preprocessed_sanity_check,
+                   select_action)
 from env_factory import make_env
 from env_metrics import make_metric_spec, action_labels_for
-from config import RUNS_DIR
+from checkpointing import EpisodeCSVLogger
+from config import DATE_FORMAT, RUNS_DIR
 
 device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
 
@@ -41,7 +42,6 @@ class BaseAgent:
         self.learning_rate_a   = hyperparams["learning_rate_a"]
         self.discount_factor_g = hyperparams["discount_factor_g"]
         self.stop_on_reward    = hyperparams["stop_on_reward"]
-        self.lr_decay_patience = hyperparams.get("lr_decay_patience", None)
         self.start_learning_after = hyperparams.get("start_learning_after", 0)
         self.max_env_steps     = hyperparams.get("max_env_steps", None)  # None = run until killed
         self.seed              = hyperparams.get("seed", None)
@@ -98,14 +98,86 @@ class BaseAgent:
     def _load_policy(self, env):
         raise NotImplementedError
 
-    def _run_episode_greedy(self, env, model, seed, collect_states=False, metric=None):
-        """Returns (reward, secondary, length, aux_vals, states).
+    def _policy_step(self, model, state):
+        """One greedy action for `state`, as (action:int, aux:float).
 
-        `secondary` is metric.value() — pipes for FlappyBird, pages for Mario. aux_vals is
-        algorithm-specific: Q-values for DQN, value estimates for PPO. Pass `metric` to read
-        `extras()` afterwards; the tuple stays a 5-tuple so existing callers are unaffected.
+        `aux` is what the algorithm reports alongside the action: the chosen Q-value for DQN, the
+        critic's estimate for PPO. Called under torch.no_grad().
         """
         raise NotImplementedError
+
+    def _run_episode_greedy(self, env, model, seed, collect_states=False, metric=None,
+                            collect_stride=1):
+        """One greedy episode, as (reward, secondary, length, aux_vals, states).
+
+        `secondary` is metric.value(): pipes on FlappyBird, pages on Mario. Pass `metric` to read
+        its `extras()` afterwards. Shared by both algorithms -- they differ only in _policy_step.
+
+        collect_states: False = none, True = every step (unbounded), int n = at most n states
+        taken every collect_stride steps, then stop the episode. The int form exists because
+        Grad-CAM needs ~10 states while a converged FlappyBird episode runs ~757k -- keeping all
+        of them is ~77 GB of stacked frames, i.e. an out-of-memory kill.
+        """
+        state, _ = env.reset(seed=seed)
+        state = torch.tensor(state, dtype=torch.float32).to(device)
+        terminated = False
+        truncated  = False
+        episode_reward = 0.0
+        episode_metric = metric if metric is not None else self.metric_spec.new()
+        episode_length = 0
+        aux_vals       = []
+        states         = []
+
+        want = None if collect_states is True else (int(collect_states) if collect_states else 0)
+
+        while not (terminated or truncated) and episode_reward < self.stop_on_reward:
+            if collect_states and (want is None or episode_length % collect_stride == 0):
+                states.append(state.clone())
+                if want is not None and len(states) >= want:
+                    break
+            with torch.no_grad():
+                action, aux = self._policy_step(model, state)
+            aux_vals.append(aux)
+            new_state, reward, terminated, truncated, info = env.step(action)
+            episode_reward += reward
+            episode_length += 1
+            episode_metric.update(reward, info)
+            state = torch.tensor(new_state, dtype=torch.float32).to(device)
+
+        return episode_reward, episode_metric.value(), episode_length, aux_vals, states
+
+    def _begin_training_run(self, restored, resume_note=None, record_video=True):
+        """Open the log and episode CSV and write the sanity-check figure.
+
+        Returns (start_time, csv_logger). `resume_note` is the algorithm's one-line description
+        of what a resume does and does not restore.
+        """
+        start_time = datetime.now()
+        log(f"{start_time.strftime(DATE_FORMAT)}: Training "
+            f"{'RESUMING' if restored else 'starting'}...", self.LOG_FILE,
+            mode='a' if restored else 'w')
+        log(f"Device: {device}", self.LOG_FILE)
+        if restored and resume_note:
+            log(resume_note, self.LOG_FILE)
+        csv_logger = EpisodeCSVLogger(self.EPISODES_CSV, resume=bool(restored))
+        if self.frame_stack and record_video:
+            save_preprocessed_sanity_check(self.env_id, self.env_make_params,
+                                           self.obs_size, self.frame_stack, self.RUN_DIR,
+                                           rgb_wrapper=self.rgb_wrapper)
+        return start_time, csv_logger
+
+    @staticmethod
+    def _counters(total_steps, episode, best_reward, best_greedy_reward,
+                  rewards_per_episode, pipes_per_episode, lengths_per_episode, **extra):
+        """The resume payload for save_run_state; `extra` carries algorithm-specific counters."""
+        return {
+            "total_steps": total_steps, "episode": episode,
+            "best_reward": best_reward, "best_greedy_reward": best_greedy_reward,
+            "rewards_per_episode": rewards_per_episode,
+            "pipes_per_episode": pipes_per_episode,
+            "lengths_per_episode": lengths_per_episode,
+            **extra,
+        }
 
     def _action_label(self, action):
         labels = getattr(self, "_action_labels", None)
@@ -167,10 +239,10 @@ class BaseAgent:
 
                 for i, s in enumerate(sampled):
                     inp = s.unsqueeze(0)
+                    action, _ = select_action(policy, s)
                     with torch.no_grad():
                         out = policy(inp)
                         logits = out[0].squeeze() if isinstance(out, tuple) else out.squeeze()
-                    action = logits.argmax().item()
 
                     grayscale_cam = cam(input_tensor=inp, targets=[ClassifierOutputTarget(action)])[0]
 

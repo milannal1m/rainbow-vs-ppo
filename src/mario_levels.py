@@ -1,7 +1,7 @@
 """Mario level inventory, archetypes and the frozen train/eval splits.
 
-Stdlib only: imported from env_factory under both conda envs, and gym_super_mario_bros only
-exists in the Mario one. The split is hardcoded rather than seeded — see SPLITS.
+Stdlib only, because env_factory imports it under both conda envs while gym_super_mario_bros
+exists in only one of them.
 """
 import os
 from dataclasses import dataclass
@@ -16,8 +16,8 @@ CASTLE      = "castle"
 
 ARCHETYPE_COUNTS = {GROUND: 13, ATHLETIC: 7, UNDERGROUND: 2, UNDERWATER: 2, CASTLE: 8}
 
-# Palette is a world-level property: worlds 3 and 6 are entirely night. Holding out either would
-# delete the night palette from training and make the eval palette extrapolation, not layout.
+# Palette is a world-level property; worlds 3 and 6 are entirely night. Holding out either would
+# remove the night palette from training, making the eval test palette rather than layout.
 NIGHT_WORLDS = frozenset({3, 6})
 
 
@@ -43,10 +43,10 @@ class LevelInfo:
 
 
 # ── Layout reuse (the leakage hazard) ────────────────────────────────────────────────
-# SMB1 ships several stages twice: the later one reuses the same ROM level data with a harder
-# enemy set. A split that straddles a twin pair measures "same layout, different palette" while
-# claiming to measure layout generalisation, so SPLITS keeps twins together — except for the two
-# pairs deliberately straddled to form the tier-0 control. Source: chridd.nfshost.com/smb-reuse
+# SMB1 ships several stages twice, the later one reusing the same ROM data with a harder enemy
+# set. Straddling a twin pair measures "same layout, different palette" while claiming to measure
+# layout generalisation, so SPLITS keeps twins together -- except the two pairs deliberately
+# straddled as the tier-0 control. Source: chridd.nfshost.com/smb-reuse
 TWIN_PAIRS = (
     ("1-3", "5-3"),
     ("1-4", "6-4"),
@@ -62,9 +62,9 @@ LOST_LEVELS_TWINS = {"C-3": "7-3", "C-4": "7-4"}
 # The only two stages with warp zones.
 WARP_LEVELS = frozenset({"1-2", "4-2"})
 
-# Warps are enabled and rewarded, so an agent training on 1-2 or 4-2 can travel into a stage that
-# is supposed to be held out. Every warp zone exits to the first stage of a later world, so
-# treating all X-1 stages as destinations is conservative and needs no per-zone table.
+# Warps are enabled and rewarded, so training on 1-2 or 4-2 can walk into a held-out stage. Every
+# warp zone exits to some world's first stage, so treating all X-1 as destinations is conservative
+# and needs no per-zone table.
 WARP_DESTINATIONS = frozenset(f"{world}-1" for world in range(1, 9))
 
 # Routing mazes: a wrong route loops back, so x_pos is non-monotone in skill and progress
@@ -149,10 +149,10 @@ def is_lost_levels(level_or_id):
 
 
 # ── The splits ───────────────────────────────────────────────────────────────────────
-# Explicit lists rather than a seeded shuffle: three constraints cannot be satisfied by a random
-# draw at once — twins must not straddle train/eval (except the deliberate tier-0 pair), every
-# eval archetype needs a training example, and eval difficulty must overlap training rather than
-# sit above it. A frozen list also goes into the report verbatim and cannot drift.
+# Explicit lists, not a seeded shuffle: no random draw satisfies all three constraints at once --
+# twins must not straddle train/eval (except the deliberate tier-0 pair), every eval archetype
+# needs a training example, and eval difficulty must overlap training rather than sit above it.
+# A frozen list also goes into the report verbatim and cannot drift.
 #
 #   train  memorisation ceiling — did it learn at all?
 #   tier0  positive control: layout twins of trained stages. If tier1/tier2 are 0% everywhere,

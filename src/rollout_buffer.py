@@ -4,17 +4,10 @@ import torch
 class RolloutBuffer:
     """On-policy rollout buffer with GAE advantage estimation.
 
-    Usage:
-        buffer.reset()
-        for each env step:
-            buffer.push(state, action, reward, log_prob, value, done)
-        buffer.finalize(last_value)   # compute GAE
-        for batch in buffer.get_minibatches(minibatch_size, device):
-            ...  # (states, actions, log_probs, advantages, returns)
+    reset() -> push() per env step -> finalize(last_value) to compute GAE -> get_minibatches().
     """
 
     def __init__(self, capacity, gamma, gae_lambda):
-        self.capacity   = capacity
         self.gamma      = gamma
         self.gae_lambda = gae_lambda
         self.reset()

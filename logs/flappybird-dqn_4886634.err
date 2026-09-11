@@ -1,9 +1,0 @@
-Traceback (most recent call last):
-  File "/opt/bwhpc/common/devel/miniforge/25.3.1-py3.12/condabin/conda", line 12, in <module>
-    from conda.cli import main
-ModuleNotFoundError: No module named 'conda'
-/home/ul/ul_student/ul_lmm50/.conda/envs/dqn-flappy-bird-cuda/lib/python3.11/site-packages/gymnasium/wrappers/rendering.py:292: UserWarning: [33mWARN: Overwriting existing videos at /pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/runs/flappybird_cnn4-2/checkpoint_videos folder (try specifying a different `video_folder` for the `RecordVideo` wrapper if this is not desired)[0m
-  logger.warn(
-/home/ul/ul_student/ul_lmm50/.conda/envs/dqn-flappy-bird-cuda/lib/python3.11/site-packages/gymnasium/wrappers/rendering.py:292: UserWarning: [33mWARN: Overwriting existing videos at /pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/runs/flappybird_cnn4-2/checkpoint_videos folder (try specifying a different `video_folder` for the `RecordVideo` wrapper if this is not desired)[0m
-  logger.warn(
-[2026-05-31T21:44:19.972] error: *** JOB 4886634 ON uc2n913 CANCELLED AT 2026-05-31T21:44:19 DUE to SIGNAL Terminated ***

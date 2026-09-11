@@ -1,16 +1,16 @@
 """Record a length-capped video of a trained policy playing.
 
-A full episode is not recordable once an agent converges: flappybird_ppo_tuned_3 survives
-~25,000 s of game time per episode (~758k frames), and RecordVideo buffers every frame in RAM
-at ~0.44 MB, i.e. ~335 GB. That is why `--evaluate` writes evaluation.png/.log but no mp4.
+A full episode is not recordable once an agent converges: a tuned FlappyBird policy survives
+~758k frames, and RecordVideo buffers every one in RAM at ~0.44 MB, i.e. ~335 GB. That is why
+`--evaluate` writes evaluation.png/.log but no mp4.
 
 --stream pipes frames straight into ffmpeg instead, so memory is O(1) and the only limits are
 compute time and disk (~75 MB for a 7-hour FlappyBird episode). Use it for anything long.
 
 Usage:
-    python src/record_video.py flappybird_ppo_tuned_3 --seconds 60
-    python src/record_video.py flappybird_ppo_tuned_3 --stream            # whole episode
-    python src/record_video.py mario_ppo --seconds 45 --seed 7 --level 1-1
+    python src/record_video.py flappybird_ppo_tuned --seconds 60
+    python src/record_video.py flappybird_ppo_tuned --stream            # whole episode
+    python src/record_video.py mario_ppo_tuned --seconds 45 --seed 7 --level 1-1
 """
 import argparse
 import os
@@ -21,12 +21,12 @@ import subprocess
 import yaml
 import torch
 
-from config import RUNS_DIR, HEADLESS
+from config import HEADLESS
 
 if HEADLESS:
     os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
 
-from utils import record_episode
+from utils import record_episode, select_action
 
 device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
 
@@ -71,10 +71,7 @@ def stream_episode(policy, env, seed, device, out_path, fps, max_steps=None):
         proc.stdin.write(frame.tobytes())
         while (not (terminated or truncated) and not stop["now"]
                and (max_steps is None or steps < max_steps)):
-            with torch.no_grad():
-                out = policy(state.unsqueeze(0))
-                logits = out[0] if isinstance(out, tuple) else out
-                action = logits.squeeze().argmax().item()
+            action, _ = select_action(policy, state)
             new_state, reward, terminated, truncated, _ = env.step(action)
             reward_total += reward
             steps += 1

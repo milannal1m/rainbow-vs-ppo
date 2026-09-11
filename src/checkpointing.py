@@ -1,12 +1,8 @@
 """Resume-from-checkpoint and durable per-episode metrics.
 
-Mario runs do not fit one SLURM job (10M steps is ~26 h against a 24 h wall clock), and before
-this a killed job lost everything: only model.state_dict() was written and the metric lists lived
-in RAM.
-
-The replay buffer is deliberately NOT checkpointed — 300k transitions is ~17 GB, too much to write
-every 15 minutes. A resumed Rainbow run refills from scratch and resume_refill_steps gates learning
-until it has; the discontinuity is logged rather than hidden.
+Mario runs do not fit one SLURM job, so model, optimizer, RNG state and the metric series all have
+to survive a kill. The replay buffer is written only once, at the wall clock, rather than on the
+periodic cadence -- see save_replay_buffer.
 """
 import csv
 import os

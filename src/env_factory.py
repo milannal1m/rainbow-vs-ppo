@@ -1,9 +1,8 @@
 """The single place that builds an env plus its observation pipeline.
 
-The wrapper chain used to be spelled out three times (BaseAgent._make_env, record_episode,
-save_preprocessed_sanity_check), each applying FlappyBirdResetFix unconditionally — which is why
-cartpole1 crashed. Mario is a branch here rather than a parallel pipeline, so preprocess_env stays
-shared; mario_env is imported lazily so nes_py is never touched in the FlappyBird env.
+Every caller goes through make_env, so game-specific wrappers cannot be applied to the wrong game.
+Mario is a branch here rather than a parallel pipeline, which keeps preprocess_env shared;
+mario_env is imported lazily so nes_py is never touched in the FlappyBird env.
 """
 import gymnasium as gym
 
@@ -19,7 +18,7 @@ GENERIC    = "generic"
 MARIO_WRAPPER_KEYS = frozenset({
     "action_set", "version", "frame_skip", "reward_clip", "reward_divisor",
     "noop_max", "sticky_prob", "max_episode_steps", "warp_bonus",
-    "level_sampler", "use_gym_make", "completion_unclipped",
+    "level_sampler", "completion_unclipped",
 })
 # Consumed by mario_levels.levels_from_config, not passed to the builder.
 MARIO_LEVEL_KEYS = frozenset({"levels", "level_split", "level_set"})

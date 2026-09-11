@@ -1,7 +1,6 @@
 """Pre-flight checks for the Mario stack. Run before training and on a new machine.
 
-Each check guards an invariant that can regress. The one-off investigations that shaped the design
-are gone — their conclusions live in constants and in mario.md.
+Each check guards an invariant that can regress, and its docstring states which one.
 
     python src/mario_probe.py                     # everything
     python src/mario_probe.py --only spaces,fps
@@ -276,26 +275,29 @@ def check_game_metric():
         return {"world": w, "stage": s, "flag_get": flag, "warps": warps,
                 "stages_skipped": skipped}
 
-    # clear 1-1, advance to 1-2, clear it, then die back at 1-1 on a later life
+    # Clears are counted on a forward stage transition, not on flag_get: _is_stage_over needs
+    # player_float_state == 3, a few-frame window frame_skip=4 can miss. The cost is that the
+    # LAST stage cleared in a run is never counted -- no transition follows it.
+    # Here: clear 1-1, advance to 1-2, clear that too, then die back at 1-1 on a later life.
     t = GameProgressTracker(info(1, 1))
-    for step in (info(1, 1), info(1, 1, flag=True), info(1, 1, flag=True),   # flag latches
+    for step in (info(1, 1), info(1, 1, flag=True), info(1, 1, flag=True),
                  info(1, 2), info(1, 2, flag=True), info(1, 2), info(1, 1)):
         t.update(step)
-    normal = (t.best_index == 2 and t.best_stage == "1-2" and t.cleared == 2
+    normal = (t.best_index == 2 and t.best_stage == "1-2" and t.cleared == 1
               and len(t.visited) == 2)
     print(f"       normal play: furthest={t.best_stage} (idx {t.best_index}) cleared={t.cleared} "
-          f"visited={len(t.visited)}")
-    print(f"{OK if normal else BAD}  advance tracked, flag latch counted once, regress ignored")
+          f"visited={len(t.visited)} (1-2's own clear is not counted, by design)")
+    print(f"{OK if normal else BAD}  advance tracked, transition counted once, regress ignored")
 
-    # a warp from 1-2 to 4-1 must count as real progress
+    # A warp from 1-2 to 4-1 is real progress, but it is not a stage clear.
     t = GameProgressTracker(info(1, 1))
     t.update(info(1, 2))
     t.update(info(4, 1, warps=1, skipped=11))
     warped = (t.best_index == 13 and t.best_stage == "4-1" and t.warps == 1
-              and t.stages_skipped == 11)
+              and t.stages_skipped == 11 and t.cleared == 1)
     print(f"       after a warp: furthest={t.best_stage} (idx {t.best_index}) "
-          f"warps={t.warps} skipped={t.stages_skipped}")
-    print(f"{OK if warped else BAD}  warp counted as progress, skip recorded")
+          f"warps={t.warps} skipped={t.stages_skipped} cleared={t.cleared}")
+    print(f"{OK if warped else BAD}  warp counted as progress and skip, but not as a clear")
 
     labels = [_index_to_stage(i) for i in (1, 4, 5, 13, 32)]
     idx_ok = labels == ["1-1", "1-4", "2-1", "4-1", "8-4"]
@@ -400,12 +402,18 @@ def check_fps():
 
 
 def check_compare(names):
-    """The env block must be identical between the two algorithm configs."""
+    """The task both algorithms face must be identical: env, observation pipeline, discount, seed.
+
+    max_env_steps is deliberately NOT compared. The runs are bounded by wall clock, not by steps,
+    and the caps configured here are orders of magnitude beyond what a run reaches, so they never
+    bind. It is set only on the DQN side because dqn_agent feeds it to metric_stride() to bound
+    the per-step metric series; PPO appends once per iteration and needs no such hint.
+    """
     _hdr(f"COMPARE — {' vs '.join(names)}")
     with open("hyperparams.yml") as f:
         hp = yaml.safe_load(f)
     keys = ("env_id", "env_package", "env_make_params", "frame_stack", "obs_size", "rgb_wrapper",
-            "discount_factor_g", "max_env_steps", "stop_on_reward", "seed")
+            "discount_factor_g", "stop_on_reward", "seed")
     cfgs = {n: hp[n] for n in names}
     diffs = [k for k in keys if len({repr(c.get(k)) for c in cfgs.values()}) > 1]
     for k in keys:
@@ -430,7 +438,7 @@ def main():
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--only", help=f"comma-separated subset of: {','.join(CHECKS)}")
     p.add_argument("--compare", nargs=2, metavar=("A", "B"),
-                   default=["mario_rainbow", "mario_ppo"],
+                   default=["mario_rainbow_tuned", "mario_ppo_tuned"],
                    help="config pair whose env blocks must match")
     a = p.parse_args()
 

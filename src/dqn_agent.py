@@ -2,7 +2,6 @@ import random
 import signal
 import torch
 import itertools
-import os
 import numpy as np
 
 from datetime import datetime, timedelta
@@ -10,10 +9,9 @@ from datetime import datetime, timedelta
 from base_agent import BaseAgent, device
 from experience_replay import ReplayMemory, PrioritizedReplayMemory, NStepBuffer
 from dqn import NETWORK_REGISTRY, optimize, mean_sigma
-from utils import log, save_graph, record_episode, save_preprocessed_sanity_check
-from checkpointing import (EpisodeCSVLogger, episode_row, load_replay_buffer,
-                           load_run_state, metric_stride, save_replay_buffer,
-                           save_run_state, CHECKPOINT_STATE_SECONDS)
+from utils import log, save_graph, record_episode
+from checkpointing import (episode_row, load_replay_buffer, load_run_state, metric_stride,
+                           save_replay_buffer, save_run_state, CHECKPOINT_STATE_SECONDS)
 from config import DATE_FORMAT, CHECKPOINT_EVERY, REPLAY_MEMORY_SEED, GRAPH_UPDATE_SECONDS
 
 
@@ -32,7 +30,7 @@ class DQNAgent(BaseAgent):
         self.epsilon_min          = hyperparams["epsilon_min"]
         self.network_sync_rate    = hyperparams["network_sync_rate"]
         self.enable_double_dqn    = hyperparams.get("enable_double_dqn", False)
-        self.network_type         = hyperparams.get("network_type", "dqn")
+        self.network_type         = hyperparams.get("network_type", "cnn_dqn")
         # One gradient step every `replay_period` env steps. Hessel et al. 2018 use 4; the default
         # is 1 so every pre-existing config keeps its exact old behaviour. Note that
         # network_sync_rate stays in ENV steps, so at period 4 the target net updates 4x more
@@ -81,9 +79,7 @@ class DQNAgent(BaseAgent):
                 use_distributional=self.use_distributional,
                 n_atoms=self.n_atoms, v_min=self.v_min, v_max=self.v_max,
             ).to(device)
-        if self.network_type == "cnn_dqn":
-            return cls(num_states, num_actions, self.hidden_dim, obs_size=self.obs_size).to(device)
-        return cls(num_states, num_actions, self.hidden_dim).to(device)
+        return cls(num_states, num_actions, self.hidden_dim, obs_size=self.obs_size).to(device)
 
     def _load_policy(self, env):
         num_actions = env.action_space.n
@@ -93,40 +89,9 @@ class DQNAgent(BaseAgent):
         policy_dqn.eval()
         return policy_dqn
 
-    def _run_episode_greedy(self, env, policy_dqn, seed, collect_states=False, metric=None,
-                            collect_stride=1):
-        state, _ = env.reset(seed=seed)
-        state = torch.tensor(state, dtype=torch.float32).to(device)
-        terminated = False
-        truncated  = False
-        episode_reward = 0.0
-        episode_metric = metric if metric is not None else self.metric_spec.new()
-        episode_length = 0
-        episode_q      = []
-        states         = []
-
-        # collect_states: False = none, True = every frame (unbounded), int n = at most n frames
-        # taken every collect_stride steps, then stop. The int form exists because Grad-CAM needs
-        # ~10 frames while a converged FlappyBird episode is ~757k steps -- collecting all of them
-        # is ~77 GB and was what OOM-killed job 6709373.
-        want = None if collect_states is True else (int(collect_states) if collect_states else 0)
-
-        while not (terminated or truncated) and episode_reward < self.stop_on_reward:
-            if collect_states and (want is None or episode_length % collect_stride == 0):
-                states.append(state.clone())
-                if want is not None and len(states) >= want:
-                    break
-            with torch.no_grad():
-                q_vals = policy_dqn(state.unsqueeze(0)).squeeze()
-            action = q_vals.argmax().item()
-            episode_q.append(q_vals.max().item())
-            new_state, reward, terminated, truncated, info = env.step(action)
-            episode_reward += reward
-            episode_length += 1
-            episode_metric.update(reward, info)
-            state = torch.tensor(new_state, dtype=torch.float32).to(device)
-
-        return episode_reward, episode_metric.value(), episode_length, episode_q, states
+    def _policy_step(self, policy_dqn, state):
+        q_vals = policy_dqn(state.unsqueeze(0)).squeeze()
+        return q_vals.argmax().item(), q_vals.max().item()
 
     def train(self, report_cb=None, record_video=True, resume=False):
         # report_cb(step, metric): optional hook (used by HPO) called once per episode;
@@ -144,10 +109,6 @@ class DQNAgent(BaseAgent):
 
         optimizer = torch.optim.Adam(policy_dqn.parameters(), lr=self.learning_rate_a,
                                      eps=self.adam_eps)
-        lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-            optimizer, mode='max', factor=0.5, patience=self.lr_decay_patience, min_lr=1e-6
-        ) if self.lr_decay_patience else None
-
         if self.use_per:
             memory = PrioritizedReplayMemory(self.replay_memory_size, alpha=self.per_alpha)
         else:
@@ -201,22 +162,12 @@ class DQNAgent(BaseAgent):
                                f"{refill_until} while it refills -- expect a brief off-policy "
                                f"discontinuity here.")
 
-        start_time = datetime.now()
+        start_time, csv_logger = self._begin_training_run(
+            restored, record_video=record_video,
+            resume_note=(f"Resumed at step {total_steps}, episode {start_episode}. {buffer_note}"
+                         if restored else None))
         last_graph_update_time = start_time
         last_state_save_time   = start_time
-        log_mode = 'a' if restored else 'w'
-        log(f"{start_time.strftime(DATE_FORMAT)}: Training "
-            f"{'RESUMING' if restored else 'starting'}...", self.LOG_FILE, mode=log_mode)
-        log(f"Device: {device}", self.LOG_FILE)
-        if restored:
-            log(f"Resumed at step {total_steps}, episode {start_episode}. {buffer_note}",
-                self.LOG_FILE)
-        csv_logger = EpisodeCSVLogger(self.EPISODES_CSV, resume=bool(restored))
-
-        if self.frame_stack and record_video:
-            save_preprocessed_sanity_check(self.env_id, self.env_make_params,
-                                           self.obs_size, self.frame_stack, self.RUN_DIR,
-                                           rgb_wrapper=self.rgb_wrapper)
 
         # SLURM's --signal=USR1@N fires N seconds before the wall clock. Flag rather than raise,
         # so the loop leaves through its own `finally` and the one-off buffer save can run.
@@ -343,13 +294,6 @@ class DQNAgent(BaseAgent):
                 if report_cb is not None:
                     report_cb(total_steps, float(np.mean(rewards_per_episode[-100:])))
 
-                if lr_scheduler and total_steps > self.start_learning_after:
-                    lr_before = optimizer.param_groups[0]['lr']
-                    lr_scheduler.step(np.mean(rewards_per_episode[-100:]))
-                    lr_after = optimizer.param_groups[0]['lr']
-                    if lr_after < lr_before:
-                        log(f"{datetime.now().strftime(DATE_FORMAT)} Episode {episode}: LR reduced {lr_before:.2e} → {lr_after:.2e}", self.LOG_FILE)
-
                 if episode_reward > best_reward:
                     best_reward = episode_reward
                     torch.save(policy_dqn.state_dict(), self.MODEL_FILE_TRAINING)
@@ -384,29 +328,21 @@ class DQNAgent(BaseAgent):
                 # time-based, so a wall-clock kill loses at most CHECKPOINT_STATE_SECONDS
                 if datetime.now() - last_state_save_time > timedelta(seconds=CHECKPOINT_STATE_SECONDS):
                     save_run_state(self.STATE_FILE, model=policy_dqn, optimizer=optimizer,
-                                   counters={
-                                       "total_steps": total_steps, "episode": next_episode,
-                                       "best_reward": best_reward,
-                                       "best_greedy_reward": best_greedy_reward,
-                                       "epsilon": epsilon,
-                                       "rewards_per_episode": rewards_per_episode,
-                                       "pipes_per_episode": pipes_per_episode,
-                                       "lengths_per_episode": lengths_per_episode,
-                                   })
+                                   counters=self._counters(
+                                       total_steps, next_episode, best_reward,
+                                       best_greedy_reward, rewards_per_episode,
+                                       pipes_per_episode, lengths_per_episode,
+                                       epsilon=epsilon))
                     last_state_save_time = datetime.now()
         finally:
             # final save, so a clean exit is resumable too
             try:
                 save_run_state(self.STATE_FILE, model=policy_dqn, optimizer=optimizer,
-                               counters={
-                                   "total_steps": total_steps, "episode": next_episode,
-                                   "best_reward": best_reward,
-                                   "best_greedy_reward": best_greedy_reward,
-                                   "epsilon": epsilon,
-                                   "rewards_per_episode": rewards_per_episode,
-                                   "pipes_per_episode": pipes_per_episode,
-                                   "lengths_per_episode": lengths_per_episode,
-                               })
+                               counters=self._counters(
+                                   total_steps, next_episode, best_reward,
+                                   best_greedy_reward, rewards_per_episode,
+                                   pipes_per_episode, lengths_per_episode,
+                                   epsilon=epsilon))
             except Exception as exc:  # noqa: BLE001
                 print(f"[checkpoint] final save failed: {exc}")
             if stop_soon["now"] or self.max_env_steps:

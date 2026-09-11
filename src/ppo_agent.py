@@ -1,6 +1,5 @@
 import torch
 import itertools
-import os
 import numpy as np
 
 from datetime import datetime, timedelta
@@ -8,8 +7,8 @@ from datetime import datetime, timedelta
 from base_agent import BaseAgent, device
 from ppo import PPO_NETWORK_REGISTRY, ppo_optimize
 from rollout_buffer import RolloutBuffer
-from utils import log, save_graph, record_episode, save_preprocessed_sanity_check
-from checkpointing import (EpisodeCSVLogger, episode_row, load_run_state, save_run_state,
+from utils import log, save_graph, record_episode
+from checkpointing import (episode_row, load_run_state, save_run_state,
                            CHECKPOINT_STATE_SECONDS)
 from config import DATE_FORMAT, CHECKPOINT_EVERY, GRAPH_UPDATE_SECONDS
 
@@ -22,7 +21,7 @@ class PPOAgent(BaseAgent):
 
         hyperparams = self.hyperparams  # resolved by BaseAgent (file or injected dict)
 
-        self.network_type   = hyperparams.get("network_type", "ppo")
+        self.network_type   = hyperparams.get("network_type", "ppo_cnn")
         self.rollout_steps  = hyperparams.get("rollout_steps", 2048)
         self.ppo_epochs     = hyperparams.get("ppo_epochs", 10)
         self.minibatch_size = hyperparams.get("minibatch_size", 64)
@@ -39,9 +38,7 @@ class PPOAgent(BaseAgent):
 
     def _build_model(self, num_states, num_actions):
         cls = PPO_NETWORK_REGISTRY[self.network_type]
-        if self.network_type == "ppo_cnn":
-            return cls(num_states, num_actions, self.hidden_dim, obs_size=self.obs_size).to(device)
-        return cls(num_states, num_actions, self.hidden_dim).to(device)
+        return cls(num_states, num_actions, self.hidden_dim, obs_size=self.obs_size).to(device)
 
     def _load_policy(self, env):
         num_actions  = env.action_space.n
@@ -51,39 +48,9 @@ class PPOAgent(BaseAgent):
         actor_critic.eval()
         return actor_critic
 
-    def _run_episode_greedy(self, env, actor_critic, seed, collect_states=False, metric=None,
-                            collect_stride=1):
-        state, _ = env.reset(seed=seed)
-        state = torch.tensor(state, dtype=torch.float32).to(device)
-        terminated = False
-        truncated  = False
-        episode_reward = 0.0
-        episode_metric = metric if metric is not None else self.metric_spec.new()
-        episode_length = 0
-        value_estimates = []
-        states = []
-
-        # collect_states: False = none, True = every frame (unbounded), int n = at most n frames
-        # taken every collect_stride steps, then stop. The int form exists because Grad-CAM needs
-        # ~10 frames while a converged FlappyBird episode is ~757k steps -- collecting all of them
-        # is ~77 GB and was what OOM-killed job 6709373.
-        want = None if collect_states is True else (int(collect_states) if collect_states else 0)
-
-        while not (terminated or truncated) and episode_reward < self.stop_on_reward:
-            if collect_states and (want is None or episode_length % collect_stride == 0):
-                states.append(state.clone())
-                if want is not None and len(states) >= want:
-                    break
-            with torch.no_grad():
-                action, _, _, value = actor_critic.get_action(state.unsqueeze(0), deterministic=True)
-            value_estimates.append(value.item())
-            new_state, reward, terminated, truncated, info = env.step(action.item())
-            episode_reward += reward
-            episode_length += 1
-            episode_metric.update(reward, info)
-            state = torch.tensor(new_state, dtype=torch.float32).to(device)
-
-        return episode_reward, episode_metric.value(), episode_length, value_estimates, states
+    def _policy_step(self, actor_critic, state):
+        action, _, _, value = actor_critic.get_action(state.unsqueeze(0), deterministic=True)
+        return action.item(), value.item()
 
     def train(self, report_cb=None, record_video=True, resume=False):
         # report_cb(step, metric): optional hook (used by HPO) called once per PPO iteration;
@@ -97,13 +64,10 @@ class PPOAgent(BaseAgent):
         actor_critic = self._build_model(num_states, num_actions)
 
         optimizer = torch.optim.Adam(actor_critic.parameters(), lr=self.learning_rate_a, eps=1e-5)
-        # Prefer linear LR annealing for PPO: its reward signal is too noisy for reliable
-        # plateau detection. ReduceLROnPlateau is kept only as a fallback when annealing is off.
+        # Linear annealing rather than plateau detection: PPO's reward signal is too noisy for
+        # a plateau to be identified reliably.
         use_lr_anneal   = bool(self.lr_anneal_steps)
         lr_floor_logged = False
-        lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-            optimizer, mode='max', factor=0.5, patience=self.lr_decay_patience, min_lr=1e-6
-        ) if (self.lr_decay_patience and not use_lr_anneal) else None
 
         buffer = RolloutBuffer(self.rollout_steps, self.discount_factor_g, self.gae_lambda)
 
@@ -131,23 +95,13 @@ class PPOAgent(BaseAgent):
             pipes_per_episode   = restored.get("pipes_per_episode", [])
             lengths_per_episode = restored.get("lengths_per_episode", [])
 
-        start_time = datetime.now()
+        start_time, csv_logger = self._begin_training_run(
+            restored, record_video=record_video,
+            resume_note=(f"Resumed at step {global_step}, episode {episode}. PPO is on-policy, so "
+                         f"there is no replay buffer to refill -- the resume is exact apart from "
+                         f"the in-flight rollout."))
         last_graph_update_time = start_time
         last_state_save_time   = start_time
-        log_mode = 'a' if restored else 'w'
-        log(f"{start_time.strftime(DATE_FORMAT)}: Training "
-            f"{'RESUMING' if restored else 'starting'}...", self.LOG_FILE, mode=log_mode)
-        log(f"Device: {device}", self.LOG_FILE)
-        if restored:
-            log(f"Resumed at step {global_step}, episode {episode}. PPO is on-policy, so there is "
-                f"no replay buffer to refill — the resume is exact apart from the in-flight rollout.",
-                self.LOG_FILE)
-        csv_logger = EpisodeCSVLogger(self.EPISODES_CSV, resume=bool(restored))
-
-        if self.frame_stack and record_video:
-            save_preprocessed_sanity_check(self.env_id, self.env_make_params,
-                                           self.obs_size, self.frame_stack, self.RUN_DIR,
-                                           rgb_wrapper=self.rgb_wrapper)
 
         # episode / global_step are set above (0, or resumed). seed=episode+1 also picks the
         # Mario level, so resuming keeps the sequence.
@@ -267,13 +221,6 @@ class PPOAgent(BaseAgent):
                 if report_cb is not None and rewards_per_episode:
                     report_cb(global_step, float(np.mean(rewards_per_episode[-100:])))
 
-                if lr_scheduler and rewards_per_episode and global_step > self.start_learning_after:
-                    lr_before = optimizer.param_groups[0]['lr']
-                    lr_scheduler.step(np.mean(rewards_per_episode[-100:]))
-                    lr_after = optimizer.param_groups[0]['lr']
-                    if lr_after < lr_before:
-                        log(f"{datetime.now().strftime(DATE_FORMAT)} Episode {episode}: LR reduced {lr_before:.2e} → {lr_after:.2e}", self.LOG_FILE)
-
                 if datetime.now() - last_graph_update_time > timedelta(seconds=GRAPH_UPDATE_SECONDS):
                     save_graph(
                         rewards_per_episode, pipes_per_episode, lengths_per_episode,
@@ -305,14 +252,3 @@ class PPOAgent(BaseAgent):
                 print(f"[checkpoint] final save failed: {exc}")
             csv_logger.close()
             env.close()
-
-    @staticmethod
-    def _counters(global_step, episode, best_reward, best_greedy_reward,
-                  rewards_per_episode, pipes_per_episode, lengths_per_episode):
-        return {
-            "total_steps": global_step, "episode": episode,
-            "best_reward": best_reward, "best_greedy_reward": best_greedy_reward,
-            "rewards_per_episode": rewards_per_episode,
-            "pipes_per_episode": pipes_per_episode,
-            "lengths_per_episode": lengths_per_episode,
-        }

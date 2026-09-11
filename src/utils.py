@@ -178,6 +178,33 @@ def _rename_latest_video(video_dir, new_filename):
         pass
 
 
+def select_action(model, state, mode="argmax"):
+    """Greedy (or sampled) action for either algorithm, as (action:int, aux:float).
+
+    PPO exposes get_action(), DQN returns Q-values; `aux` is the critic estimate or the chosen
+    Q-value. stochastic/topk3 are PPO-only -- topk3 is the paper's k=3 variant -- and fall back
+    to argmax on a value net, where the "logits" are Q-values rather than a policy.
+    """
+    is_ppo = hasattr(model, "get_action")
+    with torch.no_grad():
+        if is_ppo:
+            if mode == "argmax":
+                action, _, _, value = model.get_action(state.unsqueeze(0), deterministic=True)
+                return int(action.item()), float(value.item())
+            logits, value = model(state.unsqueeze(0))
+            logits = logits.squeeze(0)
+            if mode == "topk3":
+                k = min(3, logits.numel())
+                top_vals, top_idx = torch.topk(logits, k)
+                pick = torch.distributions.Categorical(logits=top_vals).sample()
+                return int(top_idx[pick].item()), float(value.item())
+            pick = torch.distributions.Categorical(logits=logits).sample()
+            return int(pick.item()), float(value.item())
+
+        q = model(state.unsqueeze(0)).squeeze(0)
+        return int(q.argmax().item()), float(q.max().item())
+
+
 def record_episode(policy_dqn, env_id, env_make_params, video_dir, name_prefix,
                    stop_on_reward, seed, device, obs_size=None, frame_stack=None, rgb_wrapper=False,
                    record_video=True, levels=None, max_steps=None):
@@ -209,10 +236,7 @@ def record_episode(policy_dqn, env_id, env_make_params, video_dir, name_prefix,
 
     while (not (terminated or truncated) and episode_reward < stop_on_reward
            and (max_steps is None or steps < max_steps)):
-        with torch.no_grad():
-            out = policy_dqn(state.unsqueeze(0))
-            logits = out[0] if isinstance(out, tuple) else out
-            action = logits.squeeze().argmax().item()
+        action, _ = select_action(policy_dqn, state)
         new_state, reward, terminated, truncated, _ = env.step(action)
         episode_reward += reward
         steps += 1

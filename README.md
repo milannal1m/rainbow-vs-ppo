@@ -1,234 +1,275 @@
-# Flappy Bird & Super Mario Bros RL
+# Rainbow DQN vs. PPO on Flappy Bird and Super Mario Bros.
 
-Training reinforcement-learning agents on **two games** from pixel observations, with the same two algorithms and the same entry point. The game is chosen by the config, not the command.
+A compute-matched comparison of two reinforcement learning methods learning from pixels alone.
+Both agents get the same environment, the same observation pipeline, the same reward transform
+and the same wall-clock budget; only the algorithm differs. On Mario they train on 20 levels and
+are evaluated on 21 held-out ones, 12 of them from *Super Mario Bros.: The Lost Levels*, to
+measure generalisation rather than memorisation of a single stage.
 
-- **Flappy Bird** — vector and pixel observations.
-- **Super Mario Bros (NES)** — a level *generalisation* study: train on a subset of levels, evaluate zero-shot on disjoint subsets. See [Super Mario Bros](#super-mario-bros-nes) below.
+## Layout
 
-Two algorithm families are supported, selected per-config via an `algorithm` key:
+```
+src/            all Python; run everything from the repo root
+scripts/        SLURM batch scripts
+environments/   conda environment files
+hyperparams.yml the four reported configurations
+runs/           training artifacts, evaluations, figures
+```
 
-- **DQN** (value-based, off-policy): standard DQN, Double DQN, Dueling DQN, CNN-DQN, and a full Rainbow variant (PER, n-step, Noisy Nets, distributional C51) via a plug-and-play network registry.
-- **PPO** (policy-gradient, on-policy): actor-critic with GAE, clipped surrogate objective, and an entropy bonus for exploration. Available with an MLP (`ppo`) or a CNN backbone (`ppo_cnn`).
-
-Inspired by [DeepLearningFlappyBird](https://github.com/yenchenlin/DeepLearningFlappyBird) and [dqn_pytorch](https://github.com/johnnycode8/dqn_pytorch).
-
----
+| Module | Purpose |
+|---|---|
+| `agent.py` | CLI entry point: train, evaluate, per-level evaluate |
+| `base_agent.py` | Shared agent: config loading, run directories, greedy rollout, evaluation, Grad-CAM |
+| `dqn_agent.py` / `ppo_agent.py` | The two training loops; they differ only in `_policy_step` for evaluation |
+| `dqn.py` / `ppo.py` | Networks and gradient updates. `NETWORK_REGISTRY` maps a config's `network_type` to a class |
+| `experience_replay.py` | Uniform and prioritised replay (sum tree), n-step buffer |
+| `rollout_buffer.py` | On-policy rollout buffer with GAE |
+| `env_factory.py` | The one place an env plus its observation pipeline is built |
+| `env_metrics.py` | Per-game secondary metric (pipes vs. pages), axis labels, frame rate |
+| `mario_env.py` | Mario wrappers and the multi-level env |
+| `mario_levels.py` | Level inventory, archetypes, the frozen train/eval splits |
+| `mario_eval.py` | Per-level evaluation, tier aggregates, figures, videos |
+| `mario_probe.py` | Pre-flight checks for the Mario stack |
+| `mario_rom.py` / `mario_route_table.py` | Build the route table used for normalised progress |
+| `checkpointing.py` | Resume state, per-episode CSV, replay-buffer checkpoint |
+| `tune.py` | Optuna hyperparameter search |
+| `record_video.py` | Record a policy, streaming frames to ffmpeg |
+| `utils.py` | Logging, plots, observation preprocessing, action selection |
 
 ## Installation
 
-### Local (Mac / CPU)
+Two conda environments are needed: Mario requires Python 3.13 (`gym-super-mario-bros`), Flappy
+Bird runs on 3.11. Use the `-cuda` files on a GPU node.
 
 ```bash
-conda env create -f environment.yml
-conda activate fp_dqn
+conda env create -f environments/flappybird.yml        # -> dqn-flappy-bird
+conda env create -f environments/mario.yml             # -> mario-rl
+conda env create -f environments/flappybird-cuda.yml   # -> dqn-flappy-bird-cuda
+conda env create -f environments/mario-cuda.yml        # -> mario-rl-cuda
 ```
 
-### Cluster (CUDA)
+On macOS, `export KMP_DUPLICATE_LIB_OK=TRUE` before running anything locally.
 
-```bash
-conda env create -f environment-cuda.yml
-conda activate dqn-flappy-bird-cuda
-```
+## The four reported configurations
 
-> **Note:** `torch.cuda.is_available()` returns `False` on login nodes — this is expected. CUDA is only available on compute nodes allocated by SLURM.
+All use seed 42 and the same observation pipeline: 4 stacked grayscale frames, 80×80 for Flappy
+Bird and 84×84 for Mario, scaled to [0, 1].
 
-### Super Mario Bros (separate env)
-
-`gym-super-mario-bros` 9.1.0 requires **Python ≥ 3.13**, so Mario gets its own environment. The
-same source tree serves both games: Mario configs set `env_package: gym_super_mario_bros`, which is
-what `BaseAgent.__init__` imports instead of `flappy_bird_gymnasium`.
-
-```bash
-conda env create -f environment-mario.yml        # local  (mario-rl)
-conda env create -f environment-mario-cuda.yml  # cluster (mario-rl-cuda)
-```
-
-> On macOS, conda-forge's `llvm-openmp` and the pip torch wheel each ship a `libomp.dylib`, so
-> local runs need `KMP_DUPLICATE_LIB_OK=TRUE`. Cluster runs are unaffected.
-
----
+| Config | Algorithm | Hidden width | Game |
+|---|---|---|---|
+| `flappybird_ppo_tuned` | PPO | 512 | Flappy Bird |
+| `flappybird_rainbow_tuned` | Rainbow DQN | 256 | Flappy Bird |
+| `mario_ppo_tuned` | PPO | 512 | Super Mario Bros. |
+| `mario_rainbow_tuned` | Rainbow DQN | 512 | Super Mario Bros. |
 
 ## Running
 
-The **same entry point runs both DQN and PPO** — the algorithm is chosen by the config, not the command. Each set in `hyperparams.yml` carries an `algorithm` key (`"dqn"` by default, or `"ppo"`); `src/agent.py` dispatches to the right agent automatically. So switching from DQN to PPO is just passing a different config name.
-
-### Train locally
+Everything is invoked from the repo root, so relative paths resolve.
 
 ```bash
-conda activate fp_dqn
+# train
+python src/agent.py flappybird_ppo_tuned --train
+python src/agent.py mario_rainbow_tuned --train --resume       # continue from <run>_state.pt
 
-# DQN
-python src/agent.py flappybird7 --train
+# evaluate: N greedy episodes, writes metrics.json + Grad-CAM + chart
+python src/agent.py flappybird_ppo_tuned --evaluate --episodes 25
+python src/agent.py flappybird_ppo_tuned --evaluate --episodes 10 --resume   # add 10 more
 
-# PPO (CNN backbone)
-python src/agent.py flappybird_ppo --train
+# Mario: per-level evaluation over the tiers, plus chronological full-game runs
+python src/agent.py mario_ppo_tuned --evaluate-levels
+python src/agent.py mario_ppo_tuned --evaluate-levels train,tier1 --episodes-per-level 30
 ```
 
-### Test (with display)
+### On the cluster
+
+**Size the allocation before you submit.** The `#SBATCH` lines in `scripts/` are defaults that
+suit a Flappy Bird PPO run; they are not right for every job, and memory in particular is not
+symmetric between the two algorithms. Rainbow holds a replay buffer of stacked frames, PPO holds
+nothing between updates:
+
+| Job | Replay buffer | Measured peak | Sensible `--mem` |
+|---|---|---|---|
+| Mario PPO | — | 2.9 GB | 16000 |
+| Mario Rainbow | 400k x (4,84,84) = 22.7 GB | 36.2 GB | 64000 |
+| Flappy Bird PPO | — | ~3 GB | 16000 |
+| Flappy Bird Rainbow | 1M x (4,80,80) = 51.4 GB | — | 96000 |
+
+Override what the job needs on the `sbatch` line rather than editing the scripts:
 
 ```bash
-python src/agent.py flappybird7        # DQN
-python src/agent.py flappybird_ppo     # PPO
+sbatch scripts/train.sh flappybird_ppo_tuned
+
+sbatch --mem=64000 --time=12:00:00 \
+       --export=ALL,CONDA_ENV=mario-rl-cuda scripts/train.sh mario_rainbow_tuned
+
+sbatch --export=ALL,CONDA_ENV=mario-rl-cuda \
+       scripts/evaluate.sh mario_ppo_tuned --evaluate-levels
 ```
 
-### Evaluate (100 greedy episodes; Grad-CAM for CNN configs)
+Extra flags after the config name are passed through to `agent.py`. Check your quota before
+starting a Rainbow run: `--resume` also writes the replay buffer to disk (~23 GB on Mario).
 
-```bash
-python src/agent.py flappybird_ppo --evaluate
-```
+### Evaluation flags
 
-### Submit to cluster
-
-The SLURM scripts take the config name as an argument, so they work for **either algorithm** — just pass a PPO config:
-
-```bash
-# Train — default config (flappybird_cnn1)
-sbatch train.sh
-
-# Train — specific DQN config
-sbatch train.sh flappybird8
-
-# Train — PPO config
-sbatch train.sh flappybird_ppo
-
-# Evaluate a trained config
-sbatch evaluate.sh flappybird_ppo
-```
-
-All available configs are defined in `hyperparams.yml`.
-
-### Adding a PPO config
-
-Create a new set in `hyperparams.yml` with `algorithm: "ppo"`. Key PPO parameters (with `flappybird_ppo` defaults): `network_type` (`ppo` MLP or `ppo_cnn`), `rollout_steps` (2048), `ppo_epochs` (10), `minibatch_size` (64), `clip_eps` (0.2), `gae_lambda` (0.95), `vf_coef` (0.5), `ent_coef` (0.01, the exploration knob), and `max_grad_norm` (0.5). For a CNN config, also set `network_type: "ppo_cnn"`, `frame_stack`, `obs_size`, and `rgb_wrapper`.
-
----
-
-## Super Mario Bros (NES)
-
-A level-generalisation study: train on a subset of the 32 SMB1 stages, evaluate zero-shot on
-disjoint subsets. Configs: `mario_rainbow`, `mario_ppo` (multi-level), `mario_rainbow_1_1` /
-`mario_ppo_1_1` (single level, for comparison with the CS224R paper), plus `*_debug` smoke tests.
-
-```bash
-conda activate mario-rl                                  # locally: prefix KMP_DUPLICATE_LIB_OK=TRUE
-python src/mario_probe.py                                # run FIRST: validates the whole env stack
-python src/agent.py mario_ppo_debug --train              # ~3k-step smoke test
-python src/agent.py mario_ppo --train                    # real run
-python src/agent.py mario_ppo --train --resume           # continue after a wall-clock kill
-python src/agent.py mario_ppo --evaluate-levels          # four-tier eval + 10 chronological game runs
-
-# cluster
-sbatch --export=ALL,CONDA_ENV=mario-rl-cuda train.sh mario_rainbow
-```
-
-**Resume is required, not optional.** At ~100–210 agent steps/s, 10M steps exceeds the 24 h SLURM
-wall clock, so a full run spans several jobs. `--resume` restores model, optimizer, RNG state and
-counters from `<run>_state.pt`; per-episode metrics are appended to `runs/<run>/episodes.csv`, which
-survives a `kill -9`. The replay buffer is *not* checkpointed (~17 GB), so a resumed Rainbow run
-gates learning for `resume_refill_steps` while the buffer refills — this is logged, not hidden.
-
-**Evaluation tiers** (defined in `src/mario_levels.py`, split `smb1_stage_holdout`):
-
-| Tier | Levels | Question |
+| Flag | Default | Effect |
 |---|---|---|
-| `train` | 20 | did it learn at all? (memorisation ceiling) |
-| `tier0` | 2 (5-3, 7-2) | **positive control** — layout twins of trained stages. Should be clearly non-zero |
-| `tier1` | 7 | in-distribution generalisation to novel layouts |
-| `tier2` | 12 Lost Levels | out-of-distribution (novel layouts *and* mechanics) |
-| excluded | 4-4, 7-4, 8-4 | routing mazes; appendix only |
+| `--episodes` | 100 | Greedy episodes for `--evaluate`; with `--resume` these are *added* to `evaluation/episodes_eval.csv` |
+| `--evaluate-levels [TIERS]` | all four tiers | Per-level Mario evaluation; `train,tier0,tier1,tier2` |
+| `--episodes-per-level` | 30 | Episodes per level |
+| `--full-game-runs` | 10 | Chronological runs of the original game, warps allowed; 0 to skip |
+| `--policy` | `argmax` | `argmax`, `stochastic` or `topk3` (the last two are PPO-only) |
+| `--levels` | — | Evaluate only these levels, e.g. `1-1,5-3` |
+| `--videos` | `per_world` | `per_world`, `all`, `none`, or a list |
+| `--videos-per-level` | 1 | Clips per level, best episodes first |
+| `--grad-cam` | `best` | `best`, `all`, `none`, or a list of levels |
+| `--grad-cam-frames` / `--grad-cam-stride` | 10 / 25 | The episode stops once the frames are collected, so at most `frames × stride` agent steps are simulated |
 
-Plus, alongside the per-level tiers, **10 chronological runs of the original game** (`SuperMarioBros-v0`, warps allowed, one episode = one playthrough attempt until game over), reporting the mean and max furthest stage reached, stages cleared, and warps used.
+### Recording a video
 
-**Warps are enabled and rewarded** (`warp_bonus`, paid per stage skipped). One consequence is baked into the split: every warp zone exits to an X-1 stage, so no X-1 stage may be held out — otherwise an agent training on 1-2 could warp straight into the eval set. `mario_levels._validate()` asserts this at import.
-
-The split is a **frozen protocol commitment**, not a random draw: SMB1 reuses whole level layouts
-across five stage pairs, so a naive split would silently measure "same layout, different palette".
-`mario_levels._validate()` asserts at import that no twin pair straddles train/tier1 and that every
-held-out archetype has a training representative. Tier 0 deliberately *does* straddle two twins —
-that is what distinguishes a real negative result from a broken eval harness.
-
-Design rationale, verified upstream-behaviour gotchas, and the decision log live in `mario.md`
-(gitignored).
-
----
-
-## Automatic hyperparameter tuning
-
-`src/tune.py` runs an **Optuna** search (TPE sampler + Hyperband pruning) over any of the three algorithms, using the same agents as normal training. Because a full run takes ~24h, the search trains many **short proxy runs** in parallel and prunes weak ones early, then you run only the winner at full length.
-
-`hyperparametertune.sh` packs several trials onto each of 4 A100s in one SLURM job (training is CPU/env-bound, so the GPUs sit near-idle otherwise):
+`--evaluate` writes no mp4: a converged Flappy Bird policy survives ~758k frames, and buffering
+those in RAM would need ~335 GB. `record_video.py` streams frames straight into ffmpeg instead,
+which is constant in memory.
 
 ```bash
-# Search one algorithm (dqn | rainbow | ppo). Args: <algorithm> [n_trials] [trials_per_gpu]
-sbatch --time=48:00:00 hyperparametertune.sh rainbow 400   # Rainbow: give it 48h (see below)
-sbatch hyperparametertune.sh dqn 400
-
-# PPO is replay-free — request less RAM/CPU:
-sbatch --mem=64000 --cpus-per-task=24 hyperparametertune.sh ppo 400
+python src/record_video.py flappybird_ppo_tuned --stream            # whole episode
+python src/record_video.py mario_ppo_tuned --seconds 45 --level 1-1
+sbatch scripts/stream_video.sh flappybird_ppo_tuned
 ```
 
-**Packing (`trials_per_gpu`) defaults per algorithm:** PPO / vanilla DQN are env-bound (GPU near-idle), so they pack **3/GPU**. Rainbow is GPU-compute-bound (C51 + noisy nets + dueling saturate the card), so it packs **1/GPU** — overpacking it just slows every trial. You can override with the 3rd arg.
+## Environments
 
-**Objective:** the **25th-percentile** greedy reward over `--eval-episodes` (default 30) deterministic episodes (`--objective p25|median|mean`, default `p25`). p25 is deliberately robust: it ignores lucky one-off long episodes and penalizes unstable configs (those that collapse on some seeds) — a plain mean gets inflated by a single tail episode and selects for entropy-collapse-prone configs. **What's tuned vs fixed:** fast-acting knobs (learning rate, batch size, PPO `ent_coef`/`clip_eps`/`ppo_epochs`, etc.) are searched; horizon-dependent ones are handled specially — `replay_memory_size` is **fixed** (a short proxy can't fill a large buffer, so it has no signal), while epsilon decay is searched as a **horizon-relative fraction** (`epsilon_frac`) that transfers from the proxy to the full run.
+### Flappy Bird
 
-**Fairness across algorithms:** the yardstick is identical for all three (same proxy budget, same p25 eval, same `--n-trials`, same pruner) — that's what makes the comparison valid. Because Rainbow is slower and packs 1/GPU, it completes fewer trials in a fixed wall-clock, so give it the full 48h and check `completed trials` in each `summary.txt`; compare studies at roughly equal completed-trial counts.
+`flappy-bird-gymnasium` 0.4.0, played from the rendered frame rather than the 12-dimensional
+feature vector. Rewards are already normalised: +1 per pipe, +0.1 per surviving step, −0.5 for
+leaving the top of the screen, −1 on collision, so no reward transform is applied.
 
-**Results** land in `runs/hpo/<study>/`:
+An episode ends only on collision and the environment registers no step limit, so a competent
+policy plays indefinitely; episodes are stopped once the return reaches 10⁵. Wherever that cap
+binds, the reported reward measures the cap rather than the policy.
 
-| File | Contents |
-|---|---|
-| `<study>.journal` | the Optuna study — the authoritative record of every config tried |
-| `trials.csv` | flat table: params + objective value + state, one row per trial |
-| `optimization_history.png`, `param_importances.png`, `parallel_coordinate.png`, `slice.png` | search plots |
-| `summary.txt` | best value + config |
+The upstream implementation leaks three variables across episodes (wing animation, ground scroll
+offset, flap flag), all of which reach the rendered frame. `FlappyBirdResetFix` resets them, which
+is what makes an episode a pure function of its seed.
 
-The best config is appended to `hyperparams.yml` as `flappybird_<algorithm>_tuned`. Run it at full length with the normal script:
+### Super Mario Bros.
+
+`gym-super-mario-bros` 9.1.0 on `nes-py` 9.0.1, COMPLEX_MOVEMENT (12 actions), 4-frame skip.
+Sticky actions (p = 0.25) and up to 30 no-op starts decorrelate the deterministic emulator; both
+are active during evaluation as well as training.
+
+**Reward transform.** One agent step spans 4 emulator frames whose rewards are summed. The
+environment already clamps each *frame* to its declared range of ±15, so the sum is clipped to
+±15 again and divided by 15 — one unit is one maximal frame reward as the environment defines it.
+The +50 flag bonus is exempt from that clip and re-added from the info dictionary, because the
+per-frame clamp has already reduced it to +15 and no setting above the environment can recover
+it. Without the exemption a completed level scores +1.000 against the +0.800 of sustained
+running, which asks the agent to travel right rather than to finish. See `ClipScaleReward` in
+`mario_env.py`.
+
+**Level splits** (`mario_levels.py`). `smb1_stage_holdout` is the protocol split:
+
+| Tier | n | Contents |
+|---|---|---|
+| `train` | 20 | Trained on |
+| `tier0` | 2 | Layout twins of trained stages — a positive control: if tier1/tier2 are 0 % everywhere, this is what separates a real negative result from a broken harness |
+| `tier1` | 7 | Novel SMB1 layouts |
+| `tier2` | 12 | *The Lost Levels* — novel layouts and novel mechanics |
+| excluded | 3 | Maze stages, where horizontal progress is not monotone in skill |
+
+Layout twins are kept on the same side of the split, except the two pairs deliberately straddled
+to form tier 0. No X-1 stage is held out, because warp zones exit to them and warps are enabled.
+
+## Hyperparameter search
 
 ```bash
-sbatch train.sh flappybird_ppo_tuned
+sbatch scripts/hyperparametertune.sh ppo 200
+sbatch --export=ALL,CONDA_ENV=mario-rl-cuda,TUNE_ENV=mario \
+       scripts/hyperparametertune.sh rainbow 200
 ```
 
-Local smoke test (few tiny trials, CPU/MPS):
+Optuna with a multivariate TPE sampler and Hyperband pruning; many workers share one file-based
+study. Nine parameters are searched for PPO and eight for Rainbow, over ranges identical in both
+games. `TUNE_ENV` is mandatory for Mario. Results land in `runs/hpo/<study>/` and the winner is
+appended to `hyperparams.yml` as `<env>_<algo>_tuned`.
+
+The objective differs by game and defaults accordingly: the 25th percentile of episode return on
+Flappy Bird, where unbounded episodes make the mean outlier-driven, and the mean on Mario, where
+mostly-zero flag rates collapse the percentile to zero.
+
+## Checks
+
+`mario_probe.py` runs the Mario stack's invariants — observation shapes, the x-underflow guard,
+area rebasing, decorrelation, warp tracking, the level splits, and that both algorithm configs
+face an identical task:
 
 ```bash
-python src/tune.py --algorithm ppo --n-trials 4 --proxy-steps 5000 --eval-episodes 5
-python src/tune.py --algorithm ppo --study ppo --report-only
+python src/mario_probe.py
+python src/mario_probe.py --only spaces,fps
 ```
 
-Per-worker trials run under `runs/hpo/<study>/trials/` (lightweight — no videos) and never touch top-level `runs/`.
+`mario_levels.py` additionally validates the split at import: no overlap between tiers, no twin
+straddling outside tier 0, every eval archetype represented in training.
 
----
+## Reproducing the reported results
 
-## Project Structure
+All four runs use seed 42 on one A100. Flappy Bird fits a single 24-hour job; Mario needs
+about 30 hours, which the partition's wall clock does not allow in one go, so it is run in
+blocks of 12 + 12 + 6 hours joined by `--resume`.
 
-| File | Description |
-|---|---|
-| `agent.py` | Main entry point. Reads the config's `algorithm` key and dispatches to `DQNAgent` or `PPOAgent`; handles `--train`, `--evaluate`, and test modes. |
-| `base_agent.py` | Shared `BaseAgent` base class: environment construction, evaluation, Grad-CAM (`explain()`), and the common `test`/`evaluate` loops. |
-| `dqn.py` | DQN network definitions (`DQN`, `DuelingDQN`, `CNNDQN`, Rainbow) and the `optimize` function. New architectures can be added to `NETWORK_REGISTRY`. |
-| `dqn_agent.py` | `DQNAgent` — the DQN/Rainbow training loop. |
-| `experience_replay.py` | DQN buffers: uniform `ReplayMemory` (local RNG for reproducibility), `PrioritizedReplayMemory` (PER via a sum-tree), and `NStepBuffer` (multi-step returns). |
-| `ppo.py` | PPO network definitions (`ActorCritic`, `CNNActorCritic`; `PPO_NETWORK_REGISTRY`) and the `ppo_optimize` step (clipped surrogate + value loss + entropy bonus). |
-| `ppo_agent.py` | `PPOAgent` — the PPO training loop (collect rollout → GAE → epochs of minibatch updates). |
-| `rollout_buffer.py` | On-policy `RolloutBuffer` with GAE advantage estimation; wiped each iteration. |
-| `tune.py` | Optuna hyperparameter search (search spaces, objective, pruning, plots, winner export). The only module that imports Optuna. `--env {flappybird,mario}` selects the game. |
-| `utils.py` | Preprocessing pipeline, video recording, sanity check, logging, and the shared `save_graph` (labels adapt to DQN vs PPO and to the game). |
-| `env_factory.py` | **The single owner of environment construction** — the one place that builds an env plus its observation pipeline, for either game. Replaces three duplicated wrapper chains. |
-| `env_metrics.py` | The per-game "secondary metric" layer (pipes vs pages cleared), episode-length FPS, graph labels, and Grad-CAM action names. Derived from `env_id`, so a config cannot pick the wrong one. |
-| `checkpointing.py` | Resume support (`save_run_state` / `load_run_state`: model + optimizer + counters + RNG), the append-only per-episode CSV, and the per-step metric striding that bounds memory on long runs. |
-| `mario_levels.py` | Mario level inventory, archetypes, documented layout twins, and the frozen train/eval splits. Stdlib only, so it imports under either conda env. Self-validates the split at import. |
-| `mario_env.py` | Mario wrappers (`MarioSanitizeX`, `MarioAreaRebase`, `MarioWarpGuard`, `MarioEpisodeInfo`, no-op/sticky/reward-scale) and `MultiLevelMarioEnv`, which switches level on `reset()`. Imported lazily. |
-| `mario_eval.py` | Four-tier per-level evaluation plus the chronological full-game runs; macro aggregates with bootstrap CIs, jackknife sensitivity, 8×4 heatmaps and bar charts. |
-| `mario_probe.py` | Pre-flight checks for the Mario stack — **run it before any training**. Each check guards an invariant that can regress (see `mario.md`). |
-| `config.py` | Global constants (`RUNS_DIR`, `CHECKPOINT_EVERY`, `HEADLESS`, etc.). Set `HEADLESS=1` as an environment variable to suppress the display (done automatically in `train.sh`/`evaluate.sh`). |
-| `hyperparams.yml` | All training configurations. Each named set maps to one experiment; the `algorithm` key selects DQN or PPO. |
-| `environment.yml` | Conda environment for local CPU/MPS training (Flappy Bird, python 3.11). |
-| `environment-cuda.yml` | Conda environment for cluster GPU training (CUDA 12.4). |
-| `environment-mario.yml` / `-cuda.yml` | Mario environments (python 3.13 — required by `gym-super-mario-bros` 9.1). |
-| `train.sh` | SLURM training job script. Accepts the config name; set `CONDA_ENV` to pick the environment (defaults to the Flappy Bird one). |
-| `evaluate.sh` | SLURM evaluation job script. Accepts the config name as an argument. |
-| `hyperparametertune.sh` | SLURM job that packs multiple Optuna trials across 4 GPUs for one algorithm, then exports the best config. |
+```bash
+# Flappy Bird: one 24 h block each
+sbatch                --time=24:00:00 --mem=16000 scripts/train.sh flappybird_ppo_tuned
+sbatch                --time=24:00:00 --mem=96000 scripts/train.sh flappybird_rainbow_tuned
 
-Training outputs (logs, model checkpoints, graphs, videos) are saved under `runs/<config_name>/`. Hyperparameter-search outputs are saved under `runs/hpo/<study>/`. Mario runs additionally write `episodes.csv` (one row per episode, durable across crashes), `<run>_state.pt` (resume state), and per-level evaluation under `runs/<config_name>/evaluation/mario/`.
+# Mario: ~30 h as 12 + 12 + 6, the second and third block with --resume
+M="--export=ALL,CONDA_ENV=mario-rl-cuda"
+sbatch $M --time=12:00:00 --mem=16000 scripts/train.sh mario_ppo_tuned
+sbatch $M --time=12:00:00 --mem=16000 scripts/train.sh mario_ppo_tuned --resume
+sbatch $M --time=06:00:00 --mem=16000 scripts/train.sh mario_ppo_tuned --resume
 
----
+sbatch $M --time=12:00:00 --mem=64000 scripts/train.sh mario_rainbow_tuned
+sbatch $M --time=12:00:00 --mem=64000 scripts/train.sh mario_rainbow_tuned --resume
+sbatch $M --time=06:00:00 --mem=64000 scripts/train.sh mario_rainbow_tuned --resume
+
+# evaluation
+sbatch    scripts/evaluate.sh flappybird_ppo_tuned --evaluate --episodes 25
+sbatch $M scripts/evaluate.sh mario_ppo_tuned --evaluate-levels
+```
+
+Reported numbers come from the best checkpoint of a run — selected by a greedy probe episode
+during training — not from the final weights. Each run is a single seed: the wall-clock budget
+did not allow repetition, so no difference carries a variance estimate.
+
+A Mario run does not fit one SLURM job. `--resume` continues from `<run>_state.pt`, which carries
+the model, optimizer, RNG state and metric series. Rainbow additionally writes its replay buffer
+once at the wall clock, so a resumed run continues with a full buffer instead of refilling for
+~1.4 hours; that file is large (~23 GB on Mario) and is not tracked.
+
+## Watching the agents
+
+The clips are committed, so you can just open them.
+
+`runs/<config>/checkpoint_videos/` shows training progress: one greedy episode saved every so
+often, named `checkpoint_ep<episode>_r<reward>.mp4`. Sorted by episode you can watch the policy
+come together. The reward in the name is where that episode ended, almost always by dying.
+
+`runs/<mario config>/evaluation/mario/videos/` has one clip per level from its best evaluation
+episode, `level_<level>_end<stage>_pages<n>.mp4`, where `pages` is how far it got. The held-out
+levels carry their Lost Levels id (`level_SuperMarioBros2-...`). `fullgame_best` and
+`fullgame_worst` are chronological runs of the original game.
+
+The really long recordings are not in here. A converged Flappy Bird policy does not stop on its
+own — one uncapped episode ran 18 hours of game time before it finally died — and files like that
+have no business in a git repository. Use `scripts/stream_video.sh` if you want one.
+
+## Credits
+
+The convolutional trunk borrows from two sources and departs from both. Kernel sizes, strides
+and channel counts are those of Mnih et al. (2015), which reduces resolution by striding alone;
+[yenchenlin/DeepLearningFlappyBird](https://github.com/yenchenlin/DeepLearningFlappyBird) pools
+after every convolution. This implementation pools once, after the first convolution, which is
+neither. The Flappy Bird preprocessing otherwise follows yenchenlin.
+
+Games: [flappy-bird-gymnasium](https://github.com/markub3327/flappy-bird-gymnasium) and
+[gym-super-mario-bros](https://github.com/Kautenja/gym-super-mario-bros).

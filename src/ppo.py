@@ -16,36 +16,6 @@ def layer_init(layer, gain=np.sqrt(2), bias=0.0):
     return layer
 
 
-class ActorCritic(nn.Module):
-    """Actor-Critic with shared MLP trunk for vector observations."""
-
-    def __init__(self, num_states, num_actions, hidden_dim):
-        super().__init__()
-        self.shared = nn.Sequential(
-            layer_init(nn.Linear(num_states, hidden_dim)),
-            nn.ReLU(),
-            layer_init(nn.Linear(hidden_dim, hidden_dim)),
-            nn.ReLU(),
-        )
-        self.actor  = layer_init(nn.Linear(hidden_dim, num_actions), gain=0.01)
-        self.critic = layer_init(nn.Linear(hidden_dim, 1), gain=1.0)
-
-    def forward(self, x):
-        features = self.shared(x)
-        return self.actor(features), self.critic(features).squeeze(-1)
-
-    def get_action(self, x, deterministic=False):
-        logits, value = self(x)
-        dist = Categorical(logits=logits)
-        action = logits.argmax(-1) if deterministic else dist.sample()
-        return action, dist.log_prob(action), dist.entropy(), value
-
-    def evaluate_actions(self, x, actions):
-        logits, values = self(x)
-        dist = Categorical(logits=logits)
-        return dist.log_prob(actions), dist.entropy(), values
-
-
 class CNNActorCritic(nn.Module):
     """Actor-Critic with shared CNN backbone for pixel observations.
     Uses the same conv stack as CNNDQN so Grad-CAM works identically."""
@@ -96,7 +66,6 @@ class CNNActorCritic(nn.Module):
 
 
 PPO_NETWORK_REGISTRY = {
-    "ppo":     ActorCritic,
     "ppo_cnn": CNNActorCritic,
 }
 

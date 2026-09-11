@@ -1,11 +1,7 @@
 """The per-env secondary metric (pipes vs pages), its axis label and its frame rate.
 
-The shared training/eval code used to hardcode FlappyBird specifics in four places: the
-`reward >= 1.0` pipe counter, a 30 FPS assumption, the axis label, and the Grad-CAM action names.
-
-Derived from env_id rather than a new YAML key, so a FlappyBird config cannot accidentally get the
-Mario metric and a Mario config cannot forget to set one. For FlappyBird every value here matches
-the old inline code, and metrics.json keeps eval_pipes_mean.
+Derived from env_id rather than a YAML key, so a FlappyBird config cannot accidentally get the
+Mario metric and a Mario config cannot forget to set one.
 """
 from env_factory import FLAPPYBIRD, MARIO, env_kind
 

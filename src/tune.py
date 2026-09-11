@@ -1,17 +1,11 @@
-"""Unified Optuna hyperparameter tuning for DQN / Rainbow / PPO.
+"""Optuna hyperparameter tuning for DQN / Rainbow / PPO.
 
-This is the ONLY module that knows about Optuna. It drives the existing agents through
-their public hooks (`hyperparams` dict injection, `run_name`, `max_env_steps`, the
-`report_cb`/`record_video` args on `train()`, and the `record_artifacts` arg on
-`evaluate()`); it never modifies them.
+The only module that knows about Optuna; it drives the agents through their public hooks and
+never modifies them. Worker mode (default) runs study.optimize(), with many workers sharing one
+file-based study; --report-only loads a finished study, writes trials.csv, plots and a summary,
+and appends the winner to hyperparams.yml as <env>_<algo>_tuned.
 
-Two modes:
-  * worker (default): run `study.optimize()` — many workers share one file-based study.
-  * `--report-only`: load a finished study, write trials.csv + plots + summary, and append
-    the best config to hyperparams.yml as `<env>_<algo>_tuned`
-    (`flappybird_<algo>_tuned` for the default env).
-
-Run from the repo root, e.g.:
+Run from the repo root:
     python src/tune.py --algorithm ppo --n-trials 40 --proxy-steps 300000
     python src/tune.py --algorithm ppo --study ppo_123 --report-only
     python src/tune.py --env mario --algorithm rainbow --n-trials 60
@@ -22,7 +16,6 @@ os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
 
 import argparse
 import csv
-import sys
 
 import numpy as np
 import torch
@@ -42,22 +35,18 @@ torch.set_num_threads(max(1, int(os.environ.get("OMP_NUM_THREADS", "2"))))
 BASE_SEED = 42
 HPO_DIR = os.path.join(RUNS_DIR, "hpo")
 
-# Throttle intermediate pruning reports to at most one per this many env steps. DQN/Rainbow
-# would otherwise report per-episode (~50 steps) and, with many workers on a shared journal,
-# hammer the file lock — the cause of the Rainbow study starving out. PPO already reports
-# per-iteration (~1-4k steps), so this barely affects it.
+# One pruning report per this many env steps. Rainbow would otherwise report per episode and,
+# with many workers on a shared journal, hammer the file lock -- which starved the first Rainbow
+# study. PPO already reports per iteration, so it barely notices.
 REPORT_INTERVAL_STEPS = 5000
 
-# Objective statistic over the greedy-eval episodes. p25 (default) is robust to lucky-tail
-# episodes AND penalises unstable configs (those dying on >25% of seeds), unlike the mean,
-# which the first study inflated 27x on a single lucky episode.
+# Objective over the greedy-eval episodes. p25 resists lucky tails and penalises configs that
+# die on >25% of seeds; the mean does neither -- one lucky episode inflated it 27x.
 OBJECTIVE_KEYS = {"p25": "eval_reward_p25", "median": "eval_reward_median", "mean": "eval_reward_mean"}
 
 # ── Base configs (fixed keys per algorithm) ──────────────────────────────────────────
-# Pixel pipeline matching the hand-tuned flappybird_ppo / flappybird_cnn / flappybird_rainbow
-# sets. The tuner overrides the searched keys on top of these.
 # Env blocks are merged onto the algorithm base at build time, so the search spaces stay
-# per-algorithm while the env is a separate CLI dimension.
+# per-algorithm while the env stays a separate CLI dimension.
 _ENV_FLAPPYBIRD = {
     "env_id": "FlappyBird-v0",
     "env_make_params": {"use_lidar": False, "background": None},
@@ -66,12 +55,10 @@ _ENV_FLAPPYBIRD = {
     "rgb_wrapper": True,
 }
 
-# Mario trials use the SAME 20 training levels as the real run. smb1_hpo (4 levels, all
-# ground archetype) was unfaithful: it tuned a homogeneous 4-task problem while the run is a
-# heterogeneous 20-task one, and the winning config lost to a hand-set LR schedule. Measured on
-# two configs over these 20 levels, x_pos_max separates them by 31% at 1M and 52% at 3M, so the
-# thinner 150k/level budget still ranks. Selection must only ever read training levels —
-# scoring on a held-out tier would be test-set selection.
+# Mario trials use the SAME 20 training levels as the real run. The 4-level smb1_hpo split tuned
+# a homogeneous problem while the run is heterogeneous, and its winner lost to a hand-set LR
+# schedule. Over these 20 levels x_pos_max still separates two configs by 31% at 1M and 52% at
+# 3M, so the thinner per-level budget ranks. Selection may only ever read training levels.
 _ENV_MARIO = {
     "env_id": "SuperMarioBros-v0",
     "env_package": "gym_super_mario_bros",
@@ -93,18 +80,13 @@ ENVS = {"flappybird": _ENV_FLAPPYBIRD, "mario": _ENV_MARIO}
 ENV_ALGO_OVERRIDES = {
     # Only reward-scale and memory facts are fixed per env; every tunable knob is searched, and
     # searched identically in both games. Mario's steady-state discounted value is ~59, so
-    # FlappyBird's v_max=20 would clamp essentially every C51 target, and 51 atoms would be too
-    # coarse for that range -- hence the value-support triple below.
+    # FlappyBird's v_max=20 would clamp every C51 target and 51 atoms would be too coarse. The
+    # buffer matches the hand-written Mario config, so the proxy retention derives from one number.
     ("mario", "rainbow"): {"n_atoms": 101, "v_min": -15.0, "v_max": 100.0,
-                           # 400000, not 300000: matches the hand-written mario_rainbow config, so
-                           # the project has ONE Mario Rainbow buffer size and the 3.3% retention
-                           # that build_trial_config's proxy buffer is derived from stays valid.
                            "replay_memory_size": 400000, "per_beta_frames": 5000000},
     ("mario", "dqn"):     {"replay_memory_size": 300000},
     ("mario", "ppo"):     {"rollout_steps": 4096},
 }
-
-_ENV = _ENV_FLAPPYBIRD  # backwards-compatible alias
 
 PPO_BASE = {
     "algorithm": "ppo",
@@ -166,14 +148,12 @@ def suggest_params(trial, algorithm, env="flappybird"):
         return {
             "learning_rate_a": trial.suggest_float("learning_rate_a", 1e-5, 1e-3, log=True),
             "ppo_epochs":      trial.suggest_categorical("ppo_epochs", [3, 4, 6, 10]),
-            # Floor raised 1e-3 -> 5e-3: the first study drove ent_coef to ~0.001 (entropy
-            # collapse -> unstable full runs). Keep it above the collapse regime.
+            # Floor 5e-3: the first study drove this to ~0.001, collapsing policy entropy.
             "ent_coef":        trial.suggest_float("ent_coef", 5e-3, 5e-2, log=True),
             "clip_eps":        trial.suggest_categorical("clip_eps", [0.1, 0.2, 0.3]),
             "gae_lambda":      trial.suggest_float("gae_lambda", 0.9, 0.99),
             "vf_coef":         trial.suggest_float("vf_coef", 0.3, 1.0),
-            # Floor raised to 4096: small rollouts (1024) give high-variance advantage
-            # estimates -> jittery policy over a long run. Larger rollouts smooth updates.
+            # Floor 4096: 1024-step rollouts give advantage estimates too noisy to rank configs.
             "rollout_steps":   trial.suggest_categorical("rollout_steps", [4096, 8192]),
             "minibatch_size":  trial.suggest_categorical("minibatch_size", [64, 128, 256]),
             "hidden_dim":      trial.suggest_categorical("hidden_dim", [256, 512]),
@@ -187,17 +167,16 @@ def suggest_params(trial, algorithm, env="flappybird"):
             "hidden_dim":        trial.suggest_categorical("hidden_dim", [256, 512]),
         }
     if algorithm == "rainbow":
-        # ONE space for both games. The value support (n_atoms / v_min / v_max) is deliberately
-        # NOT searched: it is a property of the reward scale, not a tunable -- the steady-state
-        # discounted value is ~10 on FlappyBird and ~59 on Mario, so no single categorical can
-        # serve both, and v_max was the least important knob of all eight in the 56-trial
-        # FlappyBird study (fANOVA .008). It is set per game in RAINBOW_BASE /
-        # ENV_ALGO_OVERRIDES instead, which is what makes this space env-independent.
-        # discount_factor_g stays fixed at 0.99 to match PPO, which does not search it either.
+        # ONE space for both games. The value support (n_atoms / v_min / v_max) is a property of
+        # the reward scale, not a tunable: the steady-state discounted value is ~10 on FlappyBird
+        # and ~59 on Mario, so no single categorical serves both, and v_max was the least
+        # important of all eight knobs in the 56-trial FlappyBird study (fANOVA .008). It is set
+        # per game in RAINBOW_BASE / ENV_ALGO_OVERRIDES, which keeps this space env-independent.
+        # discount_factor_g stays at 0.99 to match PPO, which also fixes it.
         return {
-            # Ceiling raised 5e-4 -> 1e-3: replay_period 4 quarters the update rate, so the
-            # optimum shifts up. The best trials at period 1 sat at 1.1-1.4e-4; 4x that is
-            # ~5e-4, i.e. exactly the old ceiling.
+            # Ceiling 1e-3, not 5e-4: replay_period 4 quarters the update rate, shifting the
+            # optimum up. The best trials at period 1 sat at 1.1-1.4e-4, and 4x that is the old
+            # ceiling exactly.
             "learning_rate_a":   trial.suggest_float("learning_rate_a", 1e-5, 1e-3, log=True),
             "per_alpha":         trial.suggest_float("per_alpha", 0.3, 0.7),
             "per_beta_init":     trial.suggest_float("per_beta_init", 0.3, 0.6),
@@ -223,31 +202,20 @@ def build_trial_config(algorithm, params, proxy_steps, env="flappybird"):
     cfg.update(params)
     cfg["max_env_steps"] = proxy_steps
     if algorithm == "ppo":
-        # Anneal LR over the proxy horizon so trials train in the same decaying-LR regime
-        # the exported run will use — params are then selected for annealing, not a fixed LR.
+        # Anneal over the proxy horizon so trials train in the decaying-LR regime the exported
+        # run will use, and params are selected for annealing rather than a fixed LR.
         cfg["lr_anneal_steps"] = proxy_steps
     if algorithm in ("dqn", "rainbow"):
-        # Keep warmup well under Hyperband's first rung (~proxy/9) so trials actually learn
-        # before the first prune decision (the first study pruned everything at ~13k steps).
+        # Warmup must stay well under Hyperband's first rung or trials get pruned before they
+        # learn -- the first study pruned everything at ~13k steps.
         cfg["start_learning_after"] = min(cfg.get("start_learning_after", 20000),
                                           max(1000, proxy_steps // 30))
         if cfg.get("use_per"):
             cfg["per_beta_frames"] = proxy_steps  # anneal beta over the proxy horizon
-        # Scale the replay buffer to the proxy horizon so the FRACTION of experience retained
-        # matches the real run: 300k/20M = 1.5% on Mario, 1M/10M = 10% on FlappyBird. Carrying the
-        # real run's ABSOLUTE size into a proxy puts trials in a different regime (10% resp. 100%
-        # retained -- the old 300k-buffer/300k-proxy setup never evicted at all) and, worse, runs
-        # them in the slow full-buffer regime: measured 44 -> 9 env steps/s once 300k is full,
-        # which would make a 3M Mario trial cost ~93h. The real run's buffer size stays
-        # proxy-blind and is exported unchanged by build_export_config().
-        # Scale the buffer to the proxy so trials retain the SAME FRACTION of their history as the
-        # full run does. With the absolute buffer of the full run, a proxy retains far too much
-        # (Mario 3M/300k = 10%, FlappyBird 1M/1M = 100%) and spends most of its time in the slow
-        # full-buffer regime -- measured 44 -> 9 env steps/s on Mario, which put a 3M trial at ~93h.
-        # Both games happen to land on the same number:
-        #   FlappyBird  1M buffer / 10M steps = 10.0%  ->  1M proxy x 10.0%  = 100k
-        #   Mario      400k buffer / 12M steps =  3.3%  ->  3M proxy x  3.3%  = 100k
-        # The full run's absolute buffer stays unsearched ("proxy-blind"); only trials use this.
+        # Match the FRACTION of history retained, not the absolute size: FlappyBird 1M/10M and
+        # Mario 400k/12M both scale to 100k here. The absolute size would leave a proxy holding
+        # 10-100% of its history and stuck in the slow full-buffer regime (44 -> 9 env steps/s,
+        # ~93 h for a 3M Mario trial). The full run's buffer stays unsearched.
         cfg["replay_memory_size"] = 100_000
     return cfg
 
@@ -292,9 +260,8 @@ def objective(trial, a):
             last_report = [0]
 
             def report_cb(step, metric):
-                # Intermediate reporting + pruning only in single-seed mode (unambiguous curve).
-                # Throttled to REPORT_INTERVAL_STEPS so per-episode DQN/Rainbow calls don't
-                # hammer the shared journal lock.
+                # Single-seed mode only, where the curve is unambiguous. Throttled so
+                # per-episode Rainbow calls do not hammer the shared journal lock.
                 if a.search_seeds != 1:
                     return
                 if step - last_report[0] < REPORT_INTERVAL_STEPS:
@@ -336,8 +303,8 @@ def run_worker(a):
     )
     study = optuna.create_study(
         study_name=a.study, storage=storage,
-        # unseeded: workers diverge. n_startup_trials is pure random sampling, so on a
-        # ~40-trial Mario study the default 10 would waste a quarter of the budget.
+        # Unseeded so workers diverge. n_startup_trials samples purely at random, and the
+        # default 10 would spend a quarter of a ~40-trial Mario study on it.
         sampler=optuna.samplers.TPESampler(multivariate=True,
                                           n_startup_trials=a.startup_trials),
         pruner=pruner, direction="maximize", load_if_exists=True,
@@ -472,17 +439,15 @@ def main():
 
     if a.objective is None:
         # Env-aware so it cannot be forgotten on the command line. FlappyBird needs p25: eval
-        # episodes are effectively unbounded there, so reward is heavy-tailed and one lucky long
-        # episode inflates the mean (a 27x outlier picked the winner in the first study). Mario
-        # needs mean: with 20 levels and mostly-zero flag rates p25 collapses to ~0 for nearly
-        # every config and stops discriminating, and mean had the better SNR (see mario.md).
+        # episodes there are unbounded, so reward is heavy-tailed and a 27x outlier picked the
+        # winner in the first study. Mario needs the mean: across 20 levels with mostly-zero flag
+        # rates, p25 collapses to ~0 for nearly every config and stops discriminating.
         a.objective = "mean" if a.env == "mario" else "p25"
     if a.proxy_steps is None:
-        # One proxy length per game, both algorithms. Mario needs far more steps before any signal
-        # shows (two configs are 7% apart at 500k but 31% at 1M over the 20-level split), and with
-        # trials running on all 20 training levels the per-level budget is what binds: 3M/20 =
-        # 150k per level. Rainbow used to get a shorter proxy for cost reasons; the proxy-scaled
-        # replay buffer in build_trial_config() removes that constraint.
+        # One proxy length per game, both algorithms. Mario needs far more steps before a signal
+        # shows (7% apart at 500k, 31% at 1M), and with trials on all 20 training levels the
+        # per-level budget binds: 3M/20 = 150k each. The proxy-scaled replay buffer is what makes
+        # the longer proxy affordable for Rainbow.
         a.proxy_steps = 3_000_000 if a.env == "mario" else 1_000_000
     if a.eval_episodes is None:
         a.eval_episodes = 300 if a.env == "mario" else 30
@@ -490,11 +455,11 @@ def main():
         a.startup_trials = 5 if a.env == "mario" else 10
     if a.prune_warmup_steps is None:
         # Hyperband only pays off if the FIRST rung is cheap: on FlappyBird a rejected Rainbow
-        # trial cost 0.15h, so 144 of 200 trials were discarded for 34% of the hours. A Mario
-        # rung at proxy//3 costs 8.7h -> 0 of 8 trials pruned, Hyperband inert. Measured
-        # crossovers: PPO's proxy is noise below ~300k and reliable at 400-500k (rho .47/.55/.68
-        # at 300/400/500k, n=28); Rainbow already identifies the weaker half from ~50k (n=4, so
-        # suggestive only, but it is far more sample-efficient: replay + n-step + PER).
+        # trial cost 0.15 h, discarding 144 of 200 trials for 34% of the hours, while a Mario rung
+        # at proxy//3 costs 8.7 h and pruned 0 of 8. Measured crossovers: PPO's proxy is noise
+        # below ~300k and reliable at 400-500k (rho .47/.55/.68, n=28); Rainbow separates the
+        # weaker half from ~50k (n=4, suggestive only, but replay + n-step + PER make it far more
+        # sample-efficient).
         if a.env == "mario" and a.algorithm == "ppo":
             a.prune_warmup_steps = a.proxy_steps // 3      # 1M at the 3M proxy: on the 20-level
             # split two configs are only 7% apart at 500k but 31% apart at 1M, so pruning at 500k

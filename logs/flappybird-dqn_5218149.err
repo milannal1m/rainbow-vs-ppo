@@ -1,8 +1,0 @@
-Traceback (most recent call last):
-  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/agent.py", line 444, in <module>
-    dql = Agent(hyperparams_set=args.hyperparameters)
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/pfs/data6/home/ul/ul_student/ul_lmm50/Neuroinformatik/src/agent.py", line 31, in __init__
-    hyperparams = all_hyperparam_sets[hyperparams_set]
-                  ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
-KeyError: 'flappybird_rainbow7'

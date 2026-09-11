@@ -4,33 +4,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-class DQN(nn.Module):
-    def __init__(self, state_dim, action_dim, hidden_dim=256):
-        super(DQN, self).__init__()
-        self.fc1    = nn.Linear(state_dim, hidden_dim)
-        self.output = nn.Linear(hidden_dim, action_dim)
-
-    def forward(self, x):
-        x = F.relu(self.fc1(x))
-        return self.output(x)
-
-
-class DuelingDQN(nn.Module):
-    def __init__(self, state_dim, action_dim, hidden_dim=256):
-        super(DuelingDQN, self).__init__()
-        self.fc1 = nn.Linear(state_dim, hidden_dim)
-        self.fc_value      = nn.Linear(hidden_dim, hidden_dim)
-        self.value         = nn.Linear(hidden_dim, 1)
-        self.fc_advantages = nn.Linear(hidden_dim, hidden_dim)
-        self.advantages    = nn.Linear(hidden_dim, action_dim)
-
-    def forward(self, x):
-        x = F.relu(self.fc1(x))
-        V = self.value(F.relu(self.fc_value(x)))
-        A = self.advantages(F.relu(self.fc_advantages(x)))
-        return V + A - torch.mean(A, dim=1, keepdim=True)
-
-
 class CNNDQN(nn.Module):
     # Based on https://github.com/yenchenlin/DeepLearningFlappyBird/blob/master/deep_q_network.py
     def __init__(self, in_channels, action_dim, hidden_dim=512, obs_size=80):
@@ -211,8 +184,6 @@ def mean_sigma(model):
 
 
 NETWORK_REGISTRY = {
-    "dqn":             DQN,
-    "dueling_dqn":     DuelingDQN,
     "cnn_dqn":         CNNDQN,
     "rainbow_cnn_dqn": RainbowCNNDQN,
 }

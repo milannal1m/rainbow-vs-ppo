@@ -6,14 +6,26 @@ and the same wall-clock budget; only the algorithm differs. On Mario they train 
 are evaluated on 21 held-out ones, 12 of them from *Super Mario Bros.: The Lost Levels*, to
 measure generalisation rather than memorisation of a single stage.
 
+<table>
+<tr>
+<td align="center"><img src="media/mario_1-1_rainbow.gif" width="360" alt="Rainbow DQN clearing World 1-1"></td>
+<td align="center"><img src="media/flappybird_ppo.gif" width="190" alt="PPO playing Flappy Bird"></td>
+</tr>
+<tr>
+<td align="center"><sub><b>Rainbow DQN</b>, World 1-1, flagpole reached<br><a href="runs/mario_rainbow_tuned/evaluation/mario/videos/level_1-1_end1-1_pages12.mp4">full episode</a></sub></td>
+<td align="center"><sub><b>PPO</b>, 12 s of a 33-minute episode (return 7496.80)<br><a href="runs/flappybird_ppo_tuned/checkpoint_videos/checkpoint_ep5000_r7496.80.mp4">full episode</a></sub></td>
+</tr>
+</table>
+
 ## Layout
 
 ```
-src/            all Python; run everything from the repo root
-scripts/        SLURM batch scripts
-environments/   conda environment files
-hyperparams.yml the four reported configurations
-runs/           training artifacts, evaluations, figures
+src/             all Python; run everything from the repo root
+scripts/         SLURM batch scripts
+environments/    conda environment files
+media/           the two clips above
+hyperparams.yml  the four reported configurations
+runs/            training artifacts, evaluations, figures
 ```
 
 | Module | Purpose |
@@ -248,7 +260,8 @@ once at the wall clock, so a resumed run continues with a full buffer instead of
 
 ## Watching the agents
 
-The clips are committed, so you can just open them.
+The clips are committed, so you can just open them. The two at the top of this file come from
+the directories below — they are not separate recordings.
 
 `runs/<config>/checkpoint_videos/` shows training progress: one greedy episode saved every so
 often, named `checkpoint_ep<episode>_r<reward>.mp4`. Sorted by episode you can watch the policy
